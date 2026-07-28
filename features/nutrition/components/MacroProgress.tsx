@@ -1,0 +1,50 @@
+"use client";
+
+import { useNutritionStore } from "@/stores/nutrition.store";
+import { MOCK_MACRO_GOALS, MOCK_MEALS } from "../constants";
+
+export function MacroProgress() {
+  const storeMeals = useNutritionStore((state) => state.meals);
+  const meals = storeMeals && storeMeals.length > 0 ? storeMeals : MOCK_MEALS as any[];
+
+  const consumedProtein = meals.reduce((acc, m) => acc + m.protein, 0);
+  const consumedCarbs = meals.reduce((acc, m) => acc + m.carbs, 0);
+  const consumedFat = meals.reduce((acc, m) => acc + m.fat, 0);
+
+  const macros = [
+    { label: "Protein", current: consumedProtein, target: MOCK_MACRO_GOALS.protein, color: "bg-red-500", text: "text-red-400" },
+    { label: "Carbs", current: consumedCarbs, target: MOCK_MACRO_GOALS.carbs, color: "bg-amber-500", text: "text-amber-400" },
+    { label: "Fat", current: consumedFat, target: MOCK_MACRO_GOALS.fat, color: "bg-yellow-500", text: "text-yellow-400" },
+  ];
+
+  return (
+    <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8">
+      <h2 className="text-xl font-bold text-white mb-6">Macronutrients</h2>
+      
+      <div className="space-y-6">
+        {macros.map((macro, i) => {
+          const percentage = Math.min(100, Math.round((macro.current / macro.target) * 100));
+          
+          return (
+            <div key={i}>
+              <div className="flex justify-between text-sm mb-2">
+                <span className={`font-bold uppercase tracking-wider text-xs ${macro.text}`}>
+                  {macro.label}
+                </span>
+                <span className="text-zinc-400 font-mono">
+                  <span className="text-white">{macro.current}g</span> / {macro.target}g
+                </span>
+              </div>
+              <div className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden border border-zinc-800">
+                <div 
+                  className={`h-full rounded-full transition-all duration-1000 ${macro.color}`}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
