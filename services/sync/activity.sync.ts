@@ -31,11 +31,4 @@ export const ActivitySync = {
     }
   },
 
-  async addSteps(userId: string, steps: number) {
-    // Optimistic update
-    const currentSteps = useActivityStore.getState().dailySteps;
-    useActivityStore.getState().setDailySteps(currentSteps + steps);
-    
-    // Logic to create/update activity in Firestore would go here
-  }
 };

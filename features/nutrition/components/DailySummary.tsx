@@ -5,15 +5,15 @@ import { MOCK_MACRO_GOALS, MOCK_MEALS } from "../constants";
 import { Flame, Beef, Wheat, Droplet } from "lucide-react";
 
 export function DailySummary() {
-  const storeMeals = useNutritionStore((state) => state.meals);
-  // Fallback to MOCK_MEALS if store is empty
-  const meals = storeMeals && storeMeals.length > 0 ? storeMeals : MOCK_MEALS as any[];
+  const meals = useNutritionStore((state) => state.meals);
 
-  const consumedCalories = meals.reduce((acc, m) => acc + m.calories, 0);
-  const remainingCalories = Math.max(0, MOCK_MACRO_GOALS.calories - consumedCalories);
-  const consumedProtein = meals.reduce((acc, m) => acc + m.protein, 0);
-  const consumedCarbs = meals.reduce((acc, m) => acc + m.carbs, 0);
-  const consumedFat = meals.reduce((acc, m) => acc + m.fat, 0);
+  const targetCalories = 2200;
+
+  const consumedCalories = meals.reduce((acc, m) => acc + (m.calories || 0), 0);
+  const remainingCalories = Math.max(0, targetCalories - consumedCalories);
+  const consumedProtein = meals.reduce((acc, m) => acc + (m.protein || 0), 0);
+  const consumedCarbs = meals.reduce((acc, m) => acc + (m.carbs || 0), 0);
+  const consumedFat = meals.reduce((acc, m) => acc + (m.fat || 0), 0);
 
   const stats = [
     { label: "Consumed", value: consumedCalories, unit: "kcal", icon: Flame, color: "text-orange-400", bg: "bg-orange-400/10" },

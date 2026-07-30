@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { Medal, Flame, Footprints, Activity, Dumbbell, Leaf, Droplets } from "lucide-react";
 import { MOCK_RECORDS } from "../constants";
-
+import { useActivityStore } from "@/stores/activity.store";
+import { useNutritionStore } from "@/stores/nutrition.store";
 const getIcon = (name: string) => {
   switch(name) {
     case "flame": return <Flame size={16} className="text-rose-400" />;
@@ -17,7 +18,24 @@ const getIcon = (name: string) => {
 }
 
 export function PersonalRecords() {
-  const records = MOCK_RECORDS;
+  const { activities, dailySteps } = useActivityStore();
+  const { dailyCalories } = useNutritionStore();
+
+  let records = MOCK_RECORDS;
+
+  if (activities.length > 0) {
+    const maxMinutes = Math.max(...activities.map(a => a.durationMinutes || 0), 0);
+    const maxCals = Math.max(...activities.map(a => a.caloriesBurned || 0), 0);
+
+    records = [
+      { id: "r1", title: "Longest Streak", value: 1, unit: "days", date: new Date().toISOString().split("T")[0], icon: "flame" },
+      { id: "r2", title: "Highest Daily Steps", value: dailySteps || 0, date: new Date().toISOString().split("T")[0], icon: "footprints" },
+      { id: "r3", title: "Highest Calories Burned", value: maxCals, unit: "kcal", date: new Date().toISOString().split("T")[0], icon: "activity" },
+      { id: "r4", title: "Longest Workout", value: maxMinutes, unit: "min", date: new Date().toISOString().split("T")[0], icon: "dumbbell" },
+      { id: "r5", title: "Nutrition Consistency", value: 1, unit: "days", date: new Date().toISOString().split("T")[0], icon: "leaf" },
+      { id: "r6", title: "Hydration Streak", value: 1, unit: "days", date: new Date().toISOString().split("T")[0], icon: "droplets" },
+    ];
+  }
 
   return (
     <motion.div 

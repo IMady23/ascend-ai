@@ -26,19 +26,19 @@ export function ChapterCard() {
             {title}
           </span>
           <span className="text-sm font-bold font-mono text-primary">
-            {percentageComplete}%
+            {currentChapter ? `${percentageComplete}%` : '---'}
           </span>
         </div>
         <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${percentageComplete}%` }}
+            style={{ width: currentChapter ? `${percentageComplete}%` : '0%' }}
           />
         </div>
       </div>
 
       <button className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:bg-primary/5 py-2.5 rounded-xl border border-primary/20 transition-colors">
-        View Transformation <ArrowRight size={16} />
+        {currentChapter ? "View Transformation" : "Start Journey"} <ArrowRight size={16} />
       </button>
     </div>
   );

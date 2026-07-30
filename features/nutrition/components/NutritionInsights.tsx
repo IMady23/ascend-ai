@@ -1,50 +1,32 @@
 "use client";
 
-import { MOCK_INSIGHTS } from "../constants";
+import { useNutritionStore } from "@/stores/nutrition.store";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 
 export function NutritionInsights() {
+  const meals = useNutritionStore((state) => state.meals);
+
   return (
     <section>
       <h2 className="text-xl font-bold text-white mb-6 px-1">AI Insights</h2>
       <div className="space-y-4">
-        {MOCK_INSIGHTS.map((insight) => {
-          const isWarning = insight.type === "warning";
-          const isSuccess = insight.type === "success";
-          
-          return (
-            <div 
-              key={insight.id} 
-              className={`p-5 rounded-2xl border flex gap-4 ${
-                isWarning ? "bg-amber-950/20 border-amber-900/50" :
-                isSuccess ? "bg-emerald-950/20 border-emerald-900/50" :
-                "bg-blue-950/20 border-blue-900/50"
-              }`}
-            >
-              <div className={`mt-1 ${
-                isWarning ? "text-amber-500" :
-                isSuccess ? "text-emerald-500" :
-                "text-blue-500"
-              }`}>
-                {isWarning && <AlertCircle size={20} />}
-                {isSuccess && <CheckCircle2 size={20} />}
-                {!isWarning && !isSuccess && <Info size={20} />}
-              </div>
-              <div>
-                <h3 className={`font-bold text-sm mb-1 ${
-                  isWarning ? "text-amber-400" :
-                  isSuccess ? "text-emerald-400" :
-                  "text-blue-400"
-                }`}>
-                  {insight.title}
-                </h3>
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  {insight.message}
-                </p>
-              </div>
+        {meals.length === 0 ? (
+          <div className="p-5 rounded-2xl border bg-zinc-950/20 border-zinc-900/50 flex gap-4 text-zinc-500">
+            <Info size={20} />
+            <div>
+              <h3 className="font-bold text-sm mb-1 text-zinc-400">Waiting for data</h3>
+              <p className="text-sm">Log your meals today to receive AI-powered nutritional insights and optimization strategies.</p>
             </div>
-          );
-        })}
+          </div>
+        ) : (
+          <div className="p-5 rounded-2xl border bg-emerald-950/20 border-emerald-900/50 flex gap-4 text-emerald-500">
+            <CheckCircle2 size={20} />
+            <div>
+              <h3 className="font-bold text-sm mb-1 text-emerald-400">On Track</h3>
+              <p className="text-sm text-zinc-300 leading-relaxed">You are actively tracking your nutrition today. Keep going!</p>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

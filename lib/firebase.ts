@@ -13,9 +13,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase using singleton pattern
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
-const firestore = getFirestore(app);
+const db = getFirestore(app);
+const firestore = db; // Keep for backward compatibility with repositories
 const storage = getStorage(app);
 
-export { app, auth, firestore, storage };
+export { app, auth, db, firestore, storage };

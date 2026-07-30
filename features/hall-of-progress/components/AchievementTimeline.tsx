@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Flag, Dumbbell, Flame, BookOpen, Trophy, Medal } from "lucide-react";
 import { MOCK_TIMELINE } from "../constants";
 import type { TimelineEvent } from "../types";
+import { useActivityStore } from "@/stores/activity.store";
 
 const getEventIcon = (type: TimelineEvent["type"]) => {
   switch (type) {
@@ -30,7 +31,36 @@ const getEventColor = (type: TimelineEvent["type"]) => {
 };
 
 export function AchievementTimeline() {
-  const events = MOCK_TIMELINE;
+  const { activities } = useActivityStore();
+  
+  // Derive timeline events from live data
+  const events: TimelineEvent[] = [];
+  
+  if (activities.length > 0) {
+    // Just map activities as workouts for now to demonstrate live data
+    // In a real app we'd map milestones, chapter completions, etc.
+    activities.forEach((activity, idx) => {
+      // Only show up to 5 recent workouts to avoid clutter
+      if (idx < 5) {
+        events.push({
+          id: activity.id,
+          date: new Date(activity.createdAt?.toMillis ? activity.createdAt.toMillis() : Date.now()).toISOString().split("T")[0],
+          title: "Workout Completed",
+          description: `Completed a ${activity.durationMinutes} minute session.`,
+          type: "workout"
+        });
+      }
+    });
+    
+    // Add start event
+    events.push({
+      id: "start-event",
+      date: new Date(Date.now() - 86400000).toISOString().split("T")[0], // Mock yesterday
+      title: "Journey Started",
+      description: "Committed to the Ascend AI protocol.",
+      type: "start"
+    });
+  }
 
   return (
     <motion.div 

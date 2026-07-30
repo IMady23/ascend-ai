@@ -35,6 +35,19 @@ export const AiRepository = {
     );
   },
 
+  subscribeToMessages(userId: string, conversationId: string, onUpdate: (messages: AiMessage[]) => void, onError: (error: Error) => void): () => void {
+    const q = query(this.getMessagesRef(userId, conversationId), orderBy("timestamp", "asc"));
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        onUpdate(snapshot.docs.map((doc) => doc.data()));
+      },
+      (error) => {
+        onError(error);
+      }
+    );
+  },
+
   async getConversation(userId: string, conversationId: string): Promise<AiConversation | null> {
     try {
       const docRef = doc(this.getConversationsRef(userId), conversationId);
@@ -51,6 +64,15 @@ export const AiRepository = {
       await setDoc(docRef, conversation);
     } catch (error) {
       handleFirestoreError(error, `creating AI conversation ${conversation.id} for user ${userId}`);
+    }
+  },
+
+  async updateConversation(userId: string, conversationId: string, updates: Partial<AiConversation>): Promise<void> {
+    try {
+      const docRef = doc(this.getConversationsRef(userId), conversationId);
+      await updateDoc(docRef, updates);
+    } catch (error) {
+      handleFirestoreError(error, `updating AI conversation ${conversationId} for user ${userId}`);
     }
   },
 

@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import { generateMockCalendar } from "../constants";
+import { useActivityStore } from "@/stores/activity.store";
+import type { CalendarDay } from "../types";
 
 const getColor = (intensity: number) => {
   switch (intensity) {
@@ -15,7 +17,37 @@ const getColor = (intensity: number) => {
 };
 
 export function JourneyCalendar() {
-  const days = generateMockCalendar();
+  const { activities } = useActivityStore();
+  
+  let days: CalendarDay[] = [];
+  
+  if (activities.length > 0) {
+    // Generate empty 90 days
+    const today = new Date();
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      
+      // Find activity for this day
+      const activity = activities.find(a => {
+        const aDate = new Date(a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now());
+        return aDate.toISOString().split("T")[0] === dateStr;
+      });
+      
+      let intensity: 0 | 1 | 2 | 3 | 4 = 0;
+      if (activity) {
+        if (activity.durationMinutes > 60) intensity = 4;
+        else if (activity.durationMinutes > 45) intensity = 3;
+        else if (activity.durationMinutes > 30) intensity = 2;
+        else intensity = 1;
+      }
+      
+      days.push({ date: dateStr, intensity });
+    }
+  } else {
+    days = generateMockCalendar();
+  }
 
   // Group into weeks for layout (assuming last day is today, layout grid column-wise)
   // GitHub style layout: 7 rows (days of week), columns are weeks.

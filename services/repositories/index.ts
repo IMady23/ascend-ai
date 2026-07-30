@@ -7,3 +7,4 @@ export * from "./nutrition.repository";
 export * from "./journal.repository";
 export * from "./ai.repository";
 export * from "./notification.repository";
+export * from "./conversation.repository";

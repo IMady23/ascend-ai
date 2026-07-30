@@ -4,8 +4,9 @@ import { Bot, ArrowRight } from "lucide-react";
 import { useAiStore } from "@/stores/ai.store";
 
 export function AICard() {
-  const { currentConversation } = useAiStore();
-  const message = currentConversation?.summary || "Ready to crush today's goals?";
+  const { activeConversationId, conversations } = useAiStore();
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
+  const message = activeConversation?.lastMessage || "Ready to crush today's goals?";
   return (
     <div className="bg-primary border border-primary/20 rounded-2xl p-6 shadow-md relative overflow-hidden">
       {/* Decorative gradient blob */}

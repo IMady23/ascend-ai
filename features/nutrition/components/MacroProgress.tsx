@@ -4,17 +4,20 @@ import { useNutritionStore } from "@/stores/nutrition.store";
 import { MOCK_MACRO_GOALS, MOCK_MEALS } from "../constants";
 
 export function MacroProgress() {
-  const storeMeals = useNutritionStore((state) => state.meals);
-  const meals = storeMeals && storeMeals.length > 0 ? storeMeals : MOCK_MEALS as any[];
+  const meals = useNutritionStore((state) => state.meals);
 
-  const consumedProtein = meals.reduce((acc, m) => acc + m.protein, 0);
-  const consumedCarbs = meals.reduce((acc, m) => acc + m.carbs, 0);
-  const consumedFat = meals.reduce((acc, m) => acc + m.fat, 0);
+  const consumedProtein = meals.reduce((acc, m) => acc + (m.protein || 0), 0);
+  const consumedCarbs = meals.reduce((acc, m) => acc + (m.carbs || 0), 0);
+  const consumedFat = meals.reduce((acc, m) => acc + (m.fat || 0), 0);
+
+  const targetProtein = 150;
+  const targetCarbs = 200;
+  const targetFat = 70;
 
   const macros = [
-    { label: "Protein", current: consumedProtein, target: MOCK_MACRO_GOALS.protein, color: "bg-red-500", text: "text-red-400" },
-    { label: "Carbs", current: consumedCarbs, target: MOCK_MACRO_GOALS.carbs, color: "bg-amber-500", text: "text-amber-400" },
-    { label: "Fat", current: consumedFat, target: MOCK_MACRO_GOALS.fat, color: "bg-yellow-500", text: "text-yellow-400" },
+    { label: "Protein", current: consumedProtein, target: targetProtein, color: "bg-red-500", text: "text-red-400" },
+    { label: "Carbs", current: consumedCarbs, target: targetCarbs, color: "bg-amber-500", text: "text-amber-400" },
+    { label: "Fat", current: consumedFat, target: targetFat, color: "bg-yellow-500", text: "text-yellow-400" },
   ];
 
   return (

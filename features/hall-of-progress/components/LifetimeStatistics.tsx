@@ -2,20 +2,28 @@
 
 import { motion } from "framer-motion";
 import { Activity, Dumbbell, Footprints, Flame, Leaf, Droplets, MapPin, Hash } from "lucide-react";
-import { MOCK_LIFETIME_STATS } from "../constants";
-
+import { useActivityStore } from "@/stores/activity.store";
+import { useNutritionStore } from "@/stores/nutrition.store";
 export function LifetimeStatistics() {
-  const stats = MOCK_LIFETIME_STATS;
+  const { activities, dailySteps } = useActivityStore();
+  const { dailyCalories, dailyProtein, dailyWaterMl } = useNutritionStore();
+
+  const totalWorkouts = activities.length;
+  const totalMinutes = activities.reduce((sum, a) => sum + (a.durationMinutes || 0), 0);
+  const totalSteps = dailySteps || 0; // Ideally from historical
+  const totalCalories = dailyCalories || 0;
+  const totalWaterLiters = (dailyWaterMl || 0) / 1000;
+  const totalProteinKg = (dailyProtein || 0) / 1000;
 
   const data = [
-    { label: "Total Workouts", value: stats.totalWorkouts, icon: Dumbbell, color: "text-purple-400" },
-    { label: "Minutes Trained", value: stats.totalMinutes, icon: Activity, color: "text-indigo-400" },
-    { label: "Total Steps", value: `${(stats.totalSteps / 1000).toFixed(1)}k`, icon: Footprints, color: "text-emerald-400" },
-    { label: "Distance", value: `${stats.totalDistanceKm}km`, icon: MapPin, color: "text-amber-400" },
-    { label: "Calories Burned", value: `${(stats.totalCalories / 1000).toFixed(1)}k`, icon: Flame, color: "text-rose-400" },
-    { label: "Water Consumed", value: `${stats.totalWaterLiters}L`, icon: Droplets, color: "text-cyan-400" },
-    { label: "Protein Consumed", value: `${stats.totalProteinKg}kg`, icon: Leaf, color: "text-emerald-400" },
-    { label: "Days Active", value: stats.daysActive, icon: Hash, color: "text-zinc-400" },
+    { label: "Total Workouts", value: totalWorkouts, icon: Dumbbell, color: "text-purple-400" },
+    { label: "Minutes Trained", value: totalMinutes, icon: Activity, color: "text-indigo-400" },
+    { label: "Total Steps", value: `${(totalSteps / 1000).toFixed(1)}k`, icon: Footprints, color: "text-emerald-400" },
+    { label: "Distance", value: "0km", icon: MapPin, color: "text-amber-400" },
+    { label: "Calories Burned", value: `${(totalCalories / 1000).toFixed(1)}k`, icon: Flame, color: "text-rose-400" },
+    { label: "Water Consumed", value: `${totalWaterLiters.toFixed(1)}L`, icon: Droplets, color: "text-cyan-400" },
+    { label: "Protein Consumed", value: `${totalProteinKg.toFixed(2)}kg`, icon: Leaf, color: "text-emerald-400" },
+    { label: "Days Active", value: totalWorkouts > 0 ? 1 : 0, icon: Hash, color: "text-zinc-400" },
   ];
 
   return (

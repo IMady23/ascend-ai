@@ -1,9 +1,25 @@
 import { Timestamp, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, DocumentData } from "firebase/firestore";
 
+export interface AiStructuredResponse {
+  summary: string;
+  recommendations: string[];
+  warnings: string[];
+  encouragement: string;
+  followUpQuestion?: string;
+  confidence: number;
+  widgets?: any[];
+  tool_calls?: any[];
+}
+
 export interface AiMessage {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
+  structuredContent?: AiStructuredResponse;
+  contextSnapshot?: any;
+  provider?: string;
+  model?: string;
+  responseTime?: number;
   timestamp: Timestamp;
 }
 

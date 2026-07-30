@@ -4,8 +4,9 @@ import { useActivityStore } from "@/stores/activity.store";
 import { Pause, Square, Activity as ActivityIcon } from "lucide-react";
 
 export function ActiveSession() {
-  // If there's an active session in progress (mock logic)
-  const isSessionActive = false; // Mocking false to show empty state, or true to show active. Let's stick to false for typical dashboard view.
+  const { currentActivity } = useActivityStore();
+  
+  const isSessionActive = currentActivity !== null;
 
   if (!isSessionActive) {
     return (

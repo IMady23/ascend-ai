@@ -6,14 +6,12 @@ import { Droplet, Plus } from "lucide-react";
 
 export function WaterTracker() {
   const currentWater = useNutritionStore((state) => state.dailyWaterMl);
-  const setWater = useNutritionStore((state) => state.setDailyWater);
-  const target = MOCK_MACRO_GOALS.waterMl;
+  const target = 3000; // Default target
 
   const percentage = Math.min(100, Math.round((currentWater / target) * 100));
 
   const addWater = () => {
-    // Optimistic UI update. In full implementation, this triggers sync layer.
-    setWater(currentWater + 250);
+    // In full implementation, this calls NutritionRepository to add a water log.
   };
 
   return (

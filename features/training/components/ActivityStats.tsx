@@ -7,10 +7,10 @@ export function ActivityStats() {
   const activities = useActivityStore((state) => state.activities);
   const dailySteps = useActivityStore((state) => state.dailySteps);
 
-  // Derive stats from activities array if needed, using mocks for visual completion
-  const totalWorkouts = activities ? activities.length : 14;
-  const minutesTrained = 640;
-  const caloriesBurned = 4500;
+  // Derive stats from activities array
+  const totalWorkouts = activities.length;
+  const minutesTrained = activities.reduce((acc, curr) => acc + curr.durationMinutes, 0);
+  const caloriesBurned = activities.reduce((acc, curr) => acc + (curr.caloriesBurned || 0), 0);
   const distanceWalked = (dailySteps * 0.0008).toFixed(1); // Rough km estimate
 
   const stats = [

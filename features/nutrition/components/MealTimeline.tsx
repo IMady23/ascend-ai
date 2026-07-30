@@ -5,8 +5,7 @@ import { MOCK_MEALS } from "../constants";
 import { Clock } from "lucide-react";
 
 export function MealTimeline() {
-  const storeMeals = useNutritionStore((state) => state.meals);
-  const meals = storeMeals && storeMeals.length > 0 ? storeMeals : MOCK_MEALS as any[];
+  const meals = useNutritionStore((state) => state.meals);
 
   return (
     <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">

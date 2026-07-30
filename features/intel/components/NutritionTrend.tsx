@@ -6,11 +6,13 @@ import { MOCK_NUTRITION_TREND } from "../constants";
 
 export function NutritionTrend() {
   const { dailyCalories, dailyProtein, dailyWaterMl } = useNutritionStore();
-  const data = MOCK_NUTRITION_TREND;
 
-  const calories = dailyCalories || data.avgCalories;
-  const protein = dailyProtein || data.avgProtein;
-  const water = dailyWaterMl || data.avgWater;
+  const calories = dailyCalories || 0;
+  const protein = dailyProtein || 0;
+  const water = dailyWaterMl || 0;
+
+  // Placeholder consistency score until full logic is implemented
+  const consistencyScore = 100;
 
   const metrics = [
     { label: "Calories", value: calories, unit: "kcal", target: 2000 },
@@ -54,7 +56,7 @@ export function NutritionTrend() {
            <Target size={14} />
            <span className="text-xs font-semibold uppercase tracking-wider">Macro Adherence</span>
          </div>
-         <span className="text-lg font-bold text-emerald-400 font-mono">{data.consistencyScore}%</span>
+         <span className="text-lg font-bold text-emerald-400 font-mono">{consistencyScore}%</span>
       </div>
     </div>
   );

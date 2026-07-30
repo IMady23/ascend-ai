@@ -27,19 +27,4 @@ export const MissionSync = {
     }
   },
 
-  async toggleMission(userId: string, missionId: string) {
-    try {
-      // Optimistic update
-      useMissionStore.getState().toggleMission(missionId);
-      
-      const mission = useMissionStore.getState().missions.find(m => m.id === missionId);
-      if (mission) {
-        await MissionRepository.updateMission(userId, missionId, { completed: mission.completed });
-      }
-    } catch (error) {
-      console.error("Failed to toggle mission:", error);
-      // Rollback optimistic update
-      useMissionStore.getState().toggleMission(missionId);
-    }
-  }
 };

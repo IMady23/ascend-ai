@@ -1,60 +1,166 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  
-  /* Ascend Design Language (ADL) Color Tokens */
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-
+  /* Fonts */
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+
+  /* Radius System */
+  --radius-tiny: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* Spacing System */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Blur System */
+  --blur-sm: 4px;
+  --blur-md: 8px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+
+  /* Shadow System */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.5);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.6);
+  --shadow-hero: 0 30px 60px rgba(0,0,0,0.8);
+}
+
+:root[data-theme="dark"], :root {
+  color-scheme: dark;
+  
+  /* Core Base Colors */
+  --color-bg-base: #0E1117;
+  --color-bg-surface: #1D222B;
+  --color-bg-glass-standard: rgba(255, 255, 255, 0.05);
+  --color-bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-glass-active: rgba(255, 255, 255, 0.12);
+  
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #52525B;
+
+  /* Feedback Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Module Accents */
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-orange: #F97316;
+  --color-accent-green: #10B981;
+  --color-accent-indigo: #6366F1;
+  --color-accent-cyan: #06B6D4;
+  --color-accent-gold: #EAB308;
+  --color-accent-slate: #64748B;
+  
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  
+  /* Premium Light Theme */
+  --color-bg-base: #F6F7FB;
+  --color-bg-surface: #EEF2F7;
+  --color-bg-glass-standard: rgba(255, 255, 255, 0.75);
+  --color-bg-glass-hover: rgba(255, 255, 255, 0.85);
+  --color-bg-glass-active: rgba(255, 255, 255, 0.95);
+  
+  --color-text-primary: #1B1F27;
+  --color-text-secondary: #5B6472;
+  --color-text-muted: #94A3B8;
+
+  /* Keep acccents identical */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-orange: #F97316;
+  --color-accent-green: #10B981;
+  --color-accent-indigo: #6366F1;
+  --color-accent-cyan: #06B6D4;
+  --color-accent-gold: #EAB308;
+  --color-accent-slate: #64748B;
+  
+  --color-glass-border: #D8DEE9;
+  
+  /* Overwrite Shadows to be softer for light mode */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+  --shadow-hero: 0 30px 60px rgba(0,0,0,0.12);
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-
-  /* ADL Base Colors */
-  --primary: #0F62FE;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f4;
-  --secondary-foreground: #171717;
-  --accent: #e5e5e5;
-  --accent-foreground: #171717;
-  --muted: #8d8d8d;
-  --muted-foreground: #171717;
-  --border: #e5e5e5;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-
-    /* ADL Base Colors - Dark Mode */
-    --primary: #4589ff;
-    --primary-foreground: #ffffff;
-    --secondary: #262626;
-    --secondary-foreground: #ededed;
-    --accent: #393939;
-    --accent-foreground: #ededed;
-    --muted: #a8a8a8;
-    --muted-foreground: #ededed;
-    --border: #393939;
-  }
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans), sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Tabular numbers for all data rendering by default */
+  font-variant-numeric: tabular-nums;
+  /* Ensure background doesn't overflow strangely */
+  overflow-x: hidden;
+  background-attachment: fixed;
+  transition: background-color 250ms ease-in-out, color 250ms ease-in-out;
+}
+
+* {
+  transition: background-color 250ms ease-in-out, border-color 250ms ease-in-out, color 250ms ease-in-out, box-shadow 250ms ease-in-out;
+}
+
+/* Glass Inner Highlight Utility (Tailwind v4 custom utility) */
+@utility glass-highlight {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-premium {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px rgba(255, 255, 255, 0.05) !important;
+  border-radius: 24px !important;
+}
+
+.hall-wall {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 80px rgba(37, 99, 255, 0.08);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

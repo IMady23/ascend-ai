@@ -1,11 +1,28 @@
 "use client";
 
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { PageMotion } from "@/utils/motion";
+import { cn } from "@/utils/cn";
 
-export function PageContainer({ children }: { children: ReactNode }) {
+interface PageContainerProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function PageContainer({ children, className }: PageContainerProps) {
   return (
-    <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
+    <motion.div
+      variants={PageMotion.routeTransition}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className={cn(
+        "w-full px-6 py-8 md:px-12 md:py-12",
+        className
+      )}
+    >
       {children}
-    </main>
+    </motion.div>
   );
 }

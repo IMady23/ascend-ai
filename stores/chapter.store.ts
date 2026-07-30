@@ -12,14 +12,8 @@ interface ChapterState {
 
 export const useChapterStore = create<ChapterState>((set) => ({
   chapters: [],
-  currentChapter: {
-    id: "chapter-1",
-    title: "The Awakening",
-    status: "in-progress",
-    startedAt: null as any,
-    completedAt: null as any,
-  } as any,
-  activeMilestones: ["milestone-1", "milestone-2"],
+  currentChapter: null,
+  activeMilestones: [],
   setChapters: (chapters) => set({ chapters }),
   setCurrentChapter: (chapter) => set({ currentChapter: chapter }),
   setActiveMilestones: (milestones) => set({ activeMilestones: milestones }),

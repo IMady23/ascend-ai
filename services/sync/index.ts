@@ -6,4 +6,5 @@ export * from "./nutrition.sync";
 export * from "./journal.sync";
 export * from "./notification.sync";
 export * from "./ai.sync";
+export * from "./conversation.sync";
 export * from "./sync-manager";

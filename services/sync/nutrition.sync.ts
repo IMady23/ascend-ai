@@ -1,45 +1,54 @@
 import { NutritionRepository } from "@/services/repositories";
 import { useNutritionStore } from "@/stores/nutrition.store";
-import { NutritionLog } from "@/types/nutrition";
 
-let unsubscribe: (() => void) | null = null;
+let unsubscribeMeals: (() => void) | null = null;
+let unsubscribeHydration: (() => void) | null = null;
+let unsubscribePlans: (() => void) | null = null;
 
 export const NutritionSync = {
   subscribe(userId: string) {
-    if (unsubscribe) {
-      unsubscribe();
-    }
+    this.dispose();
 
-    unsubscribe = NutritionRepository.subscribeToNutritionLogs(
+    // 1. Meals
+    unsubscribeMeals = NutritionRepository.subscribeToNutritionLogs(
       userId,
-      (logs: NutritionLog[]) => {
-        // Aggregate daily nutrition from logs
-        let calories = 0;
-        let protein = 0;
-        logs.forEach(log => {
-          calories += log.calories;
-          protein += log.protein;
-        });
-        
-        useNutritionStore.getState().setDailyNutrition(calories, protein);
+      (logs) => {
+        useNutritionStore.getState().setMeals(logs);
       },
-      (error) => {
-        console.error("Failed to sync nutrition logs:", error);
-      }
+      (error) => console.error("Failed to sync nutrition logs:", error)
+    );
+
+    // 2. Hydration
+    unsubscribeHydration = NutritionRepository.subscribeToHydrationLogs(
+      userId,
+      (logs) => {
+        useNutritionStore.getState().setHydrationLogs(logs);
+      },
+      (error) => console.error("Failed to sync hydration logs:", error)
+    );
+
+    // 3. Meal Plans
+    unsubscribePlans = NutritionRepository.subscribeToMealPlans(
+      userId,
+      (plans) => {
+        useNutritionStore.getState().setMealPlans(plans);
+      },
+      (error) => console.error("Failed to sync meal plans:", error)
     );
   },
 
   dispose() {
-    if (unsubscribe) {
-      unsubscribe();
-      unsubscribe = null;
+    if (unsubscribeMeals) {
+      unsubscribeMeals();
+      unsubscribeMeals = null;
     }
-  },
-
-  async addWater(userId: string, amountMl: number) {
-    const currentWater = useNutritionStore.getState().dailyWaterMl;
-    useNutritionStore.getState().setDailyWater(currentWater + amountMl);
-    
-    // Logic to create water log in Firestore would go here
+    if (unsubscribeHydration) {
+      unsubscribeHydration();
+      unsubscribeHydration = null;
+    }
+    if (unsubscribePlans) {
+      unsubscribePlans();
+      unsubscribePlans = null;
+    }
   }
 };

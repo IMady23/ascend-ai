@@ -1,6 +1,6 @@
 import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "firebase/firestore";
 import { firestore } from "@/lib/firebase";
-import { NutritionLog, nutritionLogConverter } from "@/types/nutrition";
+import { NutritionLog, HydrationLog, MealPlan, nutritionLogConverter, hydrationLogConverter, mealPlanConverter } from "@/types/nutrition";
 import { handleFirestoreError } from "./error-handler";
 
 export const NutritionRepository = {
@@ -57,4 +57,85 @@ export const NutritionRepository = {
       handleFirestoreError(error, `deleting nutrition log ${logId} for user ${userId}`);
     }
   },
+
+  // Hydration
+  getHydrationCollectionRef(userId: string) {
+    return collection(firestore, `users/${userId}/hydration_logs`).withConverter(hydrationLogConverter);
+  },
+
+  async logWater(userId: string, log: HydrationLog): Promise<void> {
+    try {
+      const docRef = doc(this.getHydrationCollectionRef(userId), log.id);
+      await setDoc(docRef, log);
+    } catch (error) {
+      handleFirestoreError(error, `creating hydration log ${log.id} for user ${userId}`);
+    }
+  },
+
+  async getHydrationLogs(userId: string): Promise<HydrationLog[]> {
+    try {
+      const q = query(this.getHydrationCollectionRef(userId), orderBy("date", "desc"));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => doc.data());
+    } catch (error) {
+      handleFirestoreError(error, `fetching hydration logs for user ${userId}`);
+      return [];
+    }
+  },
+
+  subscribeToHydrationLogs(userId: string, onUpdate: (logs: HydrationLog[]) => void, onError: (error: Error) => void): () => void {
+    const q = query(this.getHydrationCollectionRef(userId), orderBy("date", "desc"));
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        onUpdate(snapshot.docs.map((doc) => doc.data()));
+      },
+      (error) => onError(error)
+    );
+  },
+
+  // Meal Plans
+  getMealPlanCollectionRef(userId: string) {
+    return collection(firestore, `users/${userId}/meal_plans`).withConverter(mealPlanConverter);
+  },
+
+  async getMealPlans(userId: string): Promise<MealPlan[]> {
+    try {
+      const q = query(this.getMealPlanCollectionRef(userId), orderBy("updatedAt", "desc"));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => doc.data());
+    } catch (error) {
+      handleFirestoreError(error, `fetching meal plans for user ${userId}`);
+      return [];
+    }
+  },
+
+  subscribeToMealPlans(userId: string, onUpdate: (plans: MealPlan[]) => void, onError: (error: Error) => void): () => void {
+    const q = query(this.getMealPlanCollectionRef(userId), orderBy("updatedAt", "desc"));
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        onUpdate(snapshot.docs.map((doc) => doc.data()));
+      },
+      (error) => onError(error)
+    );
+  },
+
+  async saveMealPlan(userId: string, plan: MealPlan): Promise<void> {
+    try {
+      const docRef = doc(this.getMealPlanCollectionRef(userId), plan.id);
+      await setDoc(docRef, plan);
+    } catch (error) {
+      handleFirestoreError(error, `saving meal plan ${plan.id} for user ${userId}`);
+    }
+  },
+
+  async updateMealPlan(userId: string, planId: string, data: Partial<MealPlan>): Promise<void> {
+    try {
+      const docRef = doc(this.getMealPlanCollectionRef(userId), planId);
+      await updateDoc(docRef, data);
+    } catch (error) {
+      handleFirestoreError(error, `updating meal plan ${planId} for user ${userId}`);
+    }
+  }
 };

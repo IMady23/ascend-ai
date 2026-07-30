@@ -1,44 +1,120 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { NAVIGATION } from "@/constants/navigation";
-import { Bell, User } from "lucide-react";
+import React from "react";
+import { useUserStore } from "@/stores/user.store";
+import { Avatar } from "@/components/adl/primitives/Avatar";
+import { ProfileMenu } from "./ProfileMenu";
+import { Bell, Command, Menu, Sparkles, Clock, Sun, Moon, Monitor } from "lucide-react";
+import { AICoachDrawer } from "@/features/ai/components/AICoachDrawer";
+import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
+import { useThemeStore } from "@/stores/theme.store";
 
 export function TopBar() {
-  const pathname = usePathname();
-  const currentNav = NAVIGATION.find((nav) => nav.href === pathname);
+  const { profile } = useUserStore();
+  const userName = profile?.identity?.fullName || "Commander";
+
+  const { theme, toggleTheme } = useThemeStore();
+
+  const [isCommandOpen, setIsCommandOpen] = React.useState(false);
+  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
+  const [isReminderOpen, setIsReminderOpen] = React.useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = React.useState(false);
 
   return (
-    <header className="h-16 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-10 px-4 md:px-8 flex items-center justify-between">
-      <div className="flex flex-col">
-        <h1 className="text-lg font-semibold text-foreground leading-tight">
-          {currentNav?.title || "Ascend AI"}
-        </h1>
-        {currentNav?.subtitle && (
-          <span className="text-xs text-muted-foreground leading-tight">
-            {currentNav.subtitle}
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-center gap-4">
-        {/* Placeholder for Transformation Compass */}
-        <div className="hidden sm:flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-full border border-border">
-          <span className="text-xs font-medium text-foreground">Phase 1</span>
-          <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-            <div className="w-1/3 h-full bg-primary rounded-full" />
+    <>
+      <header className="sticky top-0 z-40 w-full bg-[var(--color-bg-base)]/80 backdrop-blur-xl border-b border-[var(--color-glass-border)]">
+        <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
+          
+          <div className="flex items-center gap-4">
+            <button className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors">
+              <Menu size={20} />
+            </button>
+            {/* AIStatusPopover removed for Sprint 1 Dashboard rewrite */}
           </div>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Command Palette Trigger */}
+            <button 
+              onClick={() => setIsCommandOpen(true)}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-surface-hover)] border border-[var(--color-glass-border)] rounded-lg text-sm text-[var(--color-text-muted)] transition-colors group"
+            >
+              <Sparkles size={14} className="group-hover:text-[var(--color-accent-blue)] transition-colors" />
+              <span className="group-hover:text-white transition-colors">Ask Ascend</span>
+              <kbd className="ml-8 hidden lg:inline-flex px-1.5 py-0.5 text-[10px] bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded shadow-sm text-[var(--color-text-secondary)] font-mono">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Mobile Search Button */}
+            <button 
+              onClick={() => setIsCommandOpen(true)}
+              className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors"
+            >
+              <Command size={18} />
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              title={`Current Theme: ${theme}`}
+            >
+              {theme === "dark" ? <Moon size={18} /> : theme === "light" ? <Sun size={18} /> : <Monitor size={18} />}
+            </button>
+
+            {/* Notifications */}
+            <button 
+              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              className="relative p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hidden sm:block"
+            >
+              <Bell size={18} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-accent-blue)] rounded-full border border-[var(--color-bg-base)]" />
+            </button>
+
+            {/* Reminders Schedule */}
+            <button 
+              onClick={() => setIsReminderOpen(true)}
+              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] transition-colors"
+              title="Manage Reminders"
+            >
+              <Clock size={18} />
+            </button>
+
+            <div className="w-px h-6 bg-[var(--color-glass-border)] mx-1" />
+
+            {/* Profile Dropdown */}
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="flex items-center gap-3 hover:bg-[var(--color-bg-surface-hover)] p-1.5 rounded-full md:rounded-xl transition-colors md:pr-4"
+            >
+              <Avatar fallback={userName.charAt(0)} />
+              <div className="hidden md:flex flex-col items-start">
+                <span className="text-sm font-semibold tracking-tight leading-none text-white">{userName}</span>
+                <span className="text-[10px] text-[var(--color-text-muted)] font-medium mt-1">Level 11 Commander</span>
+              </div>
+            </button>
+          </div>
+
         </div>
+      </header>
 
-        <button className="relative text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-secondary/50">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border border-background" />
-        </button>
+      {/* Profile Dropdown Menu */}
+      <ProfileMenu 
+        isOpen={isProfileMenuOpen} 
+        onClose={() => setIsProfileMenuOpen(false)} 
+      />
 
-        <button className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border border-border overflow-hidden">
-          <User size={16} className="text-muted-foreground" />
-        </button>
-      </div>
-    </header>
+      {/* Global AI Coach Drawer */}
+      <AICoachDrawer 
+        isOpen={isCommandOpen} 
+        onClose={() => setIsCommandOpen(false)} 
+      />
+
+      {/* Global Reminder Schedule Modal */}
+      <ReminderScheduleModal 
+        isOpen={isReminderOpen} 
+        onClose={() => setIsReminderOpen(false)} 
+      />
+    </>
   );
 }

@@ -1,32 +1,56 @@
 import { Timestamp, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, DocumentData } from "firebase/firestore";
+import { NotificationPreferences } from "./communication";
+
+export type PrimaryGoal = 'lose_fat' | 'gain_muscle' | 'maintain' | 'recomp';
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'athlete';
+export type DietType = 'vegetarian' | 'non_vegetarian' | 'vegan' | 'eggetarian';
+
+export interface UserIdentity {
+  fullName: string;
+  nickname: string;
+  dob: string;
+  height: number; // cm
+  weight: number; // kg
+}
+
+export interface UserPreferences {
+  activity: ActivityLevel;
+  wakeTime: string;
+  sleepTime: string;
+  stepGoal: number;
+  waterGoal: number;
+  workoutDays: number;
+  dietType: DietType;
+  allergies: string[];
+}
+
+export interface UserTargets {
+  tdee: number;
+  bmr: number;
+  bmi: number;
+  dailyCalories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  water: number;
+}
 
 export interface UserProfile {
-  age?: number;
-  height?: number; // cm
-  weight?: number; // kg
-  gender?: string;
-}
-
-export interface UserGoals {
-  targetWeight?: number;
-  weeklyWorkouts?: number;
-}
-
-export interface UserStats {
-  totalWorkouts: number;
-  totalChaptersCompleted: number;
-  currentStreak: number;
+  version: 1;
+  onboardingCompleted: boolean;
+  identity?: UserIdentity;
+  goals?: { primaryGoal: PrimaryGoal };
+  preferences?: UserPreferences;
+  communication?: NotificationPreferences;
+  targets?: UserTargets;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface User {
   id: string; // The uid
   email: string;
-  displayName: string | null;
-  photoURL: string | null;
   profile: UserProfile;
-  goals: UserGoals;
-  currentChapterId: string | null;
-  currentStats: UserStats;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

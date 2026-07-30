@@ -5,14 +5,13 @@ import { MOCK_MACRO_GOALS } from "../constants";
 import { Leaf, Droplets, Flame } from "lucide-react";
 
 export function NutritionHero() {
-  // Aggregate from store. Using dailyCalories logged if store supports it, or sum from meals.
   const meals = useNutritionStore((state) => state.meals);
   const currentWater = useNutritionStore((state) => state.dailyWaterMl);
   
-  const consumedCalories = meals.reduce((acc, m) => acc + m.calories, 0) || 1100; // fallback mock if empty
+  const consumedCalories = meals.reduce((acc, m) => acc + (m.calories || 0), 0);
   
-  const calPercent = Math.min(100, Math.round((consumedCalories / MOCK_MACRO_GOALS.calories) * 100));
-  const waterPercent = Math.min(100, Math.round((currentWater / MOCK_MACRO_GOALS.waterMl) * 100));
+  const calPercent = Math.min(100, Math.round((consumedCalories / 2200) * 100));
+  const waterPercent = Math.min(100, Math.round((currentWater / 3000) * 100));
   const streak = 18; // Mock
 
   return (
