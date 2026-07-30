@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { HallMotion, Timing } from "@/utils/motion";
 import { EngraveText } from "@/components/adl/typography/EngraveText";
 import { Button } from "@/components/adl/primitives/Button";
@@ -32,8 +33,9 @@ export function EntranceScene() {
           initial={{ scale: 0.95, filter: "blur(20px)", opacity: 0 }}
           animate={{ scale: 1, filter: "blur(0px)", opacity: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
+          className="w-24 h-24 mx-auto mb-8 opacity-80 relative"
         >
-          <img src="/ascend-logo.svg" alt="Ascend Logo" className="w-24 h-24 mx-auto mb-8 opacity-80" />
+          <Image src="/ascend-logo.svg" alt="Ascend Logo" fill className="object-contain" priority />
         </motion.div>
         <h1 className="text-4xl md:text-5xl tracking-[0.2em] font-light text-white uppercase mb-4">
           <EngraveText duration={2}>The Hall of Ascension</EngraveText>

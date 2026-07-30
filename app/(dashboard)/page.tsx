@@ -26,6 +26,7 @@ import {
   Clock
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMotionValue, useTransform, animate } from "framer-motion";
 import { resolvePostAuthRoute } from "@/lib/auth/post-auth-routing";
 import { MealLoggerModal } from "@/components/adl/composites/nutrition/MealLoggerModal";
 import { AICoachDrawer } from "@/features/ai/components/AICoachDrawer";
@@ -34,7 +35,21 @@ import { WaterLoggerModal } from "@/components/adl/composites/tracking/WaterLogg
 import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
 import { useNutritionStore } from "@/stores/nutrition.store";
 
+// Animated Number Hook
+const AnimatedNumber = ({ value }: { value: number }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(count, value, { duration: 0.5 });
+    return controls.stop;
+  }, [count, value]);
+
+  return <motion.span>{rounded}</motion.span>;
+};
+
 export default function MissionControl() {
+
   const { profile } = useUserStore();
   const { dailyWaterMl } = useNutritionStore();
   const router = useRouter();
@@ -79,31 +94,42 @@ export default function MissionControl() {
   const targetSteps = profile.preferences?.stepGoal || 10000;
 
   return (
-    <PageContainer className="pb-32 px-4 md:px-8 max-w-7xl mx-auto">
+    <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-4 md:px-8 max-w-7xl mx-auto">
       <DashboardLayout>
         
         {/* 1. DAILY BRIEFING HERO */}
         <motion.div variants={HeroMotion.reveal} initial="initial" animate="animate">
-          <HeroSection className="mt-8 mb-12 rounded-[var(--radius-2xl)] border border-[var(--color-glass-border)] bg-[var(--color-bg-glass-standard)] backdrop-blur-xl p-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+          <HeroSection className="mt-4 md:mt-8 mb-8 md:mb-12 rounded-[var(--radius-2xl)] border border-[var(--color-glass-border)] bg-[var(--color-bg-glass-standard)] backdrop-blur-xl p-5 md:p-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
               
-              <div className="space-y-4">
-                <Heading level="h2" className="text-3xl">Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName} 👋</Heading>
-                <Subheading size="md" className="text-[var(--color-text-secondary)]">Welcome back!</Subheading>
+              <div className="space-y-2 md:space-y-4 text-center md:text-left w-full md:w-auto">
+                <Heading level="h2" className="text-3xl md:text-5xl lg:text-6xl">
+                  Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'} <span className="hidden md:inline">, {userName}</span> 👋
+                </Heading>
+                <Subheading size="md" className="hidden md:block text-base text-[var(--color-text-secondary)]">Welcome back!</Subheading>
                 
-                <div className="mt-6">
-                  <Caption className="uppercase tracking-widest text-[var(--color-accent-blue)] mb-3 font-semibold">Today's Focus</Caption>
-                  <ul className="space-y-2 text-[var(--color-text-primary)]">
-                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-blue)]" /> Hit your protein goal ({targets?.protein || 150}g)</li>
-                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-green)]" /> Drink {targetWater}L water</li>
-                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-indigo)]" /> Complete Push Workout</li>
+                <div className="mt-3 md:mt-6">
+                  <Caption className="uppercase tracking-widest text-[var(--color-accent-blue)] mb-2 md:mb-3 font-semibold text-xs md:text-sm">Today's Focus</Caption>
+                  <ul className="space-y-1.5 md:space-y-2 text-[var(--color-text-primary)] text-sm md:text-base flex flex-col items-center md:items-start">
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-blue)]" /> Hit your protein goal ({targets?.protein || 150}g)</li>
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-green)]" /> Drink {targetWater}L water</li>
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-indigo)]" /> Complete Push Workout</li>
                   </ul>
                 </div>
               </div>
               
               <div className="flex flex-col items-center shrink-0">
-                <Caption className="mb-2">Daily Score</Caption>
-                <ProgressRing value={0} size={120} strokeWidth={8} color="var(--color-accent-blue)" icon={<Statistic className="text-4xl">0</Statistic>} />
+                <Caption className="mb-2 text-xs md:text-sm">Daily Score</Caption>
+                
+                {/* Mobile Ring (25% smaller) */}
+                <div className="md:hidden">
+                  <ProgressRing value={85} size={90} strokeWidth={6} color="var(--color-accent-blue)" icon={<Statistic className="text-3xl"><AnimatedNumber value={85} /></Statistic>} />
+                </div>
+                
+                {/* Desktop Ring */}
+                <div className="hidden md:block">
+                  <ProgressRing value={85} size={120} strokeWidth={8} color="var(--color-accent-blue)" icon={<Statistic className="text-4xl"><AnimatedNumber value={85} /></Statistic>} />
+                </div>
               </div>
             </div>
           </HeroSection>
@@ -160,7 +186,7 @@ export default function MissionControl() {
           
           <div className="md:col-span-2 space-y-6">
             <WidgetSection title="Coach Recommendation">
-              <GlassCard className="p-6 border-[var(--color-accent-indigo)]/30 bg-gradient-to-br from-[var(--color-accent-indigo)]/5 to-transparent">
+              <GlassCard className="p-4 md:p-6 border-[var(--color-accent-indigo)]/30 bg-gradient-to-br from-[var(--color-accent-indigo)]/5 to-transparent">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-[var(--color-accent-indigo)]/10 flex items-center justify-center">
                     <Sparkles size={20} className="text-[var(--color-accent-indigo)]" />

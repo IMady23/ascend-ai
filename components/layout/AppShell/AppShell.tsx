@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { Sidebar } from "../Sidebar/Sidebar";
 import { TopBar } from "../TopBar/TopBar";
+import { MobileDrawer } from "@/components/navigation/MobileDrawer";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         but styled to float above the ambient background.
       */}
       <Sidebar />
+      <MobileDrawer />
       
       {/* 
         The main content area takes the remaining width.

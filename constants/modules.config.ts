@@ -1,4 +1,4 @@
-import { Activity, Dumbbell, Apple, BrainCircuit, LineChart, Trophy, Settings } from "lucide-react";
+import { LayoutDashboard, Dumbbell, Apple, BrainCircuit, LineChart, Trophy, Settings, Award } from "lucide-react";
 
 export type ModuleConfig = {
   id: string;
@@ -13,7 +13,7 @@ export const MODULE_CONFIG: ModuleConfig[] = [
   {
     id: "mission-control",
     label: "Mission Control",
-    icon: Activity,
+    icon: LayoutDashboard,
     route: "/",
     accentColor: "var(--color-accent-blue)",
     navigationGroup: "Performance",
@@ -45,7 +45,7 @@ export const MODULE_CONFIG: ModuleConfig[] = [
   {
     id: "progress",
     label: "Hall of Progress",
-    icon: LineChart,
+    icon: Award,
     route: "/progress",
     accentColor: "var(--color-accent-gold)",
     navigationGroup: "Growth",

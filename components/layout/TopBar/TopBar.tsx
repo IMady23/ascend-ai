@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useUserStore } from "@/stores/user.store";
+import { useUiStore } from "@/stores/ui.store";
 import { Avatar } from "@/components/adl/primitives/Avatar";
 import { ProfileMenu } from "./ProfileMenu";
 import { Bell, Command, Menu, Sparkles, Clock, Sun, Moon, Monitor } from "lucide-react";
@@ -12,7 +13,8 @@ import { useThemeStore } from "@/stores/theme.store";
 export function TopBar() {
   const { profile } = useUserStore();
   const userName = profile?.identity?.fullName || "Commander";
-
+  
+  const { setMobileDrawerOpen } = useUiStore();
   const { theme, toggleTheme } = useThemeStore();
 
   const [isCommandOpen, setIsCommandOpen] = React.useState(false);
@@ -22,11 +24,15 @@ export function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[var(--color-bg-base)]/80 backdrop-blur-xl border-b border-[var(--color-glass-border)]">
+      <header className="sticky top-0 z-40 w-full bg-[var(--color-bg-base)]/80 backdrop-blur-xl border-b border-[var(--color-glass-border)] pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
           
           <div className="flex items-center gap-4">
-            <button className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors">
+            <button 
+              onClick={() => setMobileDrawerOpen(true)}
+              className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              aria-label="Open Mobile Menu"
+            >
               <Menu size={20} />
             </button>
             {/* AIStatusPopover removed for Sprint 1 Dashboard rewrite */}
@@ -49,6 +55,7 @@ export function TopBar() {
             <button 
               onClick={() => setIsCommandOpen(true)}
               className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              aria-label="Open Ask Ascend"
             >
               <Command size={18} />
             </button>
@@ -58,6 +65,7 @@ export function TopBar() {
               onClick={toggleTheme}
               className="p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors"
               title={`Current Theme: ${theme}`}
+              aria-label="Toggle Theme"
             >
               {theme === "dark" ? <Moon size={18} /> : theme === "light" ? <Sun size={18} /> : <Monitor size={18} />}
             </button>
@@ -66,6 +74,7 @@ export function TopBar() {
             <button 
               onClick={() => setIsNotifOpen(!isNotifOpen)}
               className="relative p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hidden sm:block"
+              aria-label="Notifications"
             >
               <Bell size={18} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-accent-blue)] rounded-full border border-[var(--color-bg-base)]" />
@@ -76,6 +85,7 @@ export function TopBar() {
               onClick={() => setIsReminderOpen(true)}
               className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] transition-colors"
               title="Manage Reminders"
+              aria-label="Manage Reminders"
             >
               <Clock size={18} />
             </button>
@@ -86,6 +96,7 @@ export function TopBar() {
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className="flex items-center gap-3 hover:bg-[var(--color-bg-surface-hover)] p-1.5 rounded-full md:rounded-xl transition-colors md:pr-4"
+              aria-label="Profile Menu"
             >
               <Avatar fallback={userName.charAt(0)} />
               <div className="hidden md:flex flex-col items-start">
