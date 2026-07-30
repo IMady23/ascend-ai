@@ -1,5 +1,5 @@
-import { ContextBuilder } from "./context.builder";
-import { AiService } from "@/services/ai/ai.service";
+import { ContextBuilder } from "@/services/ai/context.builder";
+
 import { useCommunicationStore } from "@/stores/communication.store";
 import { CommunicationRepository } from "@/services/repositories/communication.repository";
 import { useUserStore } from "@/stores/user.store";
@@ -70,8 +70,8 @@ export class BriefingGenerator {
         action: { label: 'Start Day', route: '/' }
       };
 
-      store.addItemLocal(item);
-      await CommunicationRepository.addItem(userId, item);
+      store.addItemLocal(item as any);
+      await CommunicationRepository.addItem(userId, item as any);
       return item;
     } catch (e) {
       console.error("Failed to generate briefing", e);

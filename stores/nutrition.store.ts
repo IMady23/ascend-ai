@@ -283,7 +283,7 @@ export const useNutritionStore = create<NutritionState>()(
             'createCustomFood',
             RELIABILITY_PROFILES.DATABASE_WRITE,
             tempId,
-            () => FoodRepository.createCustomFood(userId, foodData),
+            () => FoodRepository.createCustomFood(userId, foodData as any),
             'retry'
           ).catch(console.error);
         });

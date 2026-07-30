@@ -10,7 +10,7 @@ import { useWorkspaceStore } from "@/stores/workspace.store";
  */
 export function resetStoresOnLogout() {
   useUserStore.getState().clearUser();
-  useActivityStore.getState().reset();
+
   useWorkspaceStore.getState().reset();
 
   useAiStore.setState({

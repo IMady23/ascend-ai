@@ -16,7 +16,7 @@ interface ActiveInsightModalProps {
 }
 
 export function ActiveInsightModal({ isOpen, onClose }: ActiveInsightModalProps) {
-  const { activeInsightData, consistencyBreakdown, trendCategory, timeFilter } = useIntelligenceStore();
+  const { activeInsightData, consistencyBreakdown, trendCategory, timeFilter, sufficiency } = useIntelligenceStore();
   const router = useRouter();
 
   if (!activeInsightData) return null;
@@ -28,7 +28,8 @@ export function ActiveInsightModal({ isOpen, onClose }: ActiveInsightModalProps)
       trendCategory,
       timeFilter,
       activeInsightData,
-      consistencyBreakdown!
+      consistencyBreakdown!,
+      sufficiency?.stage || "SUFFICIENT_DATA"
     );
     
     // Dispatch a custom event to open the AI Coach Drawer with context

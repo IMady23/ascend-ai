@@ -120,7 +120,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
         fat: totalFat,
         notes: notes || undefined,
         updatedAt: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any
-      });
+      } as any);
     } else {
       const nowStr = new Date().toISOString().split("T")[0]; 
       
@@ -135,7 +135,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
         notes: notes || undefined,
         date: nowStr,
         timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any
-      });
+      } as any);
     }
     
     setIsSubmitting(false);

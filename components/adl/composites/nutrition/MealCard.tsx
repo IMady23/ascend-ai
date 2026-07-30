@@ -32,7 +32,9 @@ export function MealCard({
   macros,
   items,
   isAiVerified = false,
-  className
+  className,
+  onEdit,
+  onDelete
 }: MealCardProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const totalMacros = macros.protein + macros.carbs + macros.fat;

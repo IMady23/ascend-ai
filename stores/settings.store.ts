@@ -2,6 +2,37 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 export type NotificationChannel = "in-app" | "push" | "email";
 
+export interface AIConfig {
+  coachingStyle: "analytical" | "military" | "supportive" | "balanced" | string;
+  motivationStyle: "logical" | "aggressive" | "gentle" | string;
+  insightFrequency: "high" | "medium" | "low" | string;
+  dailyBriefing: boolean;
+  weeklyReview: boolean;
+}
+
+export interface AppearanceConfig {
+  theme: "light" | "dark" | "system" | string;
+  accentColor: string;
+  compactLayout: boolean;
+  sidebarCollapsed: boolean;
+}
+
+export interface MissionConfig {
+  dailyMissionCount: number;
+  workoutDays: number;
+  [key: string]: number;
+}
+
+export interface NotificationConfig {
+  morningReminder?: boolean;
+  workoutReminder?: boolean;
+  waterReminder?: boolean;
+  mealReminder?: boolean;
+  sleepReminder?: boolean;
+  weeklyReview?: boolean;
+  [key: string]: boolean | undefined;
+}
+
 export interface ReminderSchedule {
   id: string;
   enabled: boolean;
@@ -34,13 +65,21 @@ export interface NotificationSettings {
   smartAdaptiveWorkout: boolean;
   smartPlateauAlerts: boolean;
   smartProteinGoal: boolean;
+  [key: string]: boolean;
 }
 
 interface SettingsState {
   notifications: NotificationSettings;
   schedules: ReminderSchedule[];
+  ai: AIConfig;
+  appearance: AppearanceConfig;
+  mission: MissionConfig;
   updateNotificationSetting: (key: keyof NotificationSettings, value: boolean) => void;
+  updateNotifications: (config: Partial<NotificationConfig>) => void;
   updateSchedule: (schedule: ReminderSchedule) => void;
+  updateAi: (config: Partial<AIConfig>) => void;
+  updateAppearance: (config: Partial<AppearanceConfig>) => void;
+  updateMission: (config: Partial<MissionConfig>) => void;
   reset: () => void;
 }
 
@@ -71,6 +110,23 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       notifications: defaultNotifications,
+      ai: {
+        coachingStyle: "balanced",
+        motivationStyle: "logical",
+        insightFrequency: "medium",
+        dailyBriefing: true,
+        weeklyReview: true,
+      },
+      appearance: {
+        theme: "system",
+        accentColor: "blue",
+        compactLayout: false,
+        sidebarCollapsed: false,
+      },
+      mission: {
+        dailyMissionCount: 3,
+        workoutDays: 5,
+      },
       schedules: [
         { id: "morning", enabled: true, type: "Morning Briefing", time: "07:00", days: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"], channels: ["in-app", "push"] },
         { id: "workout", enabled: true, type: "Workout Reminder", time: "17:30", days: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"], channels: ["in-app", "push"] },
@@ -88,9 +144,25 @@ export const useSettingsStore = create<SettingsState>()(
             [key]: value
           }
         })),
+      updateNotifications: (config) => 
+        set((state) => ({
+          notifications: { ...state.notifications, ...config } as any
+        })),
       updateSchedule: (schedule) => 
         set((state) => ({
           schedules: state.schedules.map(s => s.id === schedule.id ? schedule : s)
+        })),
+      updateAi: (config) => 
+        set((state) => ({
+          ai: { ...state.ai, ...config }
+        })),
+      updateAppearance: (config) => 
+        set((state) => ({
+          appearance: { ...state.appearance, ...config }
+        })),
+      updateMission: (config) => 
+        set((state) => ({
+          mission: { ...state.mission, ...config } as any
         })),
       reset: () => set({ notifications: defaultNotifications }),
     }),

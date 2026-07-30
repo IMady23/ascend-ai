@@ -68,7 +68,7 @@ export const FoodRepository = {
       // Default ranking: Custom -> Recent -> Common
       const combined = [...customFoods, ...recentFoods, ...FOOD_DATABASE];
       const seen = new Set();
-      return combined.filter(f => {
+      return (combined as any[]).filter((f: any) => {
         const normalized = f.name.toLowerCase().trim();
         if (seen.has(normalized)) return false;
         seen.add(normalized);
@@ -84,7 +84,7 @@ export const FoodRepository = {
     for (const f of pool) {
       const normalized = f.name.toLowerCase().trim();
       if (!uniquePool.has(normalized)) {
-        uniquePool.set(normalized, f);
+        uniquePool.set(normalized, f as any);
       } else {
         // If it's already there, prefer Custom > Recent > DB by not overwriting since we inserted in that order
       }

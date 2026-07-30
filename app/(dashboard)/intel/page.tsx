@@ -279,7 +279,7 @@ export default function IntelDashboardPage() {
                       <span className="text-xs font-bold text-[var(--color-text-muted)] bg-[var(--color-bg-base)] px-2 py-1 rounded-md border border-[var(--color-glass-border)]">{insight.category}</span>
                       <div className="flex items-center gap-1 text-[var(--color-text-muted)] text-xs">
                         <Calendar size={12} />
-                        {new Date(insight.date).toLocaleDateString()}
+                        {new Date((insight as any).date || (insight.timestamp as any)?.toDate?.() || new Date()).toLocaleDateString()}
                       </div>
                     </div>
                   </GlassCard>

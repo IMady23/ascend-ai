@@ -69,7 +69,7 @@ export class IntelligenceService {
       workouts: activityState.activities?.length || 0,
       meals: nutritionState.meals?.length || 0,
       hydration: nutritionState.hydrationLogs?.length || 0,
-      recovery: recoveryState.dailyLogs?.length || 0, // Fallback if recovery logs are handled differently
+      recovery: (recoveryState as any).dailyLogs?.length || 0, // Fallback if recovery logs are handled differently
     };
 
     const targets = {
@@ -178,12 +178,12 @@ export class IntelligenceService {
         id: "ai-early",
         title: "Preliminary Trend",
         description: "Training frequency appears consistent, but more data is needed before making reliable recommendations. Recommendations may change as more data becomes available.",
-        category: "ANALYSIS",
+        category: "TREND",
         date: new Date().toISOString(),
         isRead: false,
         priority: "info",
         confidenceScore: 28,
-      };
+      } as any;
     }
 
     return {
@@ -209,7 +209,7 @@ export class IntelligenceService {
         "Recovery score stable at >80%",
         "Protein targets met"
       ]
-    };
+    } as any;
   }
 
   static async fetchHistoricalInsights(days: TimeFilter, stage: IntelligenceStage): Promise<ActiveInsightData[]> {
@@ -225,7 +225,7 @@ export class IntelligenceService {
         isRead: true,
         priority: "success",
         confidenceScore: 85
-      },
+      } as any,
     ];
   }
 

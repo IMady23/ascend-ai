@@ -74,7 +74,7 @@ export class NotificationEngine {
         'ACHIEVEMENT',
         'HIGH',
         'Level Up!',
-        `Congratulations! You reached Level ${levelUps[0].metadata.newLevel}.`,
+        `Congratulations! You reached Level ${(levelUps[0].metadata as any).newLevel}.`,
         '⭐',
         { label: 'View Progress', route: '/progress' }
       );
@@ -122,7 +122,7 @@ export class NotificationEngine {
     if (priority !== 'SILENT' && priority !== 'LOW') {
       import('@/stores/toast.store').then(m => {
         m.useToastStore.getState().addToast({
-          type: priority === 'CRITICAL' ? 'error' : priority === 'HIGH' ? 'success' : 'info',
+          type: priority === 'CRITICAL' ? 'warning' : priority === 'HIGH' ? 'success' : 'info',
           title,
           message,
           duration: priority === 'CRITICAL' ? 10000 : 5000,
@@ -134,7 +134,7 @@ export class NotificationEngine {
               window.location.href = action.route;
             }
           } : undefined
-        });
+        } as any);
       });
     }
   }

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Droplet, X, Check, Plus } from "lucide-react";
 import { Heading, BodyText, Caption } from "@/components/adl/typography";
 import { Button } from "@/components/adl/primitives/Button";
-import { Input } from "@/components/adl/primitives/Input";
 import { GlassCard } from "@/components/adl/composites/cards/Cards";
 import { ProgressRing } from "@/components/adl/composites/progress/Progress";
 import { useNutritionStore } from "@/stores/nutrition.store";

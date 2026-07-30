@@ -7,7 +7,7 @@ export const Timing = {
   verySlow: 1.2
 };
 
-export const NavigationMotion = {
+export const NavigationMotion: any = {
   sidebarCollapse: {
     expanded: { width: "280px" },
     collapsed: { width: "80px" },
@@ -18,7 +18,7 @@ export const NavigationMotion = {
   },
 };
 
-export const PageMotion = {
+export const PageMotion: any = {
   routeTransition: {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0, transition: { duration: Timing.slow, ease: "easeOut" } },
@@ -36,7 +36,7 @@ export const PageMotion = {
   },
 };
 
-export const CardMotion = {
+export const CardMotion: any = {
   hoverLift: {
     hover: { 
       y: -8, 
@@ -47,26 +47,26 @@ export const CardMotion = {
   },
 };
 
-export const ButtonMotion = {
+export const ButtonMotion: any = {
   tap: { scale: 0.95 },
   hover: { scale: 1.03, transition: { duration: Timing.fast } },
 };
 
-export const HeroMotion = {
+export const HeroMotion: any = {
   reveal: {
     initial: { opacity: 0, scale: 0.95, y: 20 },
     animate: { opacity: 1, scale: 1, y: 0, transition: { duration: Timing.slow, ease: "easeOut" } }
   }
 };
 
-export const ChartMotion = {
+export const ChartMotion: any = {
   draw: {
     initial: { pathLength: 0, opacity: 0 },
     animate: { pathLength: 1, opacity: 1, transition: { duration: 1.5, ease: "easeInOut" } }
   }
 };
 
-export const AIMotion = {
+export const AIMotion: any = {
   thinking: {
     animate: {
       scale: [1, 1.2, 1],
@@ -80,14 +80,14 @@ export const AIMotion = {
   }
 };
 
-export const ProgressMotion = {
+export const ProgressMotion: any = {
   fill: {
     initial: { width: "0%" },
     animate: (value: number) => ({ width: `${value}%`, transition: { duration: 1, type: "spring" as const, damping: 20 } })
   }
 };
 
-export const FeedbackMotion = {
+export const FeedbackMotion: any = {
   dialogReveal: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 25 } },
@@ -100,7 +100,7 @@ export const FeedbackMotion = {
   }
 };
 
-export const HallMotion = {
+export const HallMotion: any = {
   room: {
     hidden: { opacity: 0, y: 30, filter: "blur(12px)" },
     visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: Timing.slow, ease: [0.25, 0.1, 0.25, 1] } },

@@ -10,7 +10,12 @@ export type EventType =
   | 'MISSION_COMPLETED'
   | 'ACHIEVEMENT_UNLOCKED'
   | 'PR_BROKEN'
-  | 'WEIGHT_LOGGED';
+  | 'WEIGHT_LOGGED'
+  | 'RECOVERY_CRITICAL'
+  | 'SYNC_FAILED'
+  | 'PLATEAU_DETECTED'
+  | 'WORKOUT_MISSED'
+  | 'PROTEIN_LOW';
 
 export interface BaseEvent {
   id: string;
