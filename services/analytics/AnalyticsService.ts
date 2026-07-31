@@ -601,7 +601,9 @@ export class AnalyticsService {
       ],
       recommendation,
       achievement,
-      riskDetection
+      riskDetection,
+      currentStreak,
+      longestStreak
     };
   }
 }
