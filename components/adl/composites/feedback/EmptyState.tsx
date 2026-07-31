@@ -14,6 +14,11 @@ export interface EmptyStateProps {
     onClick: () => void;
     icon?: React.ReactNode;
   };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+    icon?: React.ReactNode;
+  };
   className?: string;
 }
 
@@ -24,6 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   description,
   primaryAction,
+  secondaryAction,
   className = ""
 }) => {
   return (
@@ -69,6 +75,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             className="rounded-[16px] shadow-lg shadow-[var(--color-accent-primary)]/20 hover:shadow-[var(--color-accent-primary)]/40 transition-all"
           >
             {primaryAction.label}
+          </Button>
+        )}
+        
+        {secondaryAction && (
+          <Button
+            variant="secondary"
+            onClick={secondaryAction.onClick}
+            leftIcon={secondaryAction.icon}
+            className="rounded-[16px] mt-3"
+          >
+            {secondaryAction.label}
           </Button>
         )}
       </motion.div>
