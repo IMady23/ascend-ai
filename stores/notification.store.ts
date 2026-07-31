@@ -81,8 +81,8 @@ export const useNotificationStore = create<NotificationState>()(
       updatePreferences: (updates) => {
         set((state) => {
           const newPrefs = { ...state.preferences, ...updates };
-          AudioEngine.setMasterVolume(newPrefs.masterVolume);
-          AudioEngine.setQuietHoursConfig(newPrefs.quietHours);
+          AudioEngine.setVolume('master', newPrefs.masterVolume);
+          AudioEngine.setQuietHours(newPrefs.quietHours.enabled);
           // In a real app, this would also trigger a Firestore sync 
           // e.g. PreferencesRepository.update(newPrefs)
           return { preferences: newPrefs };
@@ -103,8 +103,8 @@ export const useNotificationStore = create<NotificationState>()(
       partialize: (state) => ({ preferences: state.preferences }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          AudioEngine.setMasterVolume(state.preferences.masterVolume);
-          AudioEngine.setQuietHoursConfig(state.preferences.quietHours);
+          AudioEngine.setVolume('master', state.preferences.masterVolume);
+          AudioEngine.setQuietHours(state.preferences.quietHours.enabled);
         }
       }
     }

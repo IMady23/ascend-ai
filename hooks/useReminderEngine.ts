@@ -25,7 +25,22 @@ export function useReminderEngine() {
           // 2. Play the specific sound profile for this reminder type
           // ReminderType matches our AudioEngine profile keys (water, meal, workout, sleep)
           try {
-            AudioEngine.play(reminder.type as any);
+            switch (reminder.type) {
+              case 'water':
+                AudioEngine.playWaterDrop();
+                break;
+              case 'meal':
+                AudioEngine.playSoftNotification();
+                break;
+              case 'workout':
+                AudioEngine.playEnergeticPulse();
+                break;
+              case 'sleep':
+                AudioEngine.playSunriseChime();
+                break;
+              default:
+                AudioEngine.playAttentionTone();
+            }
           } catch (e) {
             console.error("Failed to play reminder audio", e);
           }

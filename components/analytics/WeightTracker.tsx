@@ -10,7 +10,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Weight, Target } from 'lucide-react';
 
 export interface WeightTrackerProps {
-  status: 'loading' | 'error' | 'data';
+  status: 'loading' | 'error' | 'data' | 'no-data';
   history?: { date: string; weight: number | null }[];
 }
 

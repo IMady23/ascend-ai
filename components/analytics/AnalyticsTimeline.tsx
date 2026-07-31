@@ -31,7 +31,8 @@ export function AnalyticsTimeline() {
 
     // Nutrition
     const meals = cache.nutritionLogs.filter(n => n.date === dateToInspect);
-    meals.forEach(m => {
+    meals.forEach((mealLog) => {
+      const m = mealLog as any;
       let timeStr = '12:00';
       if (m.type === 'breakfast') timeStr = '08:30';
       if (m.type === 'lunch') timeStr = '13:00';
@@ -42,7 +43,7 @@ export function AnalyticsTimeline() {
         id: `meal-${m.id}`,
         timeStr,
         type: 'nutrition',
-        title: m.name || m.type.charAt(0).toUpperCase() + m.type.slice(1),
+        title: m.name || (m.type ? m.type.charAt(0).toUpperCase() + m.type.slice(1) : 'Meal'),
         subtitle: `${m.calories || 0} kcal • ${m.protein || 0}g protein`,
         icon: m.type === 'breakfast' ? Coffee : m.type === 'snack' ? Apple : Utensils,
         color: 'var(--color-accent-orange)'
@@ -51,7 +52,8 @@ export function AnalyticsTimeline() {
 
     // Workouts
     const workouts = cache.activities.filter(a => a.date.toDate().toISOString().split("T")[0] === dateToInspect);
-    workouts.forEach(w => {
+    workouts.forEach((workout) => {
+      const w = workout as any;
       events.push({
         id: `workout-${w.id}`,
         timeStr: format(w.date.toDate(), 'HH:mm'),

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, TargetAndTransition } from 'framer-motion';
 import { cn } from '@/utils/cn';
 
 export interface LivingWidgetProps {
@@ -20,7 +20,7 @@ export function LivingWidget({
   const prefersReducedMotion = useReducedMotion();
 
   // Gentle idle breathing
-  const idleAnimation = {
+  const idleAnimation: TargetAndTransition = {
     scale: [1, 1.005, 1],
     transition: {
       duration: 4,

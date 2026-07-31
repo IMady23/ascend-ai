@@ -180,7 +180,22 @@ export class ReminderEngine {
     // Play Audio Cue
     try {
       const { AudioEngine } = await import("@/lib/audio/AudioEngine");
-      AudioEngine.play(reminder.type as any);
+      switch (reminder.type) {
+        case 'water':
+          AudioEngine.playWaterDrop();
+          break;
+        case 'meal':
+          AudioEngine.playSoftNotification();
+          break;
+        case 'workout':
+          AudioEngine.playEnergeticPulse();
+          break;
+        case 'sleep':
+          AudioEngine.playSunriseChime();
+          break;
+        default:
+          AudioEngine.playAttentionTone();
+      }
     } catch (e) {
       console.error("[ReminderEngine] Failed to play audio:", e);
     }

@@ -147,7 +147,7 @@ export const ContextBuilder = {
         streak: analyticsState.aiSummary?.currentStreak || 0,
       },
       analytics: {
-        totalWorkouts: analyticsState.aiSummary?.workoutsCompleted || 0,
+        totalWorkouts: activityState.activities.length || 0,
         consistency: analyticsState.goalCompletion?.workouts || 0,
       },
       intelligence: {
@@ -169,7 +169,7 @@ export const ContextBuilder = {
         activeMissionTitle: missionState.getActiveMission()?.title || "No active mission",
         activeMissionType: missionState.getActiveMission()?.type || "None",
       },
-      personalTimeline: timelineState.events.slice(0, 10).map(e => ({ title: e.title, description: e.description, date: e.date })),
+      personalTimeline: timelineState.events.slice(0, 10).map(e => ({ title: e.title, description: e.description, date: e.timestamp })),
       coachMemory: CoachMemoryLayer.summarizeTimeline(),
       timestamp: new Date().toISOString(),
     };

@@ -6,6 +6,7 @@ export interface DailyLog {
   mood: number; // 1-5
   energy: number; // 1-5
   sleepHours: number;
+  weightKg?: number;
   steps: number; // Added to track daily steps
   notes: string;
   createdAt: Timestamp;

@@ -14,7 +14,7 @@ export interface CelebrationParams {
 
 export function triggerCelebration(params: CelebrationParams) {
   // 1. Audio Chime
-  AudioEngine.play('achievement');
+  AudioEngine.playVictoryBurst();
 
   // 2. Toast & Browser Notification Fallback
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {

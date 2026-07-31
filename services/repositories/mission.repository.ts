@@ -1,12 +1,7 @@
 import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, onSnapshot } from "firebase/firestore";
 import { firestore } from "@/lib/firebase";
 import { handleFirestoreError } from "./error-handler";
-
-export interface Mission {
-  id: string;
-  title: string;
-  completed: boolean;
-}
+import { Mission } from "@/stores/mission.store";
 
 export const MissionRepository = {
   getCollectionRef(userId: string) {
@@ -21,8 +16,7 @@ export const MissionRepository = {
         const data = doc.data();
         return {
           id: doc.id,
-          title: data.title,
-          completed: data.completed,
+          ...data
         } as Mission;
       });
     } catch (error) {
@@ -40,8 +34,7 @@ export const MissionRepository = {
             const data = doc.data();
             return {
               id: doc.id,
-              title: data.title,
-              completed: data.completed,
+              ...data
             } as Mission;
           })
         );
@@ -55,7 +48,7 @@ export const MissionRepository = {
   async createMission(userId: string, mission: Mission): Promise<void> {
     try {
       const docRef = doc(this.getCollectionRef(userId), mission.id);
-      await setDoc(docRef, { title: mission.title, completed: mission.completed });
+      await setDoc(docRef, { ...mission });
     } catch (error) {
       handleFirestoreError(error, `creating mission ${mission.id} for user ${userId}`);
     }

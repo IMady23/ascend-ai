@@ -68,10 +68,10 @@ export const useMetricsStore = create<MetricsState>()(
         if (profile) {
           useUserStore.getState().setProfile({
             ...profile,
-            metrics: {
-              ...profile.metrics,
+            identity: {
+              ...(profile.identity || {}),
               weight: weightKg
-            }
+            } as any
           });
         }
 

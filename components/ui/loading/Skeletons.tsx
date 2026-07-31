@@ -7,9 +7,10 @@ import { cn } from '@/utils/cn';
 interface SkeletonProps {
   className?: string;
   shape?: 'rect' | 'circle';
+  style?: React.CSSProperties;
 }
 
-export function Skeleton({ className, shape = 'rect' }: SkeletonProps) {
+export function Skeleton({ className, shape = 'rect', style }: SkeletonProps) {
   return (
     <motion.div
       className={cn(
@@ -17,6 +18,7 @@ export function Skeleton({ className, shape = 'rect' }: SkeletonProps) {
         shape === 'circle' ? "rounded-full" : "rounded-[12px]",
         className
       )}
+      style={style}
     >
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 dark:via-white/5 to-transparent skew-x-[-20deg]"

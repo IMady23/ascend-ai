@@ -228,19 +228,19 @@ if (typeof window !== 'undefined') {
     // Intelligent Recalculation
     switch (event.type) {
       case 'MEAL_LOGGED':
-        if (event.metadata?.log) AnalyticsService.injectNutritionLog(event.metadata.log);
+        if ((event.metadata as any)?.log) AnalyticsService.injectNutritionLog((event.metadata as any).log);
         slicesToUpdate = ['nutrition'];
         break;
       case 'WORKOUT_COMPLETED':
-        if (event.metadata?.activity) AnalyticsService.injectActivity(event.metadata.activity);
+        if ((event.metadata as any)?.activity) AnalyticsService.injectActivity((event.metadata as any).activity);
         slicesToUpdate = ['workout'];
         break;
       case 'WATER_LOGGED':
-        if (event.metadata?.log) AnalyticsService.injectHydrationLog(event.metadata.log);
+        if ((event.metadata as any)?.log) AnalyticsService.injectHydrationLog((event.metadata as any).log);
         slicesToUpdate = ['hydration'];
         break;
       case 'DISTANCE_LOGGED':
-        if (event.metadata?.source === 'steps') {
+        if ((event.metadata as any)?.source === 'steps') {
           const dateStr = new Date().toISOString().split("T")[0];
           const steps = (await import('./activity.store')).useActivityStore.getState().dailySteps;
           AnalyticsService.updateDailyLogSteps(dateStr, steps);
@@ -249,7 +249,7 @@ if (typeof window !== 'undefined') {
         break;
       case 'WEIGHT_UPDATED': {
         const dateStr = new Date().toISOString().split("T")[0];
-        const weightKg = event.metadata?.weightKg;
+        const weightKg = (event.metadata as any)?.weightKg;
         if (weightKg) {
           import('@/services/repositories/daily-log.repository').then(({ DailyLogRepository }) => {
             DailyLogRepository.updateDailyLog(event.userId, dateStr, { weightKg });
@@ -265,11 +265,11 @@ if (typeof window !== 'undefined') {
         break;
       }
       case 'SLEEP_LOGGED':
-        if (event.metadata?.dailyLog) AnalyticsService.injectDailyLog(event.metadata.dailyLog);
+        if ((event.metadata as any)?.dailyLog) AnalyticsService.injectDailyLog((event.metadata as any).dailyLog);
         slicesToUpdate = ['sleep'];
         break;
       case 'RECOVERY_UPDATED':
-        if (event.metadata?.dailyLog) AnalyticsService.injectDailyLog(event.metadata.dailyLog);
+        if ((event.metadata as any)?.dailyLog) AnalyticsService.injectDailyLog((event.metadata as any).dailyLog);
         slicesToUpdate = ['general'];
         break;
       case 'GOAL_UPDATED':

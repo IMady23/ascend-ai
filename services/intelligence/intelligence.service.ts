@@ -188,6 +188,9 @@ export class IntelligenceService {
     const { useUserStore } = await import('@/stores/user.store');
     const profile = useUserStore.getState().profile;
     const summary = AnalyticsService.getAISummary(days, profile);
+    const cache = AnalyticsService.getCache();
+    const workoutsCompleted = cache.activities.filter((a: any) => new Date(a.date.toDate ? a.date.toDate() : a.date) >= subDays(new Date(), days)).length;
+    const avgProtein = Math.round(summary.performance.protein);
 
     return {
       id: "ai-1",
@@ -197,9 +200,9 @@ export class IntelligenceService {
       date: new Date().toISOString(),
       isRead: false,
       priority: "success",
-      trainingLoadAnalysis: `You completed ${summary.workoutsCompleted} workouts in the last ${days} days.`,
+      trainingLoadAnalysis: `You completed ${workoutsCompleted} workouts in the last ${days} days.`,
       recoveryAnalysis: `Your longest streak is ${summary.longestStreak} days. Keep it up!`,
-      nutritionAnalysis: `You averaged ${summary.avgProtein}g of protein daily.`,
+      nutritionAnalysis: `You averaged ${avgProtein}g of protein daily.`,
       sleepAnalysis: "Sleep data being gathered.",
       confidenceScore: 92,
       recommendedActions: [
@@ -207,9 +210,9 @@ export class IntelligenceService {
         "Ensure hydration stays above 2.5L"
       ],
       explanation: [
-        `Workouts: ${summary.workoutsCompleted}`,
+        `Workouts: ${workoutsCompleted}`,
         `Streak: ${summary.currentStreak} Days`,
-        `Avg Protein: ${summary.avgProtein}g`
+        `Avg Protein: ${avgProtein}g`
       ]
     } as any;
   }

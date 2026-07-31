@@ -23,7 +23,9 @@ export function resetStoresOnLogout() {
   useAnalyticsStore.setState({
     timeRange: 7,
     hasData: false,
-    workoutVolume: null,
+    stepTrend: null,
+    hydrationTrend: null,
+    overviewStats: null,
     workoutSplit: null,
     nutritionSplit: null,
     goalCompletion: null,

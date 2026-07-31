@@ -22,7 +22,7 @@ export function Tooltip({ children, content, position = 'top', delay = 0.2, clas
     right: "left-full top-1/2 -translate-y-1/2 ml-2"
   };
 
-  const animVariants = {
+  const animVariants: any = {
     hidden: { 
       opacity: 0, 
       scale: 0.95,

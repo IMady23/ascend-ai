@@ -137,7 +137,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
         recentActivities.forEach(act => {
           if (act.metrics?.totalVolume) {
             recentVolume += act.metrics.totalVolume;
-          } else if (act.category === "cardio") {
+          } else if (act.type === "cardio" || act.type === "running" || act.type === "cycling") {
             recentVolume += (act.durationMinutes * 100); // rough cardio fatigue proxy
           }
         });
@@ -167,7 +167,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
         // A true implementation would parse exercise `targetMuscles` from history.
         let muscleRecovery = { chest: 100, back: 100, legs: 100, shoulders: 100, arms: 100 };
         if (recentActivities.length > 0) {
-            const lastWorkout = recentActivities[0].name.toLowerCase();
+            const lastWorkout = (recentActivities[0].type || "").toLowerCase();
             if (lastWorkout.includes('upper') || lastWorkout.includes('push')) {
                 muscleRecovery.chest = 45;
                 muscleRecovery.shoulders = 55;
