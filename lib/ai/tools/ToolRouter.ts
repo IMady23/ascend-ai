@@ -65,7 +65,8 @@ export class ToolRouter {
         // 5. Execution
         let finalResponse: StructuredResponse;
         try {
-            const rawResult = await this.executor.execute(tool, input);
+            const enrichedInput = { ...input, _userId: userId };
+            const rawResult = await this.executor.execute(tool, enrichedInput);
             finalResponse = ToolResultFormatter.formatSuccess(tool, rawResult);
             
             // Cache successful idempotent requests

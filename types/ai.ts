@@ -25,10 +25,12 @@ export interface AiMessage {
 
 export interface AiConversation {
   id: string;
+  userId?: string;
   title: string | null;
   startedAt: Timestamp;
   lastMessageAt: Timestamp;
   summary: string | null;
+  model?: string;
 }
 
 export const aiMessageConverter: FirestoreDataConverter<AiMessage> = {

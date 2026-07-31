@@ -1,26 +1,26 @@
 import { MemoryItem, MemoryQuery } from '../types';
 import { MemoryEventBus } from './MemoryEventBus';
+import { AiMemoryRepository } from '@/services/repositories/ai-memory.repository';
 
 export interface IMemoryStore {
-    save(memory: MemoryItem): Promise<void>;
-    search(query: MemoryQuery): Promise<MemoryItem[]>;
-    update(memory: MemoryItem): Promise<void>;
-    delete(id: string): Promise<void>;
+    save(userId: string, memory: MemoryItem): Promise<void>;
+    search(userId: string, query: MemoryQuery): Promise<MemoryItem[]>;
+    update(userId: string, memory: MemoryItem): Promise<void>;
+    delete(userId: string, id: string): Promise<void>;
 }
 
-export class MockMemoryStore implements IMemoryStore {
-    private store: Map<string, MemoryItem> = new Map();
-
-    async save(memory: MemoryItem): Promise<void> {
-        this.store.set(memory.id, memory);
+export class FirebaseMemoryStore implements IMemoryStore {
+    async save(userId: string, memory: MemoryItem): Promise<void> {
+        await AiMemoryRepository.saveMemory(userId, memory);
         MemoryEventBus.emit('memory.created', memory.id, memory);
     }
 
-    async search(query: MemoryQuery): Promise<MemoryItem[]> {
+    async search(userId: string, query: MemoryQuery): Promise<MemoryItem[]> {
+        const memories = await AiMemoryRepository.getMemories(userId);
         const results: MemoryItem[] = [];
         const now = Date.now();
 
-        for (const memory of this.store.values()) {
+        for (const memory of memories) {
             // Layer filter
             if (query.layer && memory.metadata.layer !== query.layer) continue;
             
@@ -45,19 +45,13 @@ export class MockMemoryStore implements IMemoryStore {
         return results;
     }
 
-    async update(memory: MemoryItem): Promise<void> {
-        if (!this.store.has(memory.id)) {
-            throw new Error(`Memory with ID ${memory.id} not found.`);
-        }
-        this.store.set(memory.id, memory);
+    async update(userId: string, memory: MemoryItem): Promise<void> {
+        await AiMemoryRepository.updateMemory(userId, memory.id, memory);
         MemoryEventBus.emit('memory.updated', memory.id, memory);
     }
 
-    async delete(id: string): Promise<void> {
-        const memory = this.store.get(id);
-        if (memory) {
-            this.store.delete(id);
-            MemoryEventBus.emit('memory.deleted', id, memory);
-        }
+    async delete(userId: string, id: string): Promise<void> {
+        await AiMemoryRepository.deleteMemory(userId, id);
+        MemoryEventBus.emit('memory.deleted', id, undefined);
     }
 }

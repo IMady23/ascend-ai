@@ -8,3 +8,5 @@ export * from "./journal.repository";
 export * from "./ai.repository";
 export * from "./notification.repository";
 export * from "./conversation.repository";
+export * from "./daily-log.repository";
+export * from "./ai-memory.repository";

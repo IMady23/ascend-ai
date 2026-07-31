@@ -13,6 +13,8 @@ import { DashboardLayout, HeroSection, WidgetSection, AnalyticsGrid } from "@/co
 import { motion } from "framer-motion";
 import { HeroMotion, PageMotion } from "@/utils/motion";
 import { useUserStore } from "@/stores/user.store";
+import { useActivityStore } from "@/stores/activity.store";
+import { useAnalyticsStore } from "@/stores/analytics.store";
 import { 
   Dumbbell, 
   Flame, 
@@ -50,8 +52,8 @@ const AnimatedNumber = ({ value }: { value: number }) => {
 
 export default function MissionControl() {
 
-  const { profile } = useUserStore();
-  const { dailyWaterMl } = useNutritionStore();
+  const { profile, userId } = useUserStore();
+  const { dailyWaterMl, dailyCalories, dailyProtein } = useNutritionStore();
   const router = useRouter();
   
   const [isMealLoggerOpen, setIsMealLoggerOpen] = React.useState(false);
@@ -60,7 +62,21 @@ export default function MissionControl() {
   const [isStepsLoggerOpen, setIsStepsLoggerOpen] = React.useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = React.useState(false);
   const [isActionLoading, setIsActionLoading] = React.useState<string | null>(null);
-  const [currentSteps, setCurrentSteps] = React.useState(0);
+  const { dailySteps, workoutState } = useActivityStore();
+  const { weeklyStats, lifetimeStats, fetchStats } = useAnalyticsStore();
+  
+  useEffect(() => {
+    if (userId) {
+      // Mocking period IDs for now. In a real scenario, we'd compute the current week/month IDs.
+      fetchStats(userId, {
+        dailyId: new Date().toISOString().split('T')[0],
+        weeklyId: 'current-week',
+        monthlyId: 'current-month',
+        yearlyId: 'current-year',
+        lifetimeId: 'lifetime'
+      });
+    }
+  }, [userId, fetchStats]);
 
   const handleRoute = (path: string, actionId: string) => {
     setIsActionLoading(actionId);
@@ -88,10 +104,17 @@ export default function MissionControl() {
   const { identity, targets } = profile;
   const userName = identity?.nickname || identity?.fullName.split(" ")[0] || "Commander";
   
-  // Real Empty State Metrics
   const targetCalories = targets?.dailyCalories || 2000;
   const targetWater = (targets?.water || 3000) / 1000; // in L
   const targetSteps = profile.preferences?.stepGoal || 10000;
+  const targetProtein = targets?.protein || 150;
+
+  // Dynamic Score Calculation
+  const waterProgress = Math.min(1, dailyWaterMl / (targetWater * 1000));
+  const stepsProgress = Math.min(1, dailySteps / targetSteps);
+  const proteinProgress = Math.min(1, dailyProtein / targetProtein);
+  const calorieProgress = targetCalories > 0 ? Math.min(1, dailyCalories / targetCalories) : 0;
+  const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
   return (
     <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-4 md:px-8 max-w-7xl mx-auto">
@@ -109,7 +132,7 @@ export default function MissionControl() {
                 <Subheading size="md" className="hidden md:block text-base text-[var(--color-text-secondary)]">Welcome back!</Subheading>
                 
                 <div className="mt-3 md:mt-6">
-                  <Caption className="uppercase tracking-widest text-[var(--color-accent-blue)] mb-2 md:mb-3 font-semibold text-xs md:text-sm">Today's Focus</Caption>
+                  <Caption className="uppercase tracking-widest text-[var(--color-accent-blue)] mb-2 md:mb-3 font-semibold text-xs md:text-sm">Active Mission</Caption>
                   <ul className="space-y-1.5 md:space-y-2 text-[var(--color-text-primary)] text-sm md:text-base flex flex-col items-center md:items-start">
                     <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-blue)]" /> Hit your protein goal ({targets?.protein || 150}g)</li>
                     <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-green)]" /> Drink {targetWater}L water</li>
@@ -123,12 +146,12 @@ export default function MissionControl() {
                 
                 {/* Mobile Ring (25% smaller) */}
                 <div className="md:hidden">
-                  <ProgressRing value={85} size={90} strokeWidth={6} color="var(--color-accent-blue)" icon={<Statistic className="text-3xl"><AnimatedNumber value={85} /></Statistic>} />
+                  <ProgressRing value={dailyScore} size={90} strokeWidth={6} color="var(--color-accent-blue)" icon={<Statistic className="text-3xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
                 </div>
                 
                 {/* Desktop Ring */}
                 <div className="hidden md:block">
-                  <ProgressRing value={85} size={120} strokeWidth={8} color="var(--color-accent-blue)" icon={<Statistic className="text-4xl"><AnimatedNumber value={85} /></Statistic>} />
+                  <ProgressRing value={dailyScore} size={120} strokeWidth={8} color="var(--color-accent-blue)" icon={<Statistic className="text-4xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
                 </div>
               </div>
             </div>
@@ -141,7 +164,7 @@ export default function MissionControl() {
             <div onClick={() => handleRoute('/nutrition', 'calories-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
               <MetricCard 
                 label="Calories" 
-                value={`0 / ${targetCalories}`} 
+                value={`${dailyCalories} / ${targetCalories}`} 
                 icon={<Flame size={18} />} 
                 status="neutral"
               />
@@ -157,7 +180,7 @@ export default function MissionControl() {
             <div onClick={() => setIsStepsLoggerOpen(true)} className="cursor-pointer hover:opacity-80 transition-opacity">
               <MetricCard 
                 label="Steps" 
-                value={`${currentSteps} / ${targetSteps}`} 
+                value={`${dailySteps} / ${targetSteps}`} 
                 icon={<Activity size={18} />} 
                 status="neutral"
               />
@@ -165,9 +188,9 @@ export default function MissionControl() {
             <div onClick={() => handleRoute('/training', 'workout-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
               <MetricCard 
                 label="Workout" 
-                value="Not Started" 
+                value={workoutState === "completed" ? "Completed" : workoutState === "in_progress" ? "In Progress" : "Not Started"} 
                 icon={<Dumbbell size={18} />} 
-                status="neutral"
+                status={workoutState === "completed" ? "achieved" : workoutState === "in_progress" ? "warning" : "neutral"}
               />
             </div>
             <div onClick={() => handleRoute('/recovery', 'recovery-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
@@ -185,7 +208,7 @@ export default function MissionControl() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           
           <div className="md:col-span-2 space-y-6">
-            <WidgetSection title="Coach Recommendation">
+            <WidgetSection title="Today's AI Coach">
               <GlassCard className="p-4 md:p-6 border-[var(--color-accent-indigo)]/30 bg-gradient-to-br from-[var(--color-accent-indigo)]/5 to-transparent">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-[var(--color-accent-indigo)]/10 flex items-center justify-center">
@@ -226,6 +249,58 @@ export default function MissionControl() {
           </div>
         </div>
 
+        {/* 4. OVERVIEW & REPORTS */}
+        <div className="mb-12">
+          <WidgetSection title="Overview & Reports">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <InteractiveCard title="Current Streak" onClick={() => handleRoute('/progress', 'progress-streak')}>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-sm text-zinc-400">Days Active</span>
+                  <span className="font-semibold text-orange-400">{lifetimeStats?.metrics?.streakDays || 0} Days</span>
+                </div>
+                <div className="flex gap-1 mt-3">
+                  {[1, 2, 3, 4, 5, 6, 7].map((day, idx) => (
+                    <div 
+                      key={day} 
+                      className={`h-2 flex-1 rounded-full ${idx < (lifetimeStats?.metrics?.streakDays || 0) % 7 ? 'bg-orange-500' : 'bg-zinc-800'}`} 
+                    />
+                  ))}
+                </div>
+              </InteractiveCard>
+
+              <InteractiveCard title="Active Reminder" onClick={() => setIsReminderModalOpen(true)}>
+                <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-zinc-400">Next Alert</span>
+                    <span className="font-semibold text-[var(--color-accent-blue)]">2:00 PM</span>
+                  </div>
+                  <span className="text-base font-medium mt-1">Hydration Check</span>
+                </div>
+              </InteractiveCard>
+
+              <InteractiveCard title="Latest Report" onClick={() => handleRoute('/progress', 'latest-report')}>
+                <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-zinc-400">Weekly Summary</span>
+                    <span className="font-semibold text-emerald-400">Available</span>
+                  </div>
+                  <span className="text-sm mt-1 text-[var(--color-text-secondary)]">View your progress from last week.</span>
+                </div>
+              </InteractiveCard>
+
+              <InteractiveCard title="Workout Consistency" onClick={() => handleRoute('/progress', 'progress-card')}>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-sm text-zinc-400">Weekly Goal</span>
+                  <span className="font-semibold text-emerald-400">{weeklyStats?.consistency?.workout || 0}%</span>
+                </div>
+                <div className="w-full bg-zinc-800 rounded-full h-2 mt-2">
+                  <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${weeklyStats?.consistency?.workout || 0}%` }} />
+                </div>
+              </InteractiveCard>
+            </div>
+          </WidgetSection>
+        </div>
+
       </DashboardLayout>
 
       <MealLoggerModal 
@@ -241,8 +316,6 @@ export default function MissionControl() {
       <StepsLoggerModal
         isOpen={isStepsLoggerOpen}
         onClose={() => setIsStepsLoggerOpen(false)}
-        currentSteps={currentSteps}
-        onSave={(steps) => setCurrentSteps(steps)}
       />
 
       <WaterLoggerModal

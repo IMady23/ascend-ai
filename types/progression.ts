@@ -18,11 +18,14 @@ export interface Mission {
   userId: string;
   title: string;
   description: string;
-  type: 'daily' | 'weekly';
-  status: 'active' | 'completed' | 'failed';
+  type: 'walking' | 'running' | 'jogging' | 'cycling' | 'dance' | 'trekking' | 'daily' | 'weekly';
+  status: 'idle' | 'started' | 'paused' | 'resumed' | 'completed' | 'archived';
   xpReward: number;
   progress: number;
   target: number;
+  distanceMeter?: number;
+  durationSeconds?: number;
+  caloriesBurned?: number;
   createdAt: Timestamp;
   expiresAt: Timestamp;
 }
@@ -34,6 +37,15 @@ export interface Achievement {
   icon: string;
   unlockedAt: Timestamp | null;
   tier: 'bronze' | 'silver' | 'gold' | 'diamond';
+  sourceEvent?: string;
+  rewardXP?: number;
+}
+
+export interface LifetimeStatistics {
+  totalWorkouts: number;
+  totalDistanceMeters: number;
+  totalCaloriesBurned: number;
+  totalDurationSeconds: number;
 }
 
 export interface TimelineEvent {
@@ -54,6 +66,7 @@ export interface ProgressionProfile {
   xp: XP;
   streak: Streak;
   achievements: Achievement[];
+  lifetimeStats?: LifetimeStatistics;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

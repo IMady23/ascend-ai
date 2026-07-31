@@ -12,6 +12,7 @@ export class AuthRepository {
     const profile: UserProfile = {
       version: 1,
       onboardingCompleted: false,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -16,6 +16,7 @@ interface ProgressionState {
   addXP: (amount: number) => Promise<void>;
   updateStreak: (date: string) => Promise<void>;
   unlockAchievement: (achievement: Achievement) => Promise<void>;
+  updateLifetimeStats: (updates: { workouts?: number; distanceMeters?: number; caloriesBurned?: number; durationSeconds?: number }) => Promise<void>;
 }
 
 export const useProgressionStore = create<ProgressionState>()(
@@ -25,7 +26,20 @@ export const useProgressionStore = create<ProgressionState>()(
       activeMissions: [],
 
       setProfile: (profile) => set({ profile }),
-      setActiveMissions: (activeMissions) => set({ activeMissions }),
+      setActiveMissions: (missions) => {
+        set({ activeMissions: missions });
+        const userId = useUserStore.getState().userId;
+        if (userId) {
+          ReliabilityManager.execute(
+            'Firestore',
+            'saveMissions',
+            RELIABILITY_PROFILES.DATABASE_WRITE,
+            `missions-${userId}`,
+            () => ProgressionRepository.saveMissions(userId, missions),
+            'retry'
+          ).catch(console.error);
+        }
+      },
 
       addXP: async (amount) => {
         const userId = useUserStore.getState().userId;
@@ -142,6 +156,47 @@ export const useProgressionStore = create<ProgressionState>()(
           const updatedProfile = {
             ...state.profile,
             achievements: [...state.profile.achievements, achievement]
+          };
+
+          return { profile: updatedProfile };
+        });
+
+        const updated = get().profile;
+        if (updated) {
+          ReliabilityManager.execute(
+            'Firestore',
+            'updateProgressionProfile',
+            RELIABILITY_PROFILES.DATABASE_WRITE,
+            `progression-${userId}`,
+            () => ProgressionRepository.setProfile(userId, updated),
+            'retry'
+          ).catch(console.error);
+        }
+      },
+
+      updateLifetimeStats: async (updates) => {
+        const userId = useUserStore.getState().userId;
+        if (!userId) return;
+
+        set((state) => {
+          if (!state.profile) return state;
+          
+          const stats = state.profile.lifetimeStats || {
+            totalWorkouts: 0,
+            totalDistanceMeters: 0,
+            totalCaloriesBurned: 0,
+            totalDurationSeconds: 0
+          };
+
+          const updatedProfile = {
+            ...state.profile,
+            lifetimeStats: {
+              ...stats,
+              totalWorkouts: stats.totalWorkouts + (updates.workouts || 0),
+              totalDistanceMeters: stats.totalDistanceMeters + (updates.distanceMeters || 0),
+              totalCaloriesBurned: stats.totalCaloriesBurned + (updates.caloriesBurned || 0),
+              totalDurationSeconds: stats.totalDurationSeconds + (updates.durationSeconds || 0),
+            }
           };
 
           return { profile: updatedProfile };

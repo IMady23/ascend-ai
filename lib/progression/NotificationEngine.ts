@@ -9,7 +9,11 @@ export class NotificationEngine {
   private static eventQueue: AscendEvent[] = [];
   private static bundleTimeout: NodeJS.Timeout | null = null;
 
-  static evaluateEvent(event: AscendEvent) {
+  static async evaluateEvent(event: AscendEvent) {
+    const { RulesEngine } = await import("@/lib/automation/RulesEngine");
+    const shouldNotify = await RulesEngine.shouldNotify(event);
+    if (!shouldNotify) return;
+
     this.eventQueue.push(event);
     
     if (!this.bundleTimeout) {

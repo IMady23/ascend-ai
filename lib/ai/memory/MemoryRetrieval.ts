@@ -18,11 +18,11 @@ export class MemoryRetrieval {
         // Note: In a production DB, this would be heavily optimized or batched.
         // For Phase 4, the clean architecture allows us to orchestrate it modularly.
         
-        const goals = await this.store.search({ layer: 'goal', activeOnly });
-        const preferences = await this.store.search({ layer: 'preference', activeOnly });
-        const session = await this.store.search({ layer: 'session', tags: [activeModule], activeOnly });
-        const knowledge = await this.store.search({ layer: 'knowledge', activeOnly });
-        const summary = await this.store.search({ layer: 'summary', activeOnly });
+        const goals = await this.store.search(userId, { layer: 'goal', activeOnly });
+        const preferences = await this.store.search(userId, { layer: 'preference', activeOnly });
+        const session = await this.store.search(userId, { layer: 'session', tags: [activeModule], activeOnly });
+        const knowledge = await this.store.search(userId, { layer: 'knowledge', activeOnly });
+        const summary = await this.store.search(userId, { layer: 'summary', activeOnly });
 
         // Sorting by importance ensures deterministic retrieval within a layer
         const sortByImportance = (memories: MemoryItem[]) => 

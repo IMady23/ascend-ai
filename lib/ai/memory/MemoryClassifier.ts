@@ -29,6 +29,7 @@ export class MemoryClassifier {
         const metadata: MemoryMetadata = {
             id: `mem_${Math.random().toString(36).substring(2, 10)}`,
             layer,
+            category: layer,
             importance,
             confidence,
             createdBy: input.createdBy,
@@ -36,6 +37,7 @@ export class MemoryClassifier {
             tags: input.tags || [],
             createdAt: now,
             updatedAt: now,
+            lastReferencedAt: now,
             // Session memories expire after 24 hours by default
             expiresAt: layer === 'session' ? now + 86400000 : undefined
         };

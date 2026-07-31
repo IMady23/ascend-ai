@@ -15,7 +15,14 @@ export type EventType =
   | 'SYNC_FAILED'
   | 'PLATEAU_DETECTED'
   | 'WORKOUT_MISSED'
-  | 'PROTEIN_LOW';
+  | 'PROTEIN_LOW'
+  | 'MISSION_STARTED'
+  | 'MISSION_PAUSED'
+  | 'MISSION_RESUMED'
+  | 'DISTANCE_LOGGED'
+  | 'WEIGHT_UPDATED'
+  | 'STEPS_UPDATED'
+  | 'DAY_RESET';
 
 export interface BaseEvent {
   id: string;
@@ -55,4 +62,72 @@ export interface WaterLoggedEvent extends BaseEvent {
   };
 }
 
-export type AscendEvent = WorkoutCompletedEvent | MealLoggedEvent | WaterLoggedEvent | BaseEvent;
+export interface MissionStartedEvent extends BaseEvent {
+  type: 'MISSION_STARTED';
+  metadata: {
+    missionId: string;
+    missionType: string;
+  };
+}
+
+export interface MissionPausedEvent extends BaseEvent {
+  type: 'MISSION_PAUSED';
+  metadata: {
+    missionId: string;
+    progress: number;
+    distanceMeter?: number;
+    durationSeconds?: number;
+  };
+}
+
+export interface MissionResumedEvent extends BaseEvent {
+  type: 'MISSION_RESUMED';
+  metadata: {
+    missionId: string;
+  };
+}
+
+export interface DistanceLoggedEvent extends BaseEvent {
+  type: 'DISTANCE_LOGGED';
+  metadata: {
+    source: string;
+    distanceMeter: number;
+    durationSeconds?: number;
+  };
+}
+
+export interface WeightUpdatedEvent extends BaseEvent {
+  type: 'WEIGHT_UPDATED';
+  metadata: {
+    weightKg: number;
+    source: string;
+  };
+}
+
+export interface StepsUpdatedEvent extends BaseEvent {
+  type: 'STEPS_UPDATED';
+  metadata: {
+    steps: number;
+    source: string;
+  };
+}
+
+export interface DayResetEvent extends BaseEvent {
+  type: 'DAY_RESET';
+  metadata: {
+    newDate: string;
+  };
+}
+
+export type AscendEvent = 
+  | WorkoutCompletedEvent 
+  | MealLoggedEvent 
+  | WaterLoggedEvent 
+  | MissionStartedEvent
+  | MissionPausedEvent
+  | MissionResumedEvent
+  | DistanceLoggedEvent
+  | WeightUpdatedEvent
+  | StepsUpdatedEvent
+  | DayResetEvent
+  | BaseEvent;

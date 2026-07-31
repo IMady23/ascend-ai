@@ -38,6 +38,7 @@ export interface UserTargets {
 export interface UserProfile {
   version: 1;
   onboardingCompleted: boolean;
+  timezone?: string; // IANA Timezone string
   identity?: UserIdentity;
   goals?: { primaryGoal: PrimaryGoal };
   preferences?: UserPreferences;

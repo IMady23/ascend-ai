@@ -1,13 +1,16 @@
 import { AIRequest, AIResponse } from './types';
+import { Timestamp } from 'firebase/firestore';
 import { ConversationManager } from './conversation/ConversationManager';
 import { MemoryRetrieval } from './memory/MemoryRetrieval';
 import { MemoryContextBuilder } from './memory/MemoryContextBuilder';
 import { MemoryMetrics } from './memory/MemoryMetrics';
-import { MockMemoryStore } from './memory/MemoryStore';
+import { FirebaseMemoryStore } from './memory/MemoryStore';
 import { MemoryPolicyEngine } from './memory/MemoryPolicyEngine';
 import { PromptBuilder } from './prompts/PromptBuilder';
 import { AIGateway } from './gateway/AIGateway';
 import { ResponseValidator } from './validation/ResponseValidator';
+import { AiRepository } from '@/services/repositories/ai.repository';
+import { AiMessage } from '@/types/ai';
 import { ToolRegistry } from './tools/ToolRegistry';
 import { ToolRouter } from './tools/ToolRouter';
 import { CreateWorkoutTool } from './tools/actions/CreateWorkout';
@@ -23,7 +26,7 @@ import { StreamingEngine } from './streaming/StreamingEngine';
  */
 export class AIOrchestrator {
     private conversationManager = new ConversationManager();
-    private memoryStore = new MockMemoryStore();
+    private memoryStore = new FirebaseMemoryStore();
     private memoryRetrieval = new MemoryRetrieval(this.memoryStore);
     private memoryPolicy = new MemoryPolicyEngine(this.memoryStore);
     private memoryContextBuilder = new MemoryContextBuilder();
@@ -47,7 +50,8 @@ export class AIOrchestrator {
     /**
      * Executes a full AI lifecycle request synchronously.
      */
-    async executeAICommand(context: { correlationId: string; requestId: string; identity: { id: string } }, prompt: string, currentModule: string, chatHistory?: any[]): Promise<AIResponse> {
+    async executeAICommand(context: { correlationId: string; requestId: string; identity: { id: string } }, prompt: string, enrichedSnapshot: any, chatHistory?: any[]): Promise<AIResponse> {
+        const currentModule = enrichedSnapshot?.coachingScenario || 'general';
         const start = performance.now();
         const convo = this.conversationManager.startConversation(context.identity.id);
         
@@ -75,7 +79,7 @@ export class AIOrchestrator {
             conflictResolutions: 0
         });
 
-        const budgetContext = this.memoryContextBuilder.buildBudgetedContext(categorizedMemories);
+        const budgetContext = this.memoryContextBuilder.buildBudgetedContext(categorizedMemories, enrichedSnapshot);
 
         // Phase 5: Modular Prompt Framework
         request.systemContext = this.promptBuilder.build(currentModule, prompt, budgetContext);
@@ -104,13 +108,51 @@ export class AIOrchestrator {
 
         // Phase 4: Write Memory via Policy Engine
         // Any inferred knowledge from the AI response should be evaluated and saved safely.
-        await this.memoryPolicy.processAndStore({
+        await this.memoryPolicy.processAndStore(context.identity.id, {
             content: `User initiated conversation regarding: ${prompt}`,
             suggestedLayer: 'session',
             source: convo.id,
             createdBy: 'user',
             tags: [currentModule]
         });
+        
+        // Also evaluate the AI's response for long-term facts
+        if (validResponse.reasoning || validResponse.rawText) {
+            await this.memoryPolicy.processAndStore(context.identity.id, {
+                content: `AI responded: ${validResponse.reasoning || validResponse.rawText}`,
+                suggestedLayer: 'summary',
+                source: convo.id,
+                createdBy: 'ai_inference',
+                tags: [currentModule]
+            });
+        }
+
+        // Save Raw Chat History to aiChats collection
+        const userAiMsg: AiMessage = {
+            id: `msg-${Date.now()}-user`,
+            content: prompt,
+            role: "user",
+            timestamp: Timestamp.now()
+        };
+        const aiAiMsg: AiMessage = {
+            id: `msg-${Date.now()}-ai`,
+            content: validResponse.reasoning || validResponse.rawText || "",
+            role: "assistant",
+            timestamp: Timestamp.now()
+        };
+        
+        await AiRepository.createConversation(context.identity.id, {
+            id: convo.id,
+            userId: context.identity.id,
+            title: prompt.substring(0, 30) + '...',
+            startedAt: Timestamp.now(),
+            lastMessageAt: Timestamp.now(),
+            summary: validResponse.reasoning?.substring(0, 50) || "",
+            model: "openrouter-default"
+        });
+        
+        await AiRepository.createMessage(context.identity.id, convo.id, userAiMsg);
+        await AiRepository.createMessage(context.identity.id, convo.id, aiAiMsg);
 
         // Widget Mounting Broadcast
         if (validResponse.widgets.length > 0) {

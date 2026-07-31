@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-export type AggregationPeriod = 'daily' | 'weekly' | 'monthly' | 'lifetime';
+export type AggregationPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'lifetime';
 
 export interface ConsistencyScore {
   overall: number; // 0-100
@@ -32,6 +32,14 @@ export interface AggregatedStats {
     
     missionsCompleted: number;
     xpEarned: number;
+
+    weightKg: number;
+    steps: number;
+    distanceMeters: number;
+    streakDays: number;
+    totalCalories: number;
+    totalProtein: number;
+    totalWaterMl: number;
   };
   
   consistency: ConsistencyScore;
@@ -55,3 +63,13 @@ export interface Insight {
   timestamp: Timestamp;
   isRead: boolean;
 }
+
+export interface ChartDataPoint {
+  id: string;
+  timestamp: number;
+  label: string; // e.g. "Mon", "Jan", "2026-07-30"
+  value: number;
+  secondaryValue?: number;
+  metadata?: Record<string, any>;
+}
+

@@ -1,22 +1,27 @@
 import { AscendEvent } from "@/types/events";
 import { AggregatedStats, AggregationPeriod, ConsistencyScore } from "@/types/intelligence";
 import { InsightRepository } from "@/services/repositories/insight.repository";
-import { Timestamp } from "firebase/firestore";
-import { format, startOfWeek, startOfMonth } from "date-fns";
+import { format, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
-export class StatsAggregator {
+export class AnalyticsEngine {
   
   static async processEvent(event: AscendEvent) {
+    if (event.processed) return;
+    
     const date = new Date(event.timestamp.seconds * 1000);
     const dailyId = format(date, 'yyyy-MM-dd');
     const weeklyId = format(startOfWeek(date), 'yyyy-MM-dd');
     const monthlyId = format(startOfMonth(date), 'yyyy-MM');
+    const yearlyId = format(startOfYear(date), 'yyyy');
     const lifetimeId = 'lifetime';
 
-    await this.updateStats(event.userId, 'daily', dailyId, date, event);
-    await this.updateStats(event.userId, 'weekly', weeklyId, startOfWeek(date), event);
-    await this.updateStats(event.userId, 'monthly', monthlyId, startOfMonth(date), event);
-    await this.updateStats(event.userId, 'lifetime', lifetimeId, new Date(2020, 0, 1), event);
+    await Promise.all([
+      this.updateStats(event.userId, 'daily', dailyId, date, event),
+      this.updateStats(event.userId, 'weekly', weeklyId, startOfWeek(date), event),
+      this.updateStats(event.userId, 'monthly', monthlyId, startOfMonth(date), event),
+      this.updateStats(event.userId, 'yearly', yearlyId, startOfYear(date), event),
+      this.updateStats(event.userId, 'lifetime', lifetimeId, new Date(2020, 0, 1), event)
+    ]);
   }
 
   private static async updateStats(userId: string, period: AggregationPeriod, periodId: string, startDate: Date, event: AscendEvent) {
@@ -30,25 +35,44 @@ export class StatsAggregator {
     switch (event.type) {
       case 'WORKOUT_COMPLETED':
         stats.metrics.workoutsCompleted += 1;
-        stats.metrics.totalVolumeKg += event.metadata.totalVolume || 0;
-        // recalculate avg duration
-        const totalDuration = (stats.metrics.avgWorkoutDuration * (stats.metrics.workoutsCompleted - 1)) + (event.metadata.durationMinutes || 0);
+        stats.metrics.totalVolumeKg += (event as any).metadata.totalVolume || 0;
+        const totalDuration = (stats.metrics.avgWorkoutDuration * (stats.metrics.workoutsCompleted - 1)) + ((event as any).metadata.durationMinutes || 0);
         stats.metrics.avgWorkoutDuration = totalDuration / stats.metrics.workoutsCompleted;
         break;
       case 'MEAL_LOGGED':
         stats.metrics.mealsLogged += 1;
-        if (event.metadata.isGoalMet) {
+        stats.metrics.totalCalories += (event as any).metadata.calories || 0;
+        stats.metrics.totalProtein += (event as any).metadata.protein || 0;
+        
+        // Recalculate averages
+        stats.metrics.avgDailyCalories = stats.metrics.totalCalories / (stats.metrics.mealsLogged || 1); // rough proxy
+        stats.metrics.avgDailyProtein = stats.metrics.totalProtein / (stats.metrics.mealsLogged || 1);
+        
+        if ((event as any).metadata.isGoalMet) {
           stats.metrics.proteinGoalsMet += 1;
         }
         break;
       case 'WATER_LOGGED':
-        if (event.metadata.isGoalMet) {
+        stats.metrics.totalWaterMl += (event as any).metadata.amountMl || 0;
+        if ((event as any).metadata.isGoalMet) {
           stats.metrics.waterGoalsMet += 1;
         }
         break;
       case 'MISSION_COMPLETED':
         stats.metrics.missionsCompleted += 1;
-        stats.metrics.xpEarned += event.metadata.xpReward || 0;
+        stats.metrics.xpEarned += (event as any).metadata.xpReward || 0;
+        break;
+      case 'DISTANCE_LOGGED':
+        stats.metrics.distanceMeters += (event as any).metadata.distanceMeter || 0;
+        break;
+      case 'STEPS_UPDATED':
+        stats.metrics.steps += (event as any).metadata.steps || 0;
+        break;
+      case 'WEIGHT_UPDATED':
+        stats.metrics.weightKg = (event as any).metadata.weightKg || stats.metrics.weightKg;
+        break;
+      case 'STREAK_ACHIEVED':
+        stats.metrics.streakDays = (event as any).metadata.streakDays || stats.metrics.streakDays;
         break;
     }
 
@@ -76,7 +100,14 @@ export class StatsAggregator {
         proteinGoalsMet: 0,
         waterGoalsMet: 0,
         missionsCompleted: 0,
-        xpEarned: 0
+        xpEarned: 0,
+        weightKg: 0,
+        steps: 0,
+        distanceMeters: 0,
+        streakDays: 0,
+        totalCalories: 0,
+        totalProtein: 0,
+        totalWaterMl: 0
       },
       consistency: {
         overall: 0,
@@ -91,14 +122,11 @@ export class StatsAggregator {
   }
 
   private static calculateConsistency(stats: AggregatedStats): ConsistencyScore {
-    // Highly simplified placeholder logic for demonstration.
-    // In a real app, this compares against the user's specific goals for the period.
-    let w = Math.min(100, stats.metrics.workoutsCompleted * 20); // assume 5/week is 100%
-    let n = Math.min(100, stats.metrics.proteinGoalsMet * 15); // assume 7/week is 100%
+    let w = Math.min(100, stats.metrics.workoutsCompleted * 20); 
+    let n = Math.min(100, stats.metrics.proteinGoalsMet * 15); 
     let h = Math.min(100, stats.metrics.waterGoalsMet * 15);
     let m = Math.min(100, stats.metrics.missionsCompleted * 10);
     
-    // Recovery could be based on sleep data or rest days between workouts
     let r = 85; 
 
     const overall = (w * 0.4) + (n * 0.3) + (h * 0.1) + (r * 0.1) + (m * 0.1);

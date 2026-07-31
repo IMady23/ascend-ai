@@ -69,8 +69,8 @@ export function Sidebar() {
       </div>
 
       {/* Footer Area */}
-      <div 
-        className="p-3 border-t border-[var(--color-glass-border)] cursor-pointer"
+      <button 
+        className="w-full p-3 border-t border-[var(--color-glass-border)] cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)]"
         onClick={() => {
           import("@/stores/toast.store").then((m) => {
             m.useToastStore.getState().addToast({
@@ -81,8 +81,7 @@ export function Sidebar() {
             });
           });
         }}
-        role="button"
-        tabIndex={0}
+        aria-label="Sync Active"
       >
         <div className={cn(
           "flex items-center rounded-[var(--radius-md)] bg-[var(--color-bg-surface)] px-3 h-10 border border-[var(--color-glass-border)] hover:bg-[var(--color-bg-glass-hover)] transition-colors",
@@ -95,11 +94,13 @@ export function Sidebar() {
             </span>
           )}
         </div>
-      </div>
+      </button>
 
       {/* Toggle Button */}
       <button
         onClick={() => toggleSidebar()}
+        aria-label="Toggle Sidebar"
+        aria-expanded={isSidebarOpen}
         className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-glass-hover)] shadow-sm z-50 transition-colors"
       >
         {isSidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}

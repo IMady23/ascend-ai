@@ -5,6 +5,7 @@ import { ReliabilityManager } from "@/lib/reliability/ReliabilityManager";
 import { RELIABILITY_PROFILES } from "@/lib/reliability/types";
 import { ActivityRepository } from "@/services/repositories";
 import { useUserStore } from "@/stores/user.store";
+import { DailyLogRepository } from "@/services/repositories/daily-log.repository";
 import { eventBus } from "@/lib/events/EventBus";
 
 export type WorkoutState = "not_started" | "warm_up" | "in_progress" | "paused" | "rest_timer" | "exercise_transition" | "completed" | "saved";
@@ -22,7 +23,7 @@ interface ActivityState {
   setActivities: (activities: Activity[]) => void;
   setCurrentActivity: (activity: Activity | null) => void;
   setActiveExercises: (exercises: any[]) => void;
-  setDailySteps: (steps: number) => void;
+  setDailySteps: (steps: number) => Promise<void>;
   
   startWarmup: () => void;
   startExercise: () => void;
@@ -51,7 +52,33 @@ export const useActivityStore = create<ActivityState>()(
       setActivities: (activities) => set({ activities }),
       setCurrentActivity: (activity) => set({ currentActivity: activity }),
       setActiveExercises: (exercises) => set({ activeExercises: exercises }),
-      setDailySteps: (steps) => set({ dailySteps: steps }),
+      setDailySteps: async (steps) => {
+        set({ dailySteps: steps });
+        const userId = useUserStore.getState().userId;
+        if (userId) {
+          const dateStr = new Date().toISOString().split("T")[0];
+          ReliabilityManager.execute(
+            'Firestore',
+            'updateDailySteps',
+            RELIABILITY_PROFILES.DATABASE_WRITE,
+            `steps-${userId}-${dateStr}`,
+            () => DailyLogRepository.updateDailyLog(userId, dateStr, { steps }),
+            'retry'
+          ).catch(console.error);
+
+          eventBus.dispatch({
+            id: crypto.randomUUID(),
+            userId,
+            type: 'DISTANCE_LOGGED',
+            timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any,
+            metadata: { 
+              source: 'steps',
+              distanceMeter: steps * 0.762 
+            },
+            processed: false
+          });
+        }
+      },
       
       startWarmup: () => set({ workoutState: "warm_up", startTime: Date.now() }),
       startExercise: () => set({ workoutState: "in_progress" }),
@@ -139,7 +166,8 @@ export const useActivityStore = create<ActivityState>()(
         startTime: state.startTime,
         elapsedTime: state.elapsedTime,
         notes: state.notes,
-        activeExercises: state.activeExercises
+        activeExercises: state.activeExercises,
+        dailySteps: state.dailySteps,
       })
     }
   )

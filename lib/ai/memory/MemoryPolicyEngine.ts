@@ -18,9 +18,10 @@ export class MemoryPolicyEngine {
      * The absolute gatekeeper for all memory writes.
      * No module is permitted to bypass this and write directly to the MemoryStore.
      */
-    async processAndStore(input: RawMemoryInput): Promise<MemoryItem | null> {
+    async processAndStore(userId: string, input: RawMemoryInput): Promise<MemoryItem | null> {
         // 1. Classify the raw input
         const proposedMemory = this.classifier.classify(input);
+        proposedMemory.metadata.userId = userId;
 
         // 2. Reject low-confidence inference immediately to save DB costs
         if (proposedMemory.metadata.confidence < 0.2) {
@@ -29,7 +30,7 @@ export class MemoryPolicyEngine {
         }
 
         // 3. Check for conflicts (e.g. changing preferred workout time)
-        const resolvedMemory = await this.conflictResolver.resolve(proposedMemory);
+        const resolvedMemory = await this.conflictResolver.resolve(userId, proposedMemory);
         
         // If conflict resolver returns null, it means the memory was a pure duplicate or safely merged into an existing record
         if (!resolvedMemory) {
@@ -37,7 +38,7 @@ export class MemoryPolicyEngine {
         }
 
         // 4. Save to Store
-        await this.store.save(resolvedMemory);
+        await this.store.save(userId, resolvedMemory);
         return resolvedMemory;
     }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AIOrchestrator } from "@/lib/ai/AIOrchestrator";
+import { UserRepository, DailyLogRepository, NutritionRepository, ActivityRepository } from "@/services/repositories";
 
 const orchestrator = new AIOrchestrator();
 
@@ -21,13 +22,41 @@ export async function POST(req: Request) {
       identity: { id: userId }
     };
     
-    const currentModule = contextSnapshot?.coachingScenario || "general";
+    // The Context Builder Pipeline
+    const dateStr = new Date().toISOString().split("T")[0];
+    const userProfile = await UserRepository.getUser(userId);
+    const dailyLog = await DailyLogRepository.getDailyLog(userId, dateStr);
+    const recentMeals = await NutritionRepository.getNutritionLogs(userId);
+    const recentWorkouts = await ActivityRepository.getActivities(userId);
+    
+    // Lazy load ProgressionRepository because it might not be exported from services/repositories yet
+    const { ProgressionRepository } = await import("@/services/repositories/progression.repository");
+    const progressionProfile = await ProgressionRepository.getProfile(userId);
+
+    const { InsightRepository } = await import("@/services/repositories/insight.repository");
+    const { format, startOfWeek } = await import("date-fns");
+    const weeklyId = format(startOfWeek(new Date()), 'yyyy-MM-dd');
+    const weeklyAnalytics = await InsightRepository.getStats(userId, 'weekly', weeklyId);
+
+    const enrichedSnapshot = {
+      ...contextSnapshot,
+      profile: userProfile,
+      dailyStats: dailyLog,
+      recentMeals,
+      recentWorkouts: recentWorkouts ? recentWorkouts.slice(0, 3) : [], // Only send the last 3 workouts to save tokens
+      progression: progressionProfile,
+      analytics: {
+        weekly: weeklyAnalytics
+      }
+    };
+
+    const currentModule = enrichedSnapshot?.coachingScenario || "general";
     const startTime = Date.now();
     
     const structuredResponse = await orchestrator.executeAICommand(
       context,
       messageText,
-      currentModule,
+      enrichedSnapshot,
       chatHistory
     );
     

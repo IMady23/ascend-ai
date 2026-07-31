@@ -5,11 +5,11 @@ import { handleFirestoreError } from "./error-handler";
 
 export const AiRepository = {
   getConversationsRef(userId: string) {
-    return collection(firestore, `users/${userId}/ai_conversations`).withConverter(aiConversationConverter);
+    return collection(firestore, `users/${userId}/aiChats`).withConverter(aiConversationConverter);
   },
 
   getMessagesRef(userId: string, conversationId: string) {
-    return collection(firestore, `users/${userId}/ai_conversations/${conversationId}/messages`).withConverter(aiMessageConverter);
+    return collection(firestore, `users/${userId}/aiChats/${conversationId}/messages`).withConverter(aiMessageConverter);
   },
 
   async getConversations(userId: string): Promise<AiConversation[]> {

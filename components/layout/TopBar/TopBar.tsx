@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { useUserStore } from "@/stores/user.store";
 import { useUiStore } from "@/stores/ui.store";
 import { Avatar } from "@/components/adl/primitives/Avatar";
 import { ProfileMenu } from "./ProfileMenu";
+import { NotificationCenter } from "./NotificationCenter";
 import { Bell, Command, Menu, Sparkles, Clock, Sun, Moon, Monitor } from "lucide-react";
 import { AICoachDrawer } from "@/features/ai/components/AICoachDrawer";
 import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
@@ -21,6 +22,8 @@ export function TopBar() {
   const [isNotifOpen, setIsNotifOpen] = React.useState(false);
   const [isReminderOpen, setIsReminderOpen] = React.useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = React.useState(false);
+  
+  const notifRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -35,10 +38,9 @@ export function TopBar() {
             >
               <Menu size={20} />
             </button>
-            {/* AIStatusPopover removed for Sprint 1 Dashboard rewrite */}
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-4 relative">
             {/* Command Palette Trigger */}
             <button 
               onClick={() => setIsCommandOpen(true)}
@@ -71,14 +73,22 @@ export function TopBar() {
             </button>
 
             {/* Notifications */}
-            <button 
-              onClick={() => setIsNotifOpen(!isNotifOpen)}
-              className="relative p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hidden sm:block"
-              aria-label="Notifications"
-            >
-              <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-accent-blue)] rounded-full border border-[var(--color-bg-base)]" />
-            </button>
+            <div className="relative">
+              <button 
+                ref={notifRef}
+                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                className="relative p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hidden sm:block"
+                aria-label="Notifications"
+              >
+                <Bell size={18} />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-accent-blue)] rounded-full border border-[var(--color-bg-base)]" />
+              </button>
+              <NotificationCenter 
+                isOpen={isNotifOpen} 
+                onClose={() => setIsNotifOpen(false)} 
+                anchorRef={notifRef} 
+              />
+            </div>
 
             {/* Reminders Schedule */}
             <button 

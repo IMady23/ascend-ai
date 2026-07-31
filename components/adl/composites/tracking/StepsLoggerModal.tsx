@@ -4,22 +4,22 @@ import { Activity, Footprints, Flame, Timer, X, Check } from "lucide-react";
 import { Heading, BodyText, Caption } from "@/components/adl/typography";
 import { Button } from "@/components/adl/primitives/Button";
 import { GlassCard } from "@/components/adl/composites/cards/Cards";
+import { useActivityStore } from "@/stores/activity.store";
 
 interface StepsLoggerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (steps: number) => void;
-  currentSteps?: number;
 }
 
-export function StepsLoggerModal({ isOpen, onClose, onSave, currentSteps = 0 }: StepsLoggerModalProps) {
-  const [stepsInput, setStepsInput] = React.useState(currentSteps.toString());
+export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
+  const { dailySteps, setDailySteps } = useActivityStore();
+  const [stepsInput, setStepsInput] = React.useState(dailySteps.toString());
 
   React.useEffect(() => {
     if (isOpen) {
-      setStepsInput(currentSteps.toString());
+      setStepsInput(dailySteps.toString());
     }
-  }, [isOpen, currentSteps]);
+  }, [isOpen, dailySteps]);
 
   const stepsNum = parseInt(stepsInput) || 0;
   
@@ -94,7 +94,7 @@ export function StepsLoggerModal({ isOpen, onClose, onSave, currentSteps = 0 }: 
               fullWidth 
               size="lg" 
               onClick={() => {
-                onSave(stepsNum);
+                setDailySteps(stepsNum);
                 onClose();
               }}
               leftIcon={<Check size={18} />}

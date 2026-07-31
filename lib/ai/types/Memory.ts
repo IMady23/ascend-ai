@@ -3,7 +3,9 @@ export type MemoryProvenance = 'user' | 'tool' | 'ai_inference' | 'system';
 
 export interface MemoryMetadata {
     id: string;
+    userId?: string;
     layer: MemoryLayer;
+    category?: string;
     importance: number; // 0-100
     confidence: number; // 0.0-1.0
     createdBy: MemoryProvenance;
@@ -11,6 +13,7 @@ export interface MemoryMetadata {
     tags: string[];
     createdAt: number;
     updatedAt: number;
+    lastReferencedAt?: number;
     expiresAt?: number;
 }
 

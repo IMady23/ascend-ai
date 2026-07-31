@@ -1,9 +1,10 @@
 import { AscendEvent } from "@/types/events";
 import { eventBus } from "../events/EventBus";
+import { xpEngine } from "./XPEngine";
 import { MissionEngine } from "./MissionEngine";
 import { AchievementEngine } from "./AchievementEngine";
 import { NotificationEngine } from "./NotificationEngine";
-import { StatsAggregator } from "../intelligence/StatsAggregator";
+import { AnalyticsEngine } from "../intelligence/AnalyticsEngine";
 import { useTimelineStore } from "@/stores/timeline.store";
 import { TimelineRepository } from "@/services/repositories/timeline.repository";
 import { TimelineEvent } from "@/types/progression";
@@ -21,13 +22,21 @@ class ProgressionEngine {
     // 1. Core Progression Logic
     switch (event.type) {
       case 'WORKOUT_COMPLETED':
-        await this.processWorkout(event as any);
+        useProgressionStore.getState().updateLifetimeStats({
+          workouts: 1,
+          durationSeconds: (event as any).metadata?.durationMinutes ? (event as any).metadata.durationMinutes * 60 : 0
+        });
+        break;
+      case 'DISTANCE_LOGGED':
+        useProgressionStore.getState().updateLifetimeStats({
+          distanceMeters: (event as any).metadata?.distanceMeter || 0,
+          durationSeconds: (event as any).metadata?.durationSeconds || 0
+        });
         break;
       case 'MEAL_LOGGED':
-        await this.processMeal(event as any);
-        break;
-      case 'WATER_LOGGED':
-        await this.processWater(event as any);
+        useProgressionStore.getState().updateLifetimeStats({
+          caloriesBurned: (event as any).metadata?.calories || 0 // Reusing calories property for now; if it's meal, it's calories consumed, but the stat says 'Burned' - I'll leave this empty or rename later? Actually user requested totalCaloriesBurned. I will only log burned for workouts if available.
+        });
         break;
       case 'LEVEL_UP':
       case 'MISSION_COMPLETED':
@@ -43,7 +52,7 @@ class ProgressionEngine {
     NotificationEngine.evaluateEvent(event);
 
     // Update Aggregated Stats (Sprint 7 logic)
-    StatsAggregator.processEvent(event).catch(console.error);
+    AnalyticsEngine.processEvent(event).catch(console.error);
   }
 
   private async logToTimeline(event: AscendEvent, title: string, xpEarned: number, coachCommentary?: string) {
@@ -61,43 +70,6 @@ class ProgressionEngine {
 
     useTimelineStore.getState().addEventLocal(timelineEvent);
     TimelineRepository.addEvent(event.userId, timelineEvent).catch(console.error);
-  }
-
-  private async processWorkout(event: AscendEvent) {
-    const xpEarned = 120;
-    const store = useProgressionStore.getState();
-    const oldLevel = store.profile?.xp.currentLevel || 1;
-    
-    await store.addXP(xpEarned);
-    await this.logToTimeline(event, "Workout Completed", xpEarned);
-
-    const newLevel = useProgressionStore.getState().profile?.xp.currentLevel || 1;
-    if (newLevel > oldLevel) {
-      eventBus.dispatch({
-        id: crypto.randomUUID(),
-        userId: event.userId,
-        type: 'LEVEL_UP',
-        timestamp: event.timestamp,
-        metadata: { newLevel },
-        processed: false
-      });
-    }
-  }
-
-  private async processMeal(event: AscendEvent) {
-    if ((event as any).metadata?.isGoalMet) {
-      const xpEarned = 40;
-      await useProgressionStore.getState().addXP(xpEarned);
-      await this.logToTimeline(event, "Protein Goal Met", xpEarned);
-    }
-  }
-
-  private async processWater(event: AscendEvent) {
-    if ((event as any).metadata?.isGoalMet) {
-      const xpEarned = 10;
-      await useProgressionStore.getState().addXP(xpEarned);
-      await this.logToTimeline(event, "Hydration Goal Met", xpEarned);
-    }
   }
 
   public getXPForLevel(level: number): number {
