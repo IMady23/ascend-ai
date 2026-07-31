@@ -100,9 +100,9 @@ export default function AICommandModule() {
               <div>
                 <Caption className="text-text-disabled uppercase tracking-wider mb-2 font-semibold">Preferences</Caption>
                 <div className="flex flex-wrap gap-2">
-                  {profile?.preferences?.diet && <MemoryChip label={profile.preferences.diet} category="preference" />}
+                  {profile?.preferences?.dietType && <MemoryChip label={profile.preferences.dietType} category="preference" />}
                   {profile?.preferences?.activity && <MemoryChip label={profile.preferences.activity} category="preference" />}
-                  {!profile?.preferences?.diet && !profile?.preferences?.activity && (
+                  {!profile?.preferences?.dietType && !profile?.preferences?.activity && (
                     <MemoryChip label="No preferences set" category="preference" />
                   )}
                 </div>
