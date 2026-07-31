@@ -5,7 +5,7 @@ import { User as UserIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 const avatarVariants = cva(
-  "relative flex shrink-0 overflow-hidden rounded-[var(--radius-full)] bg-[var(--color-bg-surface)] items-center justify-center border border-[var(--color-glass-border)] shadow-sm",
+  "relative flex shrink-0 overflow-hidden rounded-[var(--radius-full)] bg-surface items-center justify-center border border-border-subtle shadow-sm",
   {
     variants: {
       size: {
@@ -44,7 +44,7 @@ export function Avatar({ className, size, src, alt = "Avatar", fallback, ...prop
           onError={() => setError(true)}
         />
       ) : (
-        <span className="flex h-full w-full items-center justify-center font-medium text-[var(--color-text-secondary)]">
+        <span className="flex h-full w-full items-center justify-center font-medium text-secondary">
           {fallback ? (
             fallback.substring(0, 2).toUpperCase()
           ) : (

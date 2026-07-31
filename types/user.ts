@@ -13,15 +13,26 @@ export interface UserIdentity {
   weight: number; // kg
 }
 
+export interface UserCustomGoals {
+  steps: number;
+  waterMl: number;
+  calories: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+  sleepHours: number;
+  workoutDurationMin: number;
+  workoutDaysPerWeek: number;
+}
+
 export interface UserPreferences {
   activity: ActivityLevel;
+  fitnessExperience: 'beginner' | 'intermediate' | 'advanced';
   wakeTime: string;
   sleepTime: string;
-  stepGoal: number;
-  waterGoal: number;
-  workoutDays: number;
   dietType: DietType;
   allergies: string[];
+  goals?: UserCustomGoals;
 }
 
 export interface UserTargets {

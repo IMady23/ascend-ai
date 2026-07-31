@@ -14,7 +14,7 @@ export class LogMealTool implements AITool {
         timeoutMs: 5000,
         idempotent: false,
         supportsStreaming: false,
-        requiresConfirmation: false 
+        requiresConfirmation: true 
     };
 
     validate(input: Record<string, unknown>): ValidationResult {
@@ -24,13 +24,21 @@ export class LogMealTool implements AITool {
         return { isValid: true };
     }
 
-    async execute(input: Record<string, unknown>): Promise<unknown> {
-        const userId = useUserStore.getState().userId;
+    async execute(input: Record<string, unknown>, isConfirmed?: boolean): Promise<unknown> {
+        // We get userId from input if provided (passed from orchestrator), else fallback to store
+        const userId = (input.userId as string) || useUserStore.getState().userId;
         if (!userId) {
             throw new Error("User not authenticated");
         }
         
-        const { addMeal } = useNutritionStore.getState();
+        if (!isConfirmed) {
+            return {
+                status: "pending_confirmation",
+                summary: "Meal log requires user confirmation.",
+                toolData: input
+            };
+        }
+
         const mealId = crypto.randomUUID();
         
         const now = Date.now();
@@ -38,6 +46,7 @@ export class LogMealTool implements AITool {
         const mealType = (input.mealType as string) || "snack";
 
         const newMealData = {
+            id: mealId,
             date: dateStr,
             timestamp: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any,
             mealType: mealType as any,
@@ -59,10 +68,13 @@ export class LogMealTool implements AITool {
                 }
             ],
             source: "ai" as const,
+            userId,
+            createdAt: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any,
             updatedAt: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any
-        };
+        } as any;
 
-        await addMeal(newMealData);
+        const { NutritionRepository } = await import('@/services/repositories/nutrition.repository');
+        await NutritionRepository.createNutritionLog(userId, newMealData);
 
         return {
             mealId,

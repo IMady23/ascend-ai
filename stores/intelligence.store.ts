@@ -69,17 +69,21 @@ export const useIntelligenceStore = create<IntelligenceState>((set, get) => ({
       const monthlyId = format(startOfMonth(today), 'yyyy-MM');
       const { timeFilter, trendCategory } = get();
 
-      // 1. Calculate Sufficiency based on real stores
+      // 1. Initialize AnalyticsService cache
+      const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
+      await AnalyticsService.initializeCache(userId);
+
+      // 2. Calculate Sufficiency based on real stores
       const sufficiency = IntelligenceService.getSufficiencyState();
 
-      // 2. Pass the stage to the data fetchers
+      // 3. Pass the stage to the data fetchers
       const [weekly, monthly, insights, chartData, consistency, activeInsight, historical] = await Promise.all([
         InsightRepository.getStats(userId, 'weekly', weeklyId),
         InsightRepository.getStats(userId, 'monthly', monthlyId),
         InsightRepository.getLatestInsights(userId, 5),
         IntelligenceService.fetchChartData(trendCategory, timeFilter, sufficiency.stage),
         IntelligenceService.fetchConsistencyScore(timeFilter, sufficiency.stage),
-        IntelligenceService.fetchActiveInsight(sufficiency.stage),
+        IntelligenceService.fetchActiveInsight(sufficiency.stage, timeFilter),
         IntelligenceService.fetchHistoricalInsights(timeFilter, sufficiency.stage)
       ]);
 

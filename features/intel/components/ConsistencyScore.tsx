@@ -47,10 +47,10 @@ export function ConsistencyScore() {
   ];
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 md:col-span-2">
+    <div className="bg-surface/50 border border-border-subtle rounded-xl p-6 md:col-span-2">
       <div className="flex items-center gap-2 mb-6">
-        <ShieldCheck size={18} className="text-zinc-400" />
-        <h2 className="text-lg font-semibold text-white">Consistency Score</h2>
+        <ShieldCheck size={18} className="text-secondary" />
+        <h2 className="text-lg font-semibold text-primary">Consistency Score</h2>
       </div>
 
       <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -71,8 +71,8 @@ export function ConsistencyScore() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-black text-white font-mono">{overallScore}%</span>
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Overall</span>
+            <span className="text-3xl font-black text-primary font-mono">{overallScore}%</span>
+            <span className="text-[10px] uppercase tracking-wider text-secondary font-bold">Overall</span>
           </div>
         </div>
 
@@ -80,14 +80,14 @@ export function ConsistencyScore() {
         <div className="flex-grow w-full grid gap-3">
           {categories.map((cat, i) => (
             <div key={i} className="flex items-center gap-4">
-              <span className="w-24 text-xs font-semibold uppercase tracking-wider text-zinc-400">{cat.name}</span>
-              <div className="flex-grow h-2 bg-zinc-950 rounded-full overflow-hidden flex">
+              <span className="w-24 text-xs font-semibold uppercase tracking-wider text-secondary">{cat.name}</span>
+              <div className="flex-grow h-2 bg-base rounded-full overflow-hidden flex">
                 <div 
                   className={`h-full ${cat.color} rounded-full transition-all duration-1000`}
                   style={{ width: `${cat.score}%` }}
                 />
               </div>
-              <span className="w-8 text-right text-sm font-bold text-white font-mono">{cat.score}%</span>
+              <span className="w-8 text-right text-sm font-bold text-primary font-mono">{cat.score}%</span>
             </div>
           ))}
         </div>

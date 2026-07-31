@@ -5,6 +5,10 @@ import { useChapterStore } from "@/stores/chapter.store";
 import { CoachMemoryLayer } from "@/lib/ai/CoachMemoryLayer";
 import { useIntelligenceStore } from "@/stores/intelligence.store";
 import { useRecoveryStore } from "@/stores/recovery.store";
+import { useProgressionStore } from "@/stores/progression.store";
+import { useAnalyticsStore } from "@/stores/analytics.store";
+import { useMissionStore } from "@/stores/mission.store";
+import { useTimelineStore } from "@/stores/timeline.store";
 
 export const ContextBuilder = {
   build(coachingMode?: string | null): any {
@@ -12,6 +16,10 @@ export const ContextBuilder = {
     const activityState = useActivityStore.getState();
     const nutritionState = useNutritionStore.getState();
     const chapterState = useChapterStore.getState();
+    const progressionState = useProgressionStore.getState();
+    const analyticsState = useAnalyticsStore.getState();
+    const missionState = useMissionStore.getState();
+    const timelineState = useTimelineStore.getState();
 
     const profile = {
       name: userState.profile?.identity?.fullName || "Commander",
@@ -22,7 +30,8 @@ export const ContextBuilder = {
       weight: userState.profile?.identity?.weight,
       primaryGoal: userState.profile?.goals?.primaryGoal,
       activityLevel: userState.profile?.preferences?.activity,
-      targets: userState.profile?.targets,
+      goals: userState.profile?.preferences?.goals,
+      preferences: userState.profile?.preferences,
     };
 
     const recentWorkouts = activityState.activities.slice(0, 5).map((w) => ({
@@ -46,23 +55,15 @@ export const ContextBuilder = {
 
     const nutrition = {
       waterIntake: nutritionState.dailyWaterMl,
-      waterGoal: userState.profile?.targets?.water || 3000,
+      waterGoal: userState.profile?.preferences?.goals?.waterMl || userState.profile?.targets?.water || 3000,
       caloriesConsumed: todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
       proteinConsumed: todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
       carbsConsumed: todaysMeals.reduce((acc, m) => acc + (m.carbs || 0), 0),
       fatConsumed: todaysMeals.reduce((acc, m) => acc + (m.fat || 0), 0),
-      caloriesRemaining:
-        (userState.profile?.targets?.dailyCalories || 2000) -
-        todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
-      proteinRemaining:
-        (userState.profile?.targets?.protein || 150) -
-        todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
-      carbsRemaining:
-        (userState.profile?.targets?.carbs || 200) -
-        todaysMeals.reduce((acc, m) => acc + (m.carbs || 0), 0),
-      fatRemaining:
-        (userState.profile?.targets?.fat || 65) -
-        todaysMeals.reduce((acc, m) => acc + (m.fat || 0), 0),
+      caloriesGoal: userState.profile?.preferences?.goals?.calories || userState.profile?.targets?.dailyCalories || 2000,
+      proteinGoal: userState.profile?.preferences?.goals?.proteinGrams || userState.profile?.targets?.protein || 150,
+      carbsGoal: userState.profile?.preferences?.goals?.carbsGrams || userState.profile?.targets?.carbs || 200,
+      fatGoal: userState.profile?.preferences?.goals?.fatGrams || userState.profile?.targets?.fat || 65,
       recentMeals,
       missingMeals,
       hasActiveMealPlan: !!activeMealPlan,
@@ -139,6 +140,16 @@ export const ContextBuilder = {
         status: chapterStatus,
         ...chapter,
       },
+      progression: {
+        level: progressionState.profile?.xp?.currentLevel || 1,
+        xp: progressionState.profile?.xp?.total || 0,
+        achievements: progressionState.profile?.achievements?.filter(a => a.unlockedAt).length || 0,
+        streak: analyticsState.aiSummary?.currentStreak || 0,
+      },
+      analytics: {
+        totalWorkouts: analyticsState.aiSummary?.workoutsCompleted || 0,
+        consistency: analyticsState.goalCompletion?.workouts || 0,
+      },
       intelligence: {
         consistencyScore: useIntelligenceStore.getState().weeklyStats?.consistency?.overall || 0,
         activeInsights: useIntelligenceStore.getState().latestInsights.map(i => ({
@@ -154,6 +165,11 @@ export const ContextBuilder = {
         readiness: useRecoveryStore.getState().currentProfile?.readiness || 100,
         trainingLoad: useRecoveryStore.getState().currentProfile?.trainingLoad || { acuteLoad: 0, chronicLoad: 0, workloadRatio: 1 },
       },
+      mission: {
+        activeMissionTitle: missionState.getActiveMission()?.title || "No active mission",
+        activeMissionType: missionState.getActiveMission()?.type || "None",
+      },
+      personalTimeline: timelineState.events.slice(0, 10).map(e => ({ title: e.title, description: e.description, date: e.date })),
       coachMemory: CoachMemoryLayer.summarizeTimeline(),
       timestamp: new Date().toISOString(),
     };

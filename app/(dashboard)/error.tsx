@@ -19,7 +19,7 @@ export default function DashboardError({
 
   return (
     <PageContainer className="flex items-center justify-center p-4 h-full min-h-[60vh]">
-      <div className="w-full max-w-md bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-xl)] p-8 text-center shadow-2xl relative overflow-hidden">
+      <div className="w-full max-w-md bg-surface border border-border-subtle rounded-[var(--radius-xl)] p-8 text-center shadow-2xl relative overflow-hidden">
         {/* Subtle red ambient glow */}
         <div className="absolute inset-0 bg-red-500/5 mix-blend-screen pointer-events-none" />
         
@@ -28,7 +28,7 @@ export default function DashboardError({
         </div>
         
         <Heading level="h3" className="mb-2">Module Failure</Heading>
-        <BodyText className="text-[var(--color-text-secondary)] mb-8">
+        <BodyText className="text-secondary mb-8">
           The intelligence subsystem encountered an unexpected fault while rendering this view.
         </BodyText>
         

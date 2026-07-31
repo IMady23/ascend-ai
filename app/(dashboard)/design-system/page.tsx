@@ -76,7 +76,7 @@ export default function DesignSystemPlayground() {
         
         {/* Foundation: Typography Hierarchy */}
         <section>
-          <Heading level="h2" className="mb-8 border-b border-[var(--color-border)] pb-4">1. Typography Hierarchy</Heading>
+          <Heading level="h2" className="mb-8 border-b border-border-subtle pb-4">1. Typography Hierarchy</Heading>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="space-y-6">
               <div><Heading level="h1">Heading 1</Heading><Caption>4xl / Bold / Tight</Caption></div>
@@ -95,10 +95,10 @@ export default function DesignSystemPlayground() {
 
         {/* Standardized Interaction Patterns */}
         <section>
-          <Heading level="h2" className="mb-8 border-b border-[var(--color-border)] pb-4">2. Interaction Patterns & Stress Tests</Heading>
+          <Heading level="h2" className="mb-8 border-b border-border-subtle pb-4">2. Interaction Patterns & Stress Tests</Heading>
           
           <WidgetSection title="Button Stress Test">
-            <div className="flex flex-wrap items-end gap-6 p-6 rounded-xl border border-[var(--color-border)] border-dashed">
+            <div className="flex flex-wrap items-end gap-6 p-6 rounded-xl border border-border-subtle border-dashed">
               <Button variant="primary" loading={simulateSlowNetwork}>Standard Action</Button>
               <Button variant="danger" loading={simulateSlowNetwork} leftIcon={<AlertCircle size={16}/>}>Delete Pattern</Button>
               <Button variant="success" loading={simulateSlowNetwork} leftIcon={<CheckCircle2 size={16}/>}>Success Pattern</Button>
@@ -114,7 +114,7 @@ export default function DesignSystemPlayground() {
           </WidgetSection>
 
           <WidgetSection title="Input Stress Test" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 rounded-xl border border-[var(--color-border)] border-dashed">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 rounded-xl border border-border-subtle border-dashed">
               <TextInput 
                 placeholder="Overflow test..." 
                 defaultValue="Super long user input that should scroll horizontally inside the input field without breaking the layout"
@@ -130,7 +130,7 @@ export default function DesignSystemPlayground() {
 
         {/* Semantic Layout Primitives */}
         <section>
-          <Heading level="h2" className="mb-8 border-b border-[var(--color-border)] pb-4">3. Semantic Layouts (Composites)</Heading>
+          <Heading level="h2" className="mb-8 border-b border-border-subtle pb-4">3. Semantic Layouts (Composites)</Heading>
           
           <WidgetSection title="AnalyticsGrid & MetricCard Pattern">
             <AnalyticsGrid>
@@ -143,7 +143,7 @@ export default function DesignSystemPlayground() {
           </WidgetSection>
 
           <WidgetSection title="FormSection Pattern" className="mt-8">
-            <div className="bg-[var(--color-bg-surface)] p-6 rounded-xl border border-[var(--color-glass-border)]">
+            <div className="bg-surface p-6 rounded-xl border border-border-subtle">
               <FormSection title="Profile Settings" description="Update your personal details and public profile.">
                 <TextInput placeholder="Full Name" defaultValue="Alex Rivera" />
                 <TextInput placeholder="Email Address" defaultValue="alex@ascend.ai" />
@@ -160,7 +160,7 @@ export default function DesignSystemPlayground() {
 
         {/* Empty States & Error Experiences */}
         <section>
-          <Heading level="h2" className="mb-8 border-b border-[var(--color-border)] pb-4">4. Standardized Empty & Error States</Heading>
+          <Heading level="h2" className="mb-8 border-b border-border-subtle pb-4">4. Standardized Empty & Error States</Heading>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card className="border-dashed border-2">
               <EmptyState 
@@ -183,7 +183,7 @@ export default function DesignSystemPlayground() {
 
         {/* AI & Innovation */}
         <section>
-          <Heading level="h2" className="mb-8 border-b border-[var(--color-border)] pb-4">5. AI Conversation Patterns</Heading>
+          <Heading level="h2" className="mb-8 border-b border-border-subtle pb-4">5. AI Conversation Patterns</Heading>
           <GlassCard intensity="high" className="border-[var(--color-accent-indigo)]/50 max-w-2xl mx-auto">
             <div className="flex items-start gap-4 mb-8">
               <Avatar size="md" className="bg-[var(--color-accent-indigo)]" fallback="AI" />
@@ -195,7 +195,7 @@ export default function DesignSystemPlayground() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3 justify-end pt-4 border-t border-[var(--color-glass-border)]">
+            <div className="flex flex-wrap gap-3 justify-end pt-4 border-t border-border-subtle">
               <SuggestionChip icon={<Sparkles size={14} />}>Accept Plan</SuggestionChip>
               <SuggestionChip>Make it harder</SuggestionChip>
             </div>

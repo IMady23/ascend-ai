@@ -8,7 +8,7 @@ import { WorkoutRecoveryBanner } from "@/components/adl/composites/training/Work
 
 export function DashboardLayout({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("min-h-screen bg-[var(--color-bg-base)] flex flex-col", className)} {...props}>
+    <div className={cn("min-h-screen bg-base flex flex-col", className)} {...props}>
       <WorkoutRecoveryBanner />
       {children}
     </div>
@@ -39,7 +39,7 @@ export function WidgetSection({ className, title, action, children, ...props }: 
     <section className={cn("w-full py-8", className)} {...props}>
       {(title || action) && (
         <div className="flex items-center justify-between mb-6 px-1">
-          {title && <h3 className="text-xl font-semibold text-[var(--color-text-primary)] tracking-tight">{title}</h3>}
+          {title && <h3 className="text-xl font-semibold text-primary tracking-tight">{title}</h3>}
           {action && <div>{action}</div>}
         </div>
       )}
@@ -62,10 +62,10 @@ export function AnalyticsGrid({ className, children, ...props }: React.HTMLAttri
 
 export function FormSection({ className, title, description, children, ...props }: React.HTMLAttributes<HTMLDivElement> & { title?: React.ReactNode, description?: React.ReactNode }) {
   return (
-    <div className={cn("flex flex-col md:flex-row gap-8 md:gap-12 py-8 border-b border-[var(--color-border)] last:border-0", className)} {...props}>
+    <div className={cn("flex flex-col md:flex-row gap-8 md:gap-12 py-8 border-b border-border-subtle last:border-0", className)} {...props}>
       <div className="w-full md:w-1/3">
-        {title && <h4 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">{title}</h4>}
-        {description && <p className="text-sm text-[var(--color-text-secondary)]">{description}</p>}
+        {title && <h4 className="text-lg font-semibold text-primary mb-1">{title}</h4>}
+        {description && <p className="text-sm text-secondary">{description}</p>}
       </div>
       <div className="w-full md:w-2/3 space-y-6">
         {children}

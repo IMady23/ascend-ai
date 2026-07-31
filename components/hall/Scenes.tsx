@@ -37,10 +37,10 @@ export function EntranceScene() {
         >
           <Image src="/ascend-logo.svg" alt="Ascend Logo" fill className="object-contain" priority />
         </motion.div>
-        <h1 className="text-4xl md:text-5xl tracking-[0.2em] font-light text-white uppercase mb-4">
+        <h1 className="text-4xl md:text-5xl tracking-[0.2em] font-light text-primary uppercase mb-4">
           <EngraveText duration={2}>The Hall of Ascension</EngraveText>
         </h1>
-        <p className="text-[var(--color-text-secondary)] tracking-widest text-sm uppercase mt-8 opacity-50">
+        <p className="text-secondary tracking-widest text-sm uppercase mt-8 opacity-50">
           <EngraveText delay={1} duration={1.5}>Scroll or Click to Walk</EngraveText>
         </p>
       </div>
@@ -55,7 +55,7 @@ export function DecisionRoom() {
   return (
     <SceneContainer>
       <div className="hall-wall p-12 md:p-24 max-w-4xl rounded-sm border-l-4 border-l-[var(--color-accent-blue)] z-10 shadow-[0_0_40px_rgba(59,130,246,0.02)]">
-        <h2 className="text-3xl md:text-5xl font-light leading-tight tracking-wide text-white text-left">
+        <h2 className="text-3xl md:text-5xl font-light leading-tight tracking-wide text-primary text-left">
           <EngraveText duration={3}>Discipline builds what motivation only begins.</EngraveText>
         </h2>
         <div className="mt-8 flex items-center gap-4 opacity-70">
@@ -74,18 +74,18 @@ export function MindRoom() {
   return (
     <SceneContainer>
       <div className="w-full max-w-5xl relative h-[60vh] flex items-center justify-center perspective-[1000px] z-10">
-        <motion.div className="absolute top-1/4 left-10 text-xl font-light text-[var(--color-text-secondary)] italic opacity-40"
+        <motion.div className="absolute top-1/4 left-10 text-xl font-light text-secondary italic opacity-40"
           animate={{ y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
           <EngraveText delay={0.2}>"One decision can rewrite an entire lifetime."</EngraveText>
         </motion.div>
         
         <div className="hall-wall p-12 max-w-2xl rounded-sm z-10 border-b-4 border-b-[var(--color-accent-emerald)] shadow-[0_0_40px_rgba(16,185,129,0.02)]">
-          <h2 className="text-3xl md:text-4xl font-light leading-tight tracking-wide text-white text-center">
+          <h2 className="text-3xl md:text-4xl font-light leading-tight tracking-wide text-primary text-center">
             <EngraveText duration={2.5}>The strongest version of you is still under construction.</EngraveText>
           </h2>
         </div>
 
-        <motion.div className="absolute bottom-1/4 right-10 text-xl font-light text-[var(--color-text-secondary)] italic opacity-40"
+        <motion.div className="absolute bottom-1/4 right-10 text-xl font-light text-secondary italic opacity-40"
           animate={{ y: [0, 15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>
           <EngraveText delay={0.5}>"Progress is earned quietly before it's admired publicly."</EngraveText>
         </motion.div>
@@ -101,7 +101,7 @@ export function DisciplineRoom() {
   return (
     <SceneContainer>
       <div className="max-w-5xl w-full z-10">
-        <h3 className="text-[var(--color-text-secondary)] tracking-widest uppercase mb-16 opacity-70 text-sm">
+        <h3 className="text-secondary tracking-widest uppercase mb-16 opacity-70 text-sm">
           <EngraveText duration={1.5}>The Path of Consistency</EngraveText>
         </h3>
         
@@ -117,7 +117,7 @@ export function DisciplineRoom() {
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ delay: i * 0.15 + 0.5, duration: Timing.slow }}
-              className="hall-wall aspect-square rounded-full flex flex-col items-center justify-center p-8 gap-4 border-[var(--color-glass-border)] bg-black/40"
+              className="hall-wall aspect-square rounded-full flex flex-col items-center justify-center p-8 gap-4 border-border-subtle bg-base/40"
             >
               <span className="text-4xl md:text-5xl opacity-80">{item.icon}</span>
               <span className="text-xs tracking-widest uppercase text-[var(--color-text-muted)]">{item.label}</span>
@@ -149,7 +149,7 @@ export function FutureRoom() {
             <motion.h2 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-2xl md:text-4xl font-light tracking-[0.1em] text-white"
+              className="text-2xl md:text-4xl font-light tracking-[0.1em] text-primary"
             >
               <EngraveText duration={2}>Your strongest self is waiting.</EngraveText>
             </motion.h2>
@@ -193,8 +193,8 @@ export function FinalPortal({ onBeginJourney }: FinalPortalProps) {
         style={{ transform: "perspective(500px) rotateX(60deg) scale(2)", transformOrigin: "bottom center" }}
         transition={{ duration: 1.5 }}
       >
-        <span className="text-2xl font-light italic text-white blur-[2px]">Discipline builds what motivation only begins.</span>
-        <span className="text-xl font-light italic text-white blur-[3px]">The strongest version of you is still under construction.</span>
+        <span className="text-2xl font-light italic text-primary blur-[2px]">Discipline builds what motivation only begins.</span>
+        <span className="text-xl font-light italic text-primary blur-[3px]">The strongest version of you is still under construction.</span>
       </motion.div>
 
       <div className="flex flex-col items-center justify-center relative z-10 w-full max-w-xl">
@@ -205,7 +205,7 @@ export function FinalPortal({ onBeginJourney }: FinalPortalProps) {
               {step >= 1 && (
                 <motion.h1 
                   initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="text-lg md:text-2xl tracking-[0.3em] font-light text-white uppercase"
+                  className="text-lg md:text-2xl tracking-[0.3em] font-light text-primary uppercase"
                 >
                   <EngraveText duration={1.5}>EVERY TRANSFORMATION</EngraveText>
                 </motion.h1>
@@ -216,7 +216,7 @@ export function FinalPortal({ onBeginJourney }: FinalPortalProps) {
               {step >= 2 && (
                 <motion.p 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-[var(--color-text-secondary)] tracking-widest text-sm uppercase opacity-70"
+                  className="text-secondary tracking-widest text-sm uppercase opacity-70"
                 >
                   begins with
                 </motion.p>
@@ -227,7 +227,7 @@ export function FinalPortal({ onBeginJourney }: FinalPortalProps) {
               {step >= 3 && (
                 <motion.h1 
                   initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="text-lg md:text-2xl tracking-[0.3em] font-bold text-white uppercase"
+                  className="text-lg md:text-2xl tracking-[0.3em] font-bold text-primary uppercase"
                 >
                   <EngraveText duration={1.5}>ONE DECISION.</EngraveText>
                 </motion.h1>
@@ -241,7 +241,7 @@ export function FinalPortal({ onBeginJourney }: FinalPortalProps) {
                     size="lg" 
                     variant="primary" 
                     onClick={handleDoorOpen}
-                    className="shadow-[0_0_20px_rgba(255,255,255,0.1)] px-12 tracking-wider hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all bg-white text-black"
+                    className="shadow-glow-ai px-12 tracking-wider border border-border-subtle bg-surface-elevated text-text-primary hover:bg-surface transition-all"
                   >
                     Begin Your Journey →
                   </Button>

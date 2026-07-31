@@ -106,13 +106,8 @@ export class IntelligenceService {
 
   static async fetchChartData(category: TrendCategory, days: TimeFilter, stage: IntelligenceStage): Promise<ChartDataPoint[]> {
     if (stage === "NO_DATA") return [];
-    
-    // For V1, if they have limited data we just return empty array so Recharts shows empty states.
-    // If they have sufficient data, we would normally map their REAL store data into the chart.
-    // Let's map real Activity and Nutrition data.
-    
-    const activityState = useActivityStore.getState();
-    const nutritionState = useNutritionStore.getState();
+    const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
+    const cache = AnalyticsService.getCache();
     
     const data: ChartDataPoint[] = [];
     const today = new Date();
@@ -126,20 +121,19 @@ export class IntelligenceService {
       };
 
       if (category === "workout") {
-        // Aggregate real workouts
-        const dayActivities = activityState.activities.filter(a => new Date((a as any).date || a.id).toISOString().startsWith(dateStr));
-        point.volume = 0; // We'd sum real volume here
-        point.sets = 0;
-        point.duration = 0;
+        const dayActivities = cache.activities.filter(a => a.date.toDate().toISOString().startsWith(dateStr));
+        point.volume = dayActivities.reduce((acc, a) => acc + ((a.metrics?.totalVolume as number) || 0), 0);
+        point.duration = dayActivities.reduce((acc, a) => acc + (a.durationMinutes || 0), 0);
       } else if (category === "nutrition") {
-        const dayMeals = nutritionState.meals.filter(m => new Date((m.createdAt as any)?.seconds * 1000).toISOString().startsWith(dateStr));
+        const dayMeals = cache.nutritionLogs.filter(m => m.date.startsWith(dateStr));
         point.protein = dayMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
         point.calories = dayMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
         point.carbs = dayMeals.reduce((acc, m) => acc + (m.carbs || 0), 0);
         point.fat = dayMeals.reduce((acc, m) => acc + (m.fat || 0), 0);
       } else if (category === "recovery") {
-        point.score = 0;
-        point.sleep = 0;
+        const dailyLogs = cache.dailyLogs.filter(dLog => dLog.date.startsWith(dateStr));
+        point.sleep = dailyLogs.reduce((acc, dLog) => acc + (dLog.sleepHours || 0), 0);
+        point.score = dailyLogs.reduce((acc, dLog) => acc + (dLog.energy || 0), 0) * 20; // 1-5 scale mapped to 0-100
       }
       
       data.push(point);
@@ -149,35 +143,39 @@ export class IntelligenceService {
   }
 
   static async fetchConsistencyScore(days: TimeFilter, stage: IntelligenceStage): Promise<ConsistencyBreakdown | null> {
-    if (stage === "NO_DATA" || stage === "LIMITED_DATA") {
-      return null;
-    }
+    if (stage === "NO_DATA" || stage === "LIMITED_DATA") return null;
     
-    // If sufficient data, calculate real score or return baseline
+    const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
+    const { useUserStore } = await import('@/stores/user.store');
+    const profile = useUserStore.getState().profile;
+    const goals = AnalyticsService.getGoalCompletion(days, profile);
+
+    const currentScore = Math.round((goals.workouts + goals.protein + goals.sleep + goals.water) / 4);
+
     return {
-      currentScore: 84,
-      previousScore: 78,
+      currentScore,
+      previousScore: currentScore - 2, // simplified trend
       trend30Day: "up",
-      biggestPositive: "Consistent Protein Intake (91%)",
-      biggestNegative: "Sleep Duration (64%)",
-      howToImprove: "Focus on getting to bed 30 minutes earlier to improve recovery score, which is currently dragging down your overall consistency.",
+      biggestPositive: goals.workouts >= 80 ? "Consistent Training" : "Nutrition Targets",
+      biggestNegative: goals.sleep < 70 ? "Sleep Duration" : "Hydration",
+      howToImprove: goals.sleep < 70 ? "Prioritize getting to bed 30 minutes earlier to improve your overall recovery." : "Drink more water during your workouts to hit your hydration goals.",
       breakdown: {
-        training: 92,
-        nutrition: 81,
-        recovery: 76,
-        hydration: 70
+        training: goals.workouts,
+        nutrition: goals.protein,
+        recovery: goals.sleep,
+        hydration: goals.water
       }
     };
   }
 
-  static async fetchActiveInsight(stage: IntelligenceStage): Promise<ActiveInsightData | null> {
+  static async fetchActiveInsight(stage: IntelligenceStage, days: TimeFilter = 30): Promise<ActiveInsightData | null> {
     if (stage === "NO_DATA") return null;
 
     if (stage === "LIMITED_DATA") {
       return {
         id: "ai-early",
         title: "Preliminary Trend",
-        description: "Training frequency appears consistent, but more data is needed before making reliable recommendations. Recommendations may change as more data becomes available.",
+        description: "More data is needed before making reliable recommendations. Please keep logging.",
         category: "TREND",
         date: new Date().toISOString(),
         isRead: false,
@@ -186,28 +184,32 @@ export class IntelligenceService {
       } as any;
     }
 
+    const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
+    const { useUserStore } = await import('@/stores/user.store');
+    const profile = useUserStore.getState().profile;
+    const summary = AnalyticsService.getAISummary(days, profile);
+
     return {
       id: "ai-1",
-      title: "Progressive Overload Detected",
-      description: "Your training volume has steadily increased while recovery has remained stable. This indicates excellent progression.",
+      title: "Coach Recommendation",
+      description: summary.recommendation,
       category: "TRAINING",
       date: new Date().toISOString(),
       isRead: false,
       priority: "success",
-      trainingLoadAnalysis: "Volume is up 14% this month, hitting target progressive overload zones.",
-      recoveryAnalysis: "Recovery remains stable (avg 82%) despite increased load, showing good adaptation.",
-      nutritionAnalysis: "Protein targets are being met 6/7 days, supporting the increased volume.",
-      sleepAnalysis: "Sleep is consistent at 7.2h, which is sufficient but could be optimized.",
+      trainingLoadAnalysis: `You completed ${summary.workoutsCompleted} workouts in the last ${days} days.`,
+      recoveryAnalysis: `Your longest streak is ${summary.longestStreak} days. Keep it up!`,
+      nutritionAnalysis: `You averaged ${summary.avgProtein}g of protein daily.`,
+      sleepAnalysis: "Sleep data being gathered.",
       confidenceScore: 92,
       recommendedActions: [
-        "Maintain current training block for 1 more week",
-        "Consider a deload week starting next Monday",
+        "Follow the active coach recommendation.",
         "Ensure hydration stays above 2.5L"
       ],
       explanation: [
-        "Volume increased by 14%",
-        "Recovery score stable at >80%",
-        "Protein targets met"
+        `Workouts: ${summary.workoutsCompleted}`,
+        `Streak: ${summary.currentStreak} Days`,
+        `Avg Protein: ${summary.avgProtein}g`
       ]
     } as any;
   }
@@ -218,8 +220,8 @@ export class IntelligenceService {
     return [
       {
         id: "hist-1",
-        title: "Recovery Improved",
-        description: "Your sleep quality improved by 12% over the weekend.",
+        title: "Data Synchronized",
+        description: "Your past logs have been successfully aggregated into your Analytics Profile.",
         category: "RECOVERY",
         date: subDays(new Date(), 1).toISOString(),
         isRead: true,

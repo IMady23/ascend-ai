@@ -81,10 +81,10 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
   const handleUpdateQuantity = (localId: string, quantity: number) => {
     setSelectedFoods(prev => prev.map(f => {
       if (f.localId === localId) {
-        const ratio = quantity / (f.quantity || 1);
         const baseItem = FOOD_DATABASE.find(dbF => dbF.name === f.name);
         
         if (baseItem) {
+          const ratio = quantity / (baseItem.quantity || 1);
           return {
             ...f,
             quantity,
@@ -145,7 +145,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
       <AnimatePresence>
         {isCustomFoodModalOpen && (
           <CustomFoodModal 
@@ -165,28 +165,28 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="w-full max-w-2xl max-h-[90vh] flex flex-col"
       >
-        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-[var(--color-glass-border)] bg-[var(--color-bg-base)]/95 shadow-2xl">
+        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
           
           {/* Header */}
-          <div className="p-4 border-b border-[var(--color-glass-border)] flex items-center justify-between">
+          <div className="p-4 border-b border-border-subtle flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Heading level="h3">Log Meal</Heading>
-              <div className="flex bg-[var(--color-bg-surface)] rounded-[var(--radius-full)] p-1">
+              <div className="flex bg-surface rounded-[var(--radius-full)] p-1">
                 <button 
                   onClick={() => setMode("quick")}
-                  className={`px-3 py-1 rounded-[var(--radius-full)] text-sm font-medium transition-colors ${mode === "quick" ? 'bg-[var(--color-accent-blue)] text-white' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'}`}
+                  className={`px-3 py-1 rounded-[var(--radius-full)] text-sm font-medium transition-colors ${mode === "quick" ? 'bg-[var(--color-accent-blue)] text-primary' : 'text-[var(--color-text-muted)] hover:text-primary'}`}
                 >
                   Quick
                 </button>
                 <button 
                   onClick={() => setMode("detailed")}
-                  className={`px-3 py-1 rounded-[var(--radius-full)] text-sm font-medium transition-colors ${mode === "detailed" ? 'bg-[var(--color-accent-blue)] text-white' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'}`}
+                  className={`px-3 py-1 rounded-[var(--radius-full)] text-sm font-medium transition-colors ${mode === "detailed" ? 'bg-[var(--color-accent-blue)] text-primary' : 'text-[var(--color-text-muted)] hover:text-primary'}`}
                 >
                   Detailed
                 </button>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-surface)] transition-colors">
+            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-primary rounded-full hover:bg-surface transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -199,7 +199,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                 <button 
                   key={t}
                   onClick={() => setMealType(t)}
-                  className={`px-4 py-2 rounded-[var(--radius-full)] whitespace-nowrap text-sm font-medium border transition-colors ${mealType === t ? 'bg-[var(--color-accent-green)]/10 border-[var(--color-accent-green)] text-[var(--color-accent-green)]' : 'border-[var(--color-glass-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]'}`}
+                  className={`px-4 py-2 rounded-[var(--radius-full)] whitespace-nowrap text-sm font-medium border transition-colors ${mealType === t ? 'bg-[var(--color-accent-green)]/10 border-[var(--color-accent-green)] text-[var(--color-accent-green)]' : 'border-border-subtle bg-surface text-secondary hover:border-[var(--color-text-muted)]'}`}
                 >
                   {t.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
                 </button>
@@ -208,7 +208,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
 
             {/* Detailed Mode Extras */}
             {mode === "detailed" && (
-              <div className="space-y-4 p-4 bg-[var(--color-bg-surface)] rounded-[var(--radius-lg)] border border-[var(--color-glass-border)]">
+              <div className="space-y-4 p-4 bg-surface rounded-[var(--radius-lg)] border border-border-subtle">
                 <div>
                   <label className="block text-xs font-medium text-[var(--color-text-muted)] mb-1 uppercase tracking-wider">Meal Name (Optional)</label>
                   <input 
@@ -216,7 +216,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                     value={mealName}
                     onChange={(e) => setMealName(e.target.value)}
                     placeholder="e.g. Post-workout refuel"
-                    className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                    className="w-full bg-base border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                   />
                 </div>
                 <div>
@@ -226,7 +226,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="How did you feel? Any substitutions?"
                     rows={2}
-                    className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                    className="w-full bg-base border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                   />
                 </div>
               </div>
@@ -242,17 +242,17 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search foods or brands..."
-                className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-lg)] pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                className="w-full bg-surface border border-border-subtle rounded-[var(--radius-lg)] pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
               />
             </div>
 
             {/* Selected Foods */}
             {selectedFoods.length > 0 && (
               <div className="space-y-2">
-                <Heading level="h5" className="text-sm text-[var(--color-text-secondary)]">Selected Items</Heading>
+                <Heading level="h5" className="text-sm text-secondary">Selected Items</Heading>
                 <div className="space-y-2">
                   {selectedFoods.map(food => (
-                    <div key={food.localId} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-[var(--color-bg-surface)] rounded-[var(--radius-md)] border border-[var(--color-accent-blue)]/30 gap-3">
+                    <div key={food.localId} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-surface rounded-[var(--radius-md)] border border-[var(--color-accent-blue)]/30 gap-3">
                       <div className="flex-1">
                         <BodyText size="sm" className="font-medium">{food.name}</BodyText>
                         <div className="flex items-center gap-3 mt-1">
@@ -267,7 +267,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                           type="number"
                           value={food.quantity}
                           onChange={(e) => handleUpdateQuantity(food.localId, Number(e.target.value))}
-                          className="w-16 bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded px-2 py-1 text-sm text-center"
+                          className="w-16 bg-base border border-border-subtle rounded px-2 py-1 text-sm text-center"
                           min="1"
                         />
                         <Caption className="text-[var(--color-text-muted)] w-10">{food.servingSize.split(" ")[0]}</Caption>
@@ -283,12 +283,12 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
 
             {/* Search Results */}
             <div className="space-y-2">
-              <Heading level="h5" className="text-sm text-[var(--color-text-secondary)]">
+              <Heading level="h5" className="text-sm text-secondary">
                 {searchQuery ? "Results" : "Suggested"}
               </Heading>
               
               {searchResults.length === 0 ? (
-                <div className="p-6 text-center border border-dashed border-[var(--color-glass-border)] rounded-[var(--radius-lg)]">
+                <div className="p-6 text-center border border-dashed border-border-subtle rounded-[var(--radius-lg)]">
                   <BodyText className="text-[var(--color-text-muted)] mb-3">
                     {searchQuery ? `No foods matched "${searchQuery}".` : "No foods found."}
                   </BodyText>
@@ -307,7 +307,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                     <button 
                       key={i}
                       onClick={() => handleAddFood(food)}
-                      className="flex items-center justify-between p-3 bg-[var(--color-bg-base)] rounded-[var(--radius-md)] border border-[var(--color-glass-border)] hover:border-[var(--color-accent-blue)] transition-colors text-left group"
+                      className="flex items-center justify-between p-3 bg-base rounded-[var(--radius-md)] border border-border-subtle hover:border-[var(--color-accent-blue)] transition-colors text-left group"
                     >
                       <div>
                         <div className="flex items-center gap-2">
@@ -328,7 +328,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]/50 flex items-center justify-between">
+          <div className="p-4 border-t border-border-subtle bg-surface/50 flex items-center justify-between">
             <div>
               {selectedFoods.length > 0 && (
                 <div className="flex items-center gap-4">

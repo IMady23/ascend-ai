@@ -41,14 +41,14 @@ export function InsightCard({
       <div className="flex justify-between items-start gap-4">
         <div>
           <Heading level="h4" className="text-sm text-[var(--color-accent-indigo)] mb-1">{title}</Heading>
-          <BodyText size="md" className={cn("text-[var(--color-text-primary)] transition-all duration-300", showEli5 && "font-mono text-sm leading-relaxed")}>
+          <BodyText size="md" className={cn("text-primary transition-all duration-300", showEli5 && "font-mono text-sm leading-relaxed")}>
             {activeText}
           </BodyText>
         </div>
         <ConfidenceBadge level={confidence} className="shrink-0 mt-1" />
       </div>
 
-      <div className="flex items-center justify-between border-t border-[var(--color-glass-border)] pt-3 mt-1">
+      <div className="flex items-center justify-between border-t border-border-subtle pt-3 mt-1">
         <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
@@ -62,7 +62,7 @@ export function InsightCard({
           <Button 
             variant="ghost" 
             size="sm" 
-            className="h-7 px-2 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+            className="h-7 px-2 text-xs text-[var(--color-text-muted)] hover:text-primary"
             rightIcon={expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             onClick={() => setExpanded(!expanded)}
           >
@@ -74,11 +74,11 @@ export function InsightCard({
 
       {/* Expanded State (Insight Explorer) */}
       {expanded && (
-        <div className="flex flex-col gap-4 mt-2 p-4 bg-[var(--color-bg-base)]/50 rounded-[var(--radius-lg)] border border-[var(--color-glass-border)] animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="flex flex-col gap-4 mt-2 p-4 bg-base/50 rounded-[var(--radius-lg)] border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-300">
           
           <div>
             <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-2 font-semibold">Evidence</Caption>
-            <div className="flex items-center gap-2 text-sm text-[var(--color-text-primary)] bg-[var(--color-bg-surface)] p-2 rounded-md border border-[var(--color-glass-border)]">
+            <div className="flex items-center gap-2 text-sm text-primary bg-surface p-2 rounded-md border border-border-subtle">
               <LineChart size={16} className="text-[var(--color-accent-blue)]" />
               <span>{evidenceLabel}</span>
             </div>
@@ -87,21 +87,21 @@ export function InsightCard({
           {suggestedAction && (
             <div>
               <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-2 font-semibold">Suggested Action</Caption>
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text-primary)] bg-[var(--color-accent-green)]/5 p-2 rounded-md border border-[var(--color-accent-green)]/20">
+              <div className="flex items-center gap-2 text-sm text-primary bg-[var(--color-accent-green)]/5 p-2 rounded-md border border-[var(--color-accent-green)]/20">
                 <MessageSquare size={16} className="text-[var(--color-accent-green)]" />
                 <span>{suggestedAction}</span>
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-3 border-t border-[var(--color-glass-border)]">
+          <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
             <Caption className="text-[var(--color-text-muted)]">Rate this insight:</Caption>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star 
                   key={star} 
                   size={16} 
-                  className={cn("cursor-pointer transition-colors", star <= rating ? "fill-[var(--color-accent-gold)] text-[var(--color-accent-gold)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]")}
+                  className={cn("cursor-pointer transition-colors", star <= rating ? "fill-[var(--color-accent-gold)] text-[var(--color-accent-gold)]" : "text-[var(--color-text-muted)] hover:text-secondary")}
                   onClick={() => setRating(star)}
                 />
               ))}

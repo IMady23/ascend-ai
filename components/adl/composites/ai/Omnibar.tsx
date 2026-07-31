@@ -25,13 +25,13 @@ export function Omnibar({ onSend, className, placeholder = "Ask your coach anyth
   return (
     <form 
       onSubmit={handleSubmit}
-      className={cn("w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-2xl p-2 flex items-end gap-2 shadow-sm focus-within:border-[var(--color-accent-indigo)]/50 focus-within:shadow-[var(--color-accent-indigo)]/10 transition-all", className)}
+      className={cn("w-full bg-surface border border-border-subtle rounded-2xl p-2 flex items-end gap-2 shadow-sm focus-within:border-[var(--color-accent-indigo)]/50 focus-within:shadow-[var(--color-accent-indigo)]/10 transition-all", className)}
     >
       <Button 
         type="button"
         variant="ghost" 
         size="icon" 
-        className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] rounded-xl"
+        className="shrink-0 text-[var(--color-text-muted)] hover:text-primary rounded-xl"
       >
         <Paperclip size={20} />
       </Button>
@@ -46,7 +46,7 @@ export function Omnibar({ onSend, className, placeholder = "Ask your coach anyth
           }
         }}
         placeholder={placeholder}
-        className="w-full bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] resize-none outline-none py-3 max-h-32 min-h-[44px]"
+        className="w-full bg-transparent text-primary placeholder-[var(--color-text-muted)] resize-none outline-none py-3 max-h-32 min-h-[44px]"
         rows={1}
       />
 

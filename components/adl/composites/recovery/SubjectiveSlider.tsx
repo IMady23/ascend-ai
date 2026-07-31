@@ -48,13 +48,13 @@ export function SubjectiveSlider({
   return (
     <div className={cn("w-full flex flex-col gap-2", className)}>
       <div className="flex justify-between items-center">
-        <Caption className="text-[var(--color-text-primary)] font-semibold uppercase tracking-wider">{label}</Caption>
-        <div className="font-mono text-[var(--color-text-primary)] font-bold">{value} <span className="text-[var(--color-text-muted)] text-xs font-sans font-normal">/ 10</span></div>
+        <Caption className="text-primary font-semibold uppercase tracking-wider">{label}</Caption>
+        <div className="font-mono text-primary font-bold">{value} <span className="text-[var(--color-text-muted)] text-xs font-sans font-normal">/ 10</span></div>
       </div>
       
       <div 
         ref={containerRef}
-        className="h-8 w-full bg-[var(--color-bg-surface)] rounded-full border border-[var(--color-glass-border)] relative cursor-pointer touch-none"
+        className="h-8 w-full bg-surface rounded-full border border-border-subtle relative cursor-pointer touch-none"
         onClick={handleClick}
       >
         <motion.div 

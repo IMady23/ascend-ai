@@ -22,11 +22,11 @@ export function AIChatBubble({ content, confidence, className }: AIChatBubblePro
       <div className="flex gap-4 max-w-[85%]">
         
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-accent-indigo)] to-[var(--color-accent-blue)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--color-accent-indigo)]/20 mt-1">
-          <Sparkles size={14} className="text-white" />
+          <Sparkles size={14} className="text-primary" />
         </div>
         
         <div className="flex flex-col gap-2">
-          <div className="bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-2xl rounded-tl-sm p-4 text-[var(--color-text-primary)] shadow-sm">
+          <div className="bg-surface border border-border-subtle rounded-2xl rounded-tl-sm p-4 text-primary shadow-sm">
             <BodyText size="md" className="leading-relaxed whitespace-pre-wrap">
               {content}
             </BodyText>

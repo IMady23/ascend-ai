@@ -15,6 +15,7 @@ export interface AppearanceConfig {
   accentColor: string;
   compactLayout: boolean;
   sidebarCollapsed: boolean;
+  reduceMotion: boolean;
 }
 
 export interface MissionConfig {
@@ -68,17 +69,25 @@ export interface NotificationSettings {
   [key: string]: boolean;
 }
 
+export interface LocalizationConfig {
+  units: "metric" | "imperial";
+  timeFormat: "12h" | "24h";
+  language: "en";
+}
+
 interface SettingsState {
   notifications: NotificationSettings;
   schedules: ReminderSchedule[];
   ai: AIConfig;
   appearance: AppearanceConfig;
+  localization: LocalizationConfig;
   mission: MissionConfig;
   updateNotificationSetting: (key: keyof NotificationSettings, value: boolean) => void;
   updateNotifications: (config: Partial<NotificationConfig>) => void;
   updateSchedule: (schedule: ReminderSchedule) => void;
   updateAi: (config: Partial<AIConfig>) => void;
-  updateAppearance: (config: Partial<AppearanceConfig>) => void;
+  updateAppearance: (config: Partial<AppearanceConfig>) => Promise<void>;
+  updateLocalization: (config: Partial<LocalizationConfig>) => Promise<void>;
   updateMission: (config: Partial<MissionConfig>) => void;
   reset: () => void;
 }
@@ -108,7 +117,7 @@ const defaultNotifications: NotificationSettings = {
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       notifications: defaultNotifications,
       ai: {
         coachingStyle: "balanced",
@@ -122,6 +131,12 @@ export const useSettingsStore = create<SettingsState>()(
         accentColor: "blue",
         compactLayout: false,
         sidebarCollapsed: false,
+        reduceMotion: false,
+      },
+      localization: {
+        units: "metric",
+        timeFormat: "24h",
+        language: "en"
       },
       mission: {
         dailyMissionCount: 3,
@@ -156,10 +171,54 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           ai: { ...state.ai, ...config }
         })),
-      updateAppearance: (config) => 
+      updateAppearance: async (config) => {
         set((state) => ({
           appearance: { ...state.appearance, ...config }
-        })),
+        }));
+        
+        // Sync to Firestore if authenticated
+        try {
+          const { useUserStore } = await import("@/stores/user.store");
+          const userId = useUserStore.getState().userId;
+          if (userId) {
+            const { doc, setDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+            await setDoc(doc(db, "users", userId), {
+              profile: {
+                preferences: {
+                  appearance: { ...get().appearance, ...config }
+                }
+              }
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.error("Failed to sync appearance preference", e);
+        }
+      },
+      updateLocalization: async (config) => {
+        set((state) => ({
+          localization: { ...state.localization, ...config }
+        }));
+        
+        // Sync to Firestore if authenticated
+        try {
+          const { useUserStore } = await import("@/stores/user.store");
+          const userId = useUserStore.getState().userId;
+          if (userId) {
+            const { doc, setDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+            await setDoc(doc(db, "users", userId), {
+              profile: {
+                preferences: {
+                  localization: { ...get().localization, ...config }
+                }
+              }
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.error("Failed to sync localization preference", e);
+        }
+      },
       updateMission: (config) => 
         set((state) => ({
           mission: { ...state.mission, ...config } as any

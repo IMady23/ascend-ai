@@ -5,7 +5,7 @@ import { cn } from "@/utils/cn";
 // ----------------------------------------------------------------------
 // Heading
 // ----------------------------------------------------------------------
-const headingVariants = cva("font-semibold tracking-tight text-[var(--color-text-primary)]", {
+const headingVariants = cva("font-semibold tracking-tight text-primary", {
   variants: {
     level: {
       h1: "text-4xl md:text-5xl lg:text-6xl font-bold",
@@ -33,7 +33,7 @@ export function Heading({ className, level, ...props }: HeadingProps) {
 // ----------------------------------------------------------------------
 // Subheading
 // ----------------------------------------------------------------------
-const subheadingVariants = cva("text-[var(--color-text-secondary)]", {
+const subheadingVariants = cva("text-secondary", {
   variants: {
     size: {
       sm: "text-sm md:text-base",
@@ -55,7 +55,7 @@ export function Subheading({ className, size, ...props }: SubheadingProps) {
 // ----------------------------------------------------------------------
 // BodyText
 // ----------------------------------------------------------------------
-const bodyVariants = cva("text-[var(--color-text-primary)] leading-relaxed", {
+const bodyVariants = cva("text-primary leading-relaxed", {
   variants: {
     size: {
       sm: "text-sm",
@@ -99,7 +99,7 @@ export function Label({ className, ...props }: React.HTMLAttributes<HTMLLabelEle
 // ----------------------------------------------------------------------
 export function Statistic({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span className={cn("text-4xl md:text-5xl font-bold tracking-tighter text-[var(--color-text-primary)] font-sans", className)} {...props} />
+    <span className={cn("text-4xl md:text-5xl font-bold tracking-tighter text-primary font-sans", className)} {...props} />
   );
 }
 

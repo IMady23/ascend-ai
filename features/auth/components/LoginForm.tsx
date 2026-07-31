@@ -36,20 +36,20 @@ export function LoginForm() {
       )}
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Email</label>
         <input 
           type="email"
           required
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="commander@ascend.ai"
         />
       </div>
 
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Password</label>
+          <label className="text-xs font-bold text-secondary uppercase tracking-wider">Password</label>
           <Link href="/forgot-password" className="text-xs font-semibold text-purple-400 hover:text-purple-300">
             Forgot?
           </Link>
@@ -59,7 +59,7 @@ export function LoginForm() {
           required
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="••••••••"
         />
       </div>
@@ -67,14 +67,14 @@ export function LoginForm() {
       <button 
         type="submit" 
         disabled={loading}
-        className="w-full bg-white text-black font-bold rounded-lg p-3 flex items-center justify-center hover:bg-zinc-200 transition-colors disabled:opacity-50 mt-4"
+        className="w-full bg-primary text-primary-foreground font-bold rounded-lg p-3 flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 mt-4"
       >
         {loading ? <Loader2 size={18} className="animate-spin" /> : "Initiate Sequence"}
       </button>
 
       <div className="text-center mt-6">
-        <span className="text-xs text-zinc-500">Don't have an account? </span>
-        <Link href="/signup" className="text-xs font-bold text-white hover:text-purple-400 transition-colors">
+        <span className="text-xs text-secondary">Don't have an account? </span>
+        <Link href="/signup" className="text-xs font-bold text-primary hover:text-purple-400 transition-colors">
           Join Protocol
         </Link>
       </div>

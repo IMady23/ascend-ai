@@ -55,8 +55,8 @@ export function WorkoutRecoveryBanner() {
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-[var(--color-text-primary)]">Unfinished Workout Detected</h4>
-              <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+              <h4 className="text-sm font-semibold text-primary">Unfinished Workout Detected</h4>
+              <p className="text-xs text-secondary mt-1">
                 You have an unfinished {currentActivity?.type || "Training"} session from {elapsedMinutes} minutes ago.
               </p>
               <div className="flex items-center gap-4 mt-2 text-xs text-[var(--color-text-muted)]">

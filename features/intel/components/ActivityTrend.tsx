@@ -26,26 +26,26 @@ export function ActivityTrend() {
   const maxMinutes = Math.max(...weeklyDistribution.map(d => d.minutes), 1); // fallback to 1 to avoid / 0
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+    <div className="bg-surface/50 border border-border-subtle rounded-xl p-6">
       <div className="flex items-center gap-2 mb-6">
-        <Activity size={18} className="text-zinc-400" />
-        <h2 className="text-lg font-semibold text-white">Activity Trend</h2>
+        <Activity size={18} className="text-secondary" />
+        <h2 className="text-lg font-semibold text-primary">Activity Trend</h2>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 text-zinc-400 mb-1">
+          <div className="flex items-center gap-1.5 text-secondary mb-1">
             <Dumbbell size={14} className="text-indigo-400" />
             <span className="text-xs uppercase tracking-wider font-semibold">Sessions</span>
           </div>
-          <span className="text-2xl font-bold text-white font-mono">{totalWorkouts}</span>
+          <span className="text-2xl font-bold text-primary font-mono">{totalWorkouts}</span>
         </div>
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 text-zinc-400 mb-1">
+          <div className="flex items-center gap-1.5 text-secondary mb-1">
             <Timer size={14} className="text-rose-400" />
             <span className="text-xs uppercase tracking-wider font-semibold">Minutes</span>
           </div>
-          <span className="text-2xl font-bold text-white font-mono">{totalMinutes}</span>
+          <span className="text-2xl font-bold text-primary font-mono">{totalMinutes}</span>
         </div>
       </div>
 
@@ -57,13 +57,13 @@ export function ActivityTrend() {
           
           return (
             <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
-              <div className="w-full relative h-full flex flex-col justify-end bg-zinc-950 rounded-sm overflow-hidden">
+              <div className="w-full relative h-full flex flex-col justify-end bg-base rounded-sm overflow-hidden">
                 <div 
-                  className={`w-full rounded-sm transition-all duration-500 ${isActive ? 'bg-indigo-500 group-hover:bg-indigo-400' : 'bg-zinc-800'}`}
+                  className={`w-full rounded-sm transition-all duration-500 ${isActive ? 'bg-indigo-500 group-hover:bg-indigo-400' : 'bg-surface-elevated'}`}
                   style={{ height: `${heightPct}%` }}
                 />
               </div>
-              <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">
+              <span className="text-[10px] text-secondary font-medium uppercase tracking-wider">
                 {day.day[0]}
               </span>
             </div>

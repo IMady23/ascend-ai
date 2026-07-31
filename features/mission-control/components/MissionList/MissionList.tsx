@@ -23,7 +23,7 @@ export function MissionList() {
         {missions.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border border-dashed border-border rounded-xl">
             <Target size={32} className="text-muted-foreground mb-3 opacity-50" />
-            <p className="text-sm font-semibold text-zinc-300">No missions yet.</p>
+            <p className="text-sm font-semibold text-primary">No missions yet.</p>
             <p className="text-xs text-muted-foreground mt-1">Create your first mission to begin.</p>
           </div>
         ) : (

@@ -16,7 +16,7 @@ export function InteractiveWidgetWrapper({ children, className }: InteractiveWid
         
         {/* AI Avatar Column */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-accent-indigo)] to-[var(--color-accent-blue)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--color-accent-indigo)]/20 mt-1">
-          <Sparkles size={14} className="text-white" />
+          <Sparkles size={14} className="text-primary" />
         </div>
         
         {/* Widget Container */}

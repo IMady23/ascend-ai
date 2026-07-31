@@ -117,27 +117,27 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="w-full max-w-3xl max-h-[90vh] flex flex-col"
       >
-        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-[var(--color-accent-indigo)]/30 bg-[var(--color-bg-base)]/95 shadow-2xl relative">
+        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-[var(--color-accent-indigo)]/30 bg-base/95 shadow-2xl relative">
           
           {/* Header */}
-          <div className="p-5 border-b border-[var(--color-glass-border)] flex items-center justify-between">
+          <div className="p-5 border-b border-border-subtle flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-accent-indigo)] to-[var(--color-accent-blue)] flex items-center justify-center">
-                <Sparkles size={18} className="text-white" />
+                <Sparkles size={18} className="text-primary" />
               </div>
               <div>
                 <Heading level="h3">AI Meal Plan Generator</Heading>
                 <Caption className="text-[var(--color-text-muted)]">Customized to your macros & preferences</Caption>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-surface)] transition-colors">
+            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-primary rounded-full hover:bg-surface transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -155,14 +155,14 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
                 <div className="flex-1 overflow-y-auto space-y-4 px-2">
                   {messages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${msg.role === "user" ? "bg-[var(--color-accent-indigo)] text-white" : "bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] text-[var(--color-text-primary)]"}`}>
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${msg.role === "user" ? "bg-[var(--color-accent-indigo)] text-primary" : "bg-surface border border-border-subtle text-primary"}`}>
                         {msg.content}
                       </div>
                     </div>
                   ))}
                   {isTyping && (
                     <div className="flex justify-start">
-                      <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] flex items-center">
+                      <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-surface border border-border-subtle flex items-center">
                         <ThinkingIndicator size="sm" />
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
                   <div ref={chatEndRef} />
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-[var(--color-glass-border)] relative">
+                <div className="mt-auto pt-4 border-t border-border-subtle relative">
                   <Omnibar 
                     onSend={handleSend} 
                     placeholder="E.g. I need vegetarian meals under 2000 calories..."
@@ -221,7 +221,7 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
                       
                       return (
                         <div key={category} className="space-y-2">
-                           <Heading level="h5" className="text-[var(--color-text-secondary)] border-b border-[var(--color-glass-border)] pb-1">{category}</Heading>
+                           <Heading level="h5" className="text-secondary border-b border-border-subtle pb-1">{category}</Heading>
                            <ul className="space-y-1">
                              {categoryItems.map((item, i) => (
                                <li key={i} className="flex justify-between text-sm">
@@ -237,9 +237,9 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
                 ) : (
                   <div className="space-y-4">
                     {currentPlan.meals.map((meal, idx) => (
-                    <GlassCard key={idx} className="p-4 border border-[var(--color-glass-border)] relative overflow-hidden group">
+                    <GlassCard key={idx} className="p-4 border border-border-subtle relative overflow-hidden group">
                       {isRegeneratingMeal === meal.mealType && (
-                        <div className="absolute inset-0 z-10 bg-[var(--color-bg-base)]/80 backdrop-blur-sm flex items-center justify-center flex-col gap-2">
+                        <div className="absolute inset-0 z-10 bg-base/80 backdrop-blur-sm flex items-center justify-center flex-col gap-2">
                           <div className="w-8 h-8 rounded-full border-2 border-[var(--color-accent-indigo)] border-t-transparent animate-spin" />
                           <Caption className="text-[var(--color-accent-indigo)] font-medium">Re-calculating...</Caption>
                         </div>
@@ -248,7 +248,7 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="default" className="bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)]">
+                            <Badge variant="default" className="bg-surface text-secondary">
                               {meal.mealType.toUpperCase()}
                             </Badge>
                             <Heading level="h4" className="text-lg">{meal.name}</Heading>
@@ -276,7 +276,7 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
 
                       <div className="space-y-2">
                         {meal.foods.map((food, fIdx) => (
-                          <div key={fIdx} className="flex items-center justify-between py-1 border-b border-[var(--color-glass-border)] last:border-0">
+                          <div key={fIdx} className="flex items-center justify-between py-1 border-b border-border-subtle last:border-0">
                             <BodyText size="sm">{food.name}</BodyText>
                             <Caption className="text-[var(--color-text-muted)]">{food.quantity}{food.servingSize}</Caption>
                           </div>
@@ -292,12 +292,12 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
 
           {/* Footer */}
           {currentPlan && (
-            <div className="p-5 border-t border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]/50 flex justify-end gap-3">
+            <div className="p-5 border-t border-border-subtle bg-surface/50 flex justify-end gap-3">
               <Button variant="ghost" onClick={() => setCurrentPlan(null)}>Start Over</Button>
               <Button 
                 variant="primary" 
                 onClick={handleSavePlan}
-                className="bg-[var(--color-accent-indigo)] hover:bg-[var(--color-accent-indigo)]/90 text-white border-none"
+                className="bg-[var(--color-accent-indigo)] hover:bg-[var(--color-accent-indigo)]/90 text-primary border-none"
                 leftIcon={<Check size={16} />}
               >
                 Save to My Plans

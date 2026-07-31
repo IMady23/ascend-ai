@@ -27,41 +27,41 @@ export function IntelHero() {
             <Activity size={16} />
             <span className="uppercase tracking-wider text-xs font-bold">Intel Center</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
             How am I doing?
           </h1>
-          <p className="text-zinc-400 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-secondary max-w-xl text-sm md:text-base leading-relaxed">
             Your transformation is on track. Consistency is key. Keep pushing forward.
           </p>
         </div>
 
         <div className="flex gap-4">
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Trophy size={14} className="text-amber-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Score</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white font-mono">{transformationScore}</span>
+              <span className="text-2xl font-black text-primary font-mono">{transformationScore}</span>
             </div>
           </div>
           
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Activity size={14} className="text-indigo-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Weekly</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white font-mono">{completionRate}%</span>
+              <span className="text-2xl font-black text-primary font-mono">{completionRate}%</span>
             </div>
           </div>
 
-          <div className="hidden sm:flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[100px]">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="hidden sm:flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[100px]">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Flame size={14} className="text-rose-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Streak</span>
             </div>
-            <span className="text-2xl font-black text-white font-mono">{currentStreak}</span>
+            <span className="text-2xl font-black text-primary font-mono">{currentStreak}</span>
           </div>
         </div>
       </div>

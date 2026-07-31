@@ -8,7 +8,7 @@ import { useUserStore } from "@/stores/user.store";
 import { DailyLogRepository } from "@/services/repositories/daily-log.repository";
 import { eventBus } from "@/lib/events/EventBus";
 
-export type WorkoutState = "not_started" | "warm_up" | "in_progress" | "paused" | "rest_timer" | "exercise_transition" | "completed" | "saved";
+export type WorkoutState = "not_started" | "ready" | "warm_up" | "in_progress" | "paused" | "rest_timer" | "exercise_transition" | "completed" | "saved";
 
 interface ActivityState {
   activities: Activity[];
@@ -19,11 +19,15 @@ interface ActivityState {
   notes: string;
   activeExercises: any[];
   dailySteps: number;
+  distance: number;
+  cardioSteps: number;
+  elevation: number;
   
   setActivities: (activities: Activity[]) => void;
   setCurrentActivity: (activity: Activity | null) => void;
   setActiveExercises: (exercises: any[]) => void;
   setDailySteps: (steps: number) => Promise<void>;
+  updateCardioMetrics: (metrics: Partial<{ distance: number; cardioSteps: number; elevation: number }>) => void;
   
   startWarmup: () => void;
   startExercise: () => void;
@@ -48,10 +52,14 @@ export const useActivityStore = create<ActivityState>()(
       notes: "",
       activeExercises: [],
       dailySteps: 0,
+      distance: 0,
+      cardioSteps: 0,
+      elevation: 0,
       
       setActivities: (activities) => set({ activities }),
       setCurrentActivity: (activity) => set({ currentActivity: activity }),
       setActiveExercises: (exercises) => set({ activeExercises: exercises }),
+      updateCardioMetrics: (metrics) => set((state) => ({ ...state, ...metrics })),
       setDailySteps: async (steps) => {
         set({ dailySteps: steps });
         const userId = useUserStore.getState().userId;
@@ -94,7 +102,10 @@ export const useActivityStore = create<ActivityState>()(
         startTime: null,
         elapsedTime: 0,
         notes: "",
-        activeExercises: []
+        activeExercises: [],
+        distance: 0,
+        cardioSteps: 0,
+        elevation: 0
       }),
   updateExerciseSet: (exerciseId, setId, updates) => set((state) => {
     const newExercises = state.activeExercises.map(ex => {
@@ -117,7 +128,10 @@ export const useActivityStore = create<ActivityState>()(
             ...state.currentActivity.metrics,
             exercises: state.activeExercises,
             elapsedTime: state.elapsedTime,
-            notes: state.notes
+            notes: state.notes,
+            distance: state.distance,
+            cardioSteps: state.cardioSteps,
+            elevation: state.elevation
           }
         };
         
@@ -141,7 +155,8 @@ export const useActivityStore = create<ActivityState>()(
             metadata: { 
               workoutId: completedActivity.id,
               durationMinutes: state.elapsedTime / 60,
-              totalVolume: 0 
+              totalVolume: 0,
+              activity: completedActivity
             },
             processed: false
           });
@@ -154,7 +169,10 @@ export const useActivityStore = create<ActivityState>()(
           startTime: null,
           elapsedTime: 0,
           notes: "",
-          activeExercises: []
+          activeExercises: [],
+          distance: 0,
+          cardioSteps: 0,
+          elevation: 0
         };
       })
     }),
@@ -168,6 +186,9 @@ export const useActivityStore = create<ActivityState>()(
         notes: state.notes,
         activeExercises: state.activeExercises,
         dailySteps: state.dailySteps,
+        distance: state.distance,
+        cardioSteps: state.cardioSteps,
+        elevation: state.elevation,
       })
     }
   )

@@ -63,7 +63,7 @@ export function ExerciseCard({
       onClick={onClick}
     >
       <div className={cn(
-        "p-4 border border-[var(--color-glass-border)] rounded-[var(--radius-xl)]",
+        "p-4 border border-border-subtle rounded-[var(--radius-xl)]",
         isActive && "border-transparent"
       )}>
         {/* Header */}
@@ -80,9 +80,9 @@ export function ExerciseCard({
           </div>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-             <button className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"><PlayCircle size={16} /></button>
+             <button className="text-[var(--color-text-muted)] hover:text-primary"><PlayCircle size={16} /></button>
              <button 
-               className={cn("hover:text-[var(--color-text-primary)] transition-colors", showInfo ? "text-[var(--color-accent-blue)]" : "text-[var(--color-text-muted)]")}
+               className={cn("hover:text-primary transition-colors", showInfo ? "text-[var(--color-accent-blue)]" : "text-[var(--color-text-muted)]")}
                onClick={(e) => { e.stopPropagation(); setShowInfo(!showInfo); }}
              >
                <Info size={16} />
@@ -99,7 +99,7 @@ export function ExerciseCard({
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mb-4 p-4 bg-[var(--color-bg-base)] rounded-[var(--radius-lg)] border border-[var(--color-glass-border)] space-y-3">
+              <div className="mb-4 p-4 bg-base rounded-[var(--radius-lg)] border border-border-subtle space-y-3">
                 {targetMuscles.length > 0 && (
                   <div>
                     <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Target Muscles</Caption>
@@ -117,7 +117,7 @@ export function ExerciseCard({
                 {tips.length > 0 && (
                   <div>
                     <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Tips & Form</Caption>
-                    <ul className="list-disc pl-4 text-sm text-[var(--color-text-secondary)] space-y-0.5">
+                    <ul className="list-disc pl-4 text-sm text-secondary space-y-0.5">
                       {tips.map((t, i) => <li key={i}>{t}</li>)}
                     </ul>
                   </div>
@@ -151,10 +151,10 @@ export function ExerciseCard({
                   "grid grid-cols-12 gap-2 items-center p-2 rounded-[var(--radius-lg)] transition-colors border",
                   set.completed 
                     ? "bg-[var(--color-success)]/10 border-[var(--color-success)]/30" 
-                    : "bg-[var(--color-bg-surface)] border-[var(--color-glass-border)] hover:border-[var(--color-text-secondary)]"
+                    : "bg-surface border-border-subtle hover:border-[var(--color-text-secondary)]"
                 )}
               >
-                <div className="col-span-1 text-center font-mono text-sm font-semibold text-[var(--color-text-secondary)]">
+                <div className="col-span-1 text-center font-mono text-sm font-semibold text-secondary">
                   {idx + 1}
                 </div>
                 
@@ -168,7 +168,7 @@ export function ExerciseCard({
                     value={set.weight} 
                     onChange={(e) => onUpdateSet(set.id, { weight: Number(e.target.value) })}
                     disabled={set.completed}
-                    className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-[var(--color-text-primary)]"
+                    className="w-full bg-base border border-border-subtle rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-primary"
                   />
                 </div>
 
@@ -178,7 +178,7 @@ export function ExerciseCard({
                     value={set.reps} 
                     onChange={(e) => onUpdateSet(set.id, { reps: Number(e.target.value) })}
                     disabled={set.completed}
-                    className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-[var(--color-text-primary)]"
+                    className="w-full bg-base border border-border-subtle rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-primary"
                   />
                 </div>
 
@@ -189,7 +189,7 @@ export function ExerciseCard({
                     placeholder="-"
                     onChange={(e) => onUpdateSet(set.id, { rpe: Number(e.target.value) })}
                     disabled={set.completed}
-                    className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-[var(--color-text-primary)]"
+                    className="w-full bg-base border border-border-subtle rounded-[var(--radius-md)] text-center text-sm py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)] disabled:opacity-50 text-primary"
                   />
                 </div>
 
@@ -202,8 +202,8 @@ export function ExerciseCard({
                     className={cn(
                       "w-6 h-6 rounded-[var(--radius-md)] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-blue)]",
                       set.completed 
-                        ? "bg-[var(--color-success)] text-white" 
-                        : "bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] text-transparent hover:border-[var(--color-success)]"
+                        ? "bg-[var(--color-success)] text-primary" 
+                        : "bg-base border border-border-subtle text-transparent hover:border-[var(--color-success)]"
                     )}
                   >
                     <Check size={14} className={cn(set.completed ? "opacity-100" : "opacity-0")} />

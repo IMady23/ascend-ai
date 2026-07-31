@@ -17,7 +17,7 @@ export class InsightRepository {
   }
 
   static async getStats(userId: string, period: AggregationPeriod, periodId: string): Promise<AggregatedStats | null> {
-    const docRef = doc(db, "users", userId, "analytics", period, periodId);
+    const docRef = doc(db, "users", userId, `analytics_${period}`, periodId);
     const snapshot = await getDoc(docRef);
     if (snapshot.exists()) {
       return snapshot.data() as AggregatedStats;
@@ -26,12 +26,12 @@ export class InsightRepository {
   }
 
   static async saveStats(userId: string, stats: AggregatedStats): Promise<void> {
-    const docRef = doc(db, "users", userId, "analytics", stats.period, stats.id);
+    const docRef = doc(db, "users", userId, `analytics_${stats.period}`, stats.id);
     await setDoc(docRef, stats);
   }
 
   static async updateStats(userId: string, period: AggregationPeriod, periodId: string, updates: Partial<AggregatedStats>): Promise<void> {
-    const docRef = doc(db, "users", userId, "analytics", period, periodId);
+    const docRef = doc(db, "users", userId, `analytics_${period}`, periodId);
     await updateDoc(docRef, updates);
   }
 }

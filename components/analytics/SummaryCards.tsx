@@ -1,55 +1,69 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useAnalyticsStore } from '@/stores/analytics.store';
+import { MotionCard } from '@/components/ui/motion/MotionCard';
 import { Target, Calendar, CalendarDays, Infinity as InfinityIcon } from 'lucide-react';
-import { AggregatedStats } from '@/types/intelligence';
 
-export function SummaryCards() {
-  const { dailyStats, weeklyStats, monthlyStats, lifetimeStats } = useAnalyticsStore();
+export interface SummaryCardsProps {
+  status: 'loading' | 'no-data' | 'data' | 'error';
+  dailyStats?: any;
+  weeklyStats?: any;
+  monthlyStats?: any;
+  lifetimeStats?: any;
+}
 
-  const renderCard = (title: string, icon: React.ReactNode, stats: AggregatedStats | null, color: string) => {
+export function SummaryCards({ status, dailyStats, weeklyStats, monthlyStats, lifetimeStats }: SummaryCardsProps) {
+  
+  const renderState = (content: React.ReactNode) => {
+    if (status === 'loading') return <div className="h-full flex items-center justify-center py-6"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-text-primary"></div></div>;
+    if (status === 'error') return <div className="text-danger py-6 text-center">Error</div>;
+    if (status === 'no-data') return <div className="text-text-secondary text-sm py-6 text-center">Complete workout to unlock</div>;
+    return content;
+  };
+
+  const renderCard = (title: string, icon: React.ReactNode, stats: any, colorToken: string) => {
     return (
-      <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-xl hover:bg-zinc-800/50 transition-colors">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`p-2 rounded-lg bg-${color}-500/20 text-${color}-500`}>
+      <MotionCard className="glass-panel" interactive={false}>
+        <div className="p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className={`p-2 rounded-lg bg-${colorToken}/20 text-${colorToken}`}>
               {icon}
             </div>
-            <h3 className="text-lg font-medium text-zinc-200">{title}</h3>
+            <h3 className="text-lg font-medium text-text-primary">{title}</h3>
           </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Workouts</span>
-              <span className="font-semibold text-zinc-100">{stats?.metrics?.workoutsCompleted || 0}</span>
+          {renderState(
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-secondary">Avg. Steps</span>
+                <span className="font-semibold text-text-primary">{Math.round(stats?.metrics?.avgDailySteps || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-secondary">Avg. Water</span>
+                <span className="font-semibold text-text-primary">{Math.round(stats?.metrics?.avgDailyWater || 0)} ml</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-secondary">Avg. Protein</span>
+                <span className="font-semibold text-text-primary">{Math.round(stats?.metrics?.avgDailyProtein || 0)} g</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-border-subtle">
+                <span className="text-sm font-medium text-text-primary">Consistency</span>
+                <span className={`font-semibold ${stats?.consistency?.overall && stats.consistency.overall >= 80 ? 'text-success' : 'text-text-primary'}`}>
+                  {stats?.consistency?.overall || 0}%
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Total Vol.</span>
-              <span className="font-semibold text-zinc-100">{stats?.metrics?.totalVolumeKg || 0} kg</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Avg. Protein</span>
-              <span className="font-semibold text-zinc-100">{Math.round(stats?.metrics?.avgDailyProtein || 0)} g</span>
-            </div>
-            <div className="flex justify-between items-center pt-2 border-t border-zinc-800">
-              <span className="text-sm font-medium text-zinc-300">Consistency</span>
-              <span className={`font-semibold ${stats?.consistency?.overall && stats.consistency.overall >= 80 ? 'text-emerald-400' : 'text-zinc-100'}`}>
-                {stats?.consistency?.overall || 0}%
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+        </div>
+      </MotionCard>
     );
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {renderCard('Today', <Target className="w-5 h-5 text-blue-500" />, dailyStats, 'blue')}
-      {renderCard('This Week', <Calendar className="w-5 h-5 text-indigo-500" />, weeklyStats, 'indigo')}
-      {renderCard('This Month', <CalendarDays className="w-5 h-5 text-purple-500" />, monthlyStats, 'purple')}
-      {renderCard('Lifetime', <InfinityIcon className="w-5 h-5 text-emerald-500" />, lifetimeStats, 'emerald')}
+      {renderCard('Today', <Target className="w-5 h-5 text-accent-hydration" />, dailyStats, 'accent-hydration')}
+      {renderCard('This Week', <Calendar className="w-5 h-5 text-info" />, weeklyStats, 'info')}
+      {renderCard('This Month', <CalendarDays className="w-5 h-5 text-accent-workout" />, monthlyStats, 'accent-workout')}
+      {renderCard('Lifetime', <InfinityIcon className="w-5 h-5 text-accent-nutrition" />, lifetimeStats, 'accent-nutrition')}
     </div>
   );
 }

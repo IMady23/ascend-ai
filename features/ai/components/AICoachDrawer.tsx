@@ -169,7 +169,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-base/60 backdrop-blur-sm z-50"
           />
 
           <motion.div
@@ -177,16 +177,16 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full md:w-[400px] lg:w-[450px] bg-[var(--color-bg-surface)] border-l border-[var(--color-glass-border)] shadow-2xl z-50 flex flex-col"
+            className="fixed top-0 right-0 h-full w-full md:w-[400px] lg:w-[450px] bg-surface border-l border-border-subtle shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[var(--color-glass-border)] bg-gradient-to-br from-[var(--color-bg-glass-standard)] to-[var(--color-bg-base)]">
+            <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-gradient-to-br from-[var(--color-bg-glass-standard)] to-[var(--color-bg-base)]">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[var(--color-accent-blue)]/20 flex items-center justify-center">
                   <Sparkles size={16} className="text-[var(--color-accent-blue)]" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-sm text-white">Ascend AI</h2>
+                  <h2 className="font-bold text-sm text-primary">Ascend AI</h2>
                   <div className="flex items-center gap-1.5 text-xs text-[var(--color-success)]">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-75"></span>
@@ -199,13 +199,13 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => createNewConversation()}
-                  className="p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg text-xs font-medium flex items-center gap-1 border border-[var(--color-glass-border)]"
+                  className="p-2 text-secondary hover:text-primary transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg text-xs font-medium flex items-center gap-1 border border-border-subtle"
                 >
                   <Plus size={14} /> New
                 </button>
                 <button
                   onClick={onClose}
-                  className="p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg"
+                  className="p-2 text-secondary hover:text-primary transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg"
                 >
                   <X size={20} />
                 </button>
@@ -213,15 +213,15 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             </div>
 
             {conversations.length > 1 && (
-              <div className="px-4 py-2 border-b border-[var(--color-glass-border)] bg-[var(--color-bg-base)] overflow-x-auto no-scrollbar flex gap-2">
+              <div className="px-4 py-2 border-b border-border-subtle bg-base overflow-x-auto no-scrollbar flex gap-2">
                 {conversations.slice(0, 5).map((c) => (
                   <button
                     key={c.id}
                     onClick={() => loadConversation(c.id)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border max-w-[120px] truncate ${
                       activeConversationId === c.id
-                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-white"
-                        : "bg-[var(--color-bg-surface)] border-[var(--color-glass-border)] text-[var(--color-text-secondary)] hover:text-white"
+                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
+                        : "bg-surface border-border-subtle text-secondary hover:text-primary"
                     }`}
                   >
                     {c.title}
@@ -231,14 +231,14 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             )}
 
             {/* Mode Selector */}
-            <div className="px-4 py-2 border-b border-[var(--color-glass-border)] bg-[var(--color-bg-base)] overflow-x-auto no-scrollbar">
+            <div className="px-4 py-2 border-b border-border-subtle bg-base overflow-x-auto no-scrollbar">
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveMode(null)}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                     activeMode === null
-                      ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-white"
-                      : "bg-[var(--color-bg-surface)] border-[var(--color-glass-border)] text-[var(--color-text-secondary)] hover:text-white"
+                      ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
+                      : "bg-surface border-border-subtle text-secondary hover:text-primary"
                   }`}
                 >
                   General
@@ -249,8 +249,8 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     onClick={() => setActiveMode(mode.id)}
                     className={`flex items-center gap-1.5 flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                       activeMode === mode.id
-                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-white"
-                        : "bg-[var(--color-bg-surface)] border-[var(--color-glass-border)] text-[var(--color-text-secondary)] hover:text-white"
+                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
+                        : "bg-surface border-border-subtle text-secondary hover:text-primary"
                     }`}
                   >
                     {mode.icon} {mode.label}
@@ -268,8 +268,8 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                   </div>
 
                   <div className="space-y-2 max-w-[300px]">
-                    <h3 className="text-xl font-bold text-white">{emptyState.greeting}</h3>
-                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                    <h3 className="text-xl font-bold text-primary">{emptyState.greeting}</h3>
+                    <p className="text-sm text-secondary leading-relaxed">
                       {emptyState.subtitle}
                     </p>
                   </div>
@@ -279,7 +279,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                       <button
                         key={i}
                         onClick={() => handleSend(prompt)}
-                        className="text-sm p-3 rounded-xl border border-[var(--color-glass-border)] bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-surface-hover)] hover:border-[var(--color-accent-blue)]/50 transition-all text-left text-[var(--color-text-secondary)] hover:text-white"
+                        className="text-sm p-3 rounded-xl border border-border-subtle bg-surface hover:bg-[var(--color-bg-surface-hover)] hover:border-[var(--color-accent-blue)]/50 transition-all text-left text-secondary hover:text-primary"
                       >
                         {prompt}
                       </button>
@@ -303,7 +303,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                       msg.role === "user"
                         ? "bg-[var(--color-accent-blue)] text-white"
-                        : "bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] text-white"
+                        : "bg-surface border border-border-subtle text-primary"
                     }`}
                   >
                     {msg.role === "assistant" ? renderAssistantMessage(msg) : msg.content}
@@ -316,7 +316,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                   <div className="w-8 h-8 flex-shrink-0 rounded-full bg-[var(--color-accent-blue)]/20 flex items-center justify-center mt-1">
                     <Sparkles size={14} className="text-[var(--color-accent-blue)]" />
                   </div>
-                  <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] flex items-center">
+                  <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-surface border border-border-subtle flex items-center">
                     <ThinkingIndicator size="sm" />
                   </div>
                 </div>
@@ -326,7 +326,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-[var(--color-glass-border)] bg-[var(--color-bg-base)]">
+            <div className="p-4 border-t border-border-subtle bg-base">
               <div className="relative flex items-center">
                 <input
                   type="text"
@@ -336,12 +336,12 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     if (e.key === "Enter") handleSend(input);
                   }}
                   placeholder="Ask your coach..."
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-xl py-3 pl-4 pr-12 text-sm text-primary placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
                 <button
                   onClick={() => handleSend(input)}
                   disabled={!input.trim() || isTyping}
-                  className="absolute right-2 p-1.5 rounded-lg bg-[var(--color-accent-blue)] text-white disabled:opacity-50 disabled:bg-[var(--color-bg-surface-hover)] transition-colors"
+                  className="absolute right-2 p-1.5 rounded-lg bg-[var(--color-accent-blue)] text-primary disabled:opacity-50 disabled:bg-[var(--color-bg-surface-hover)] transition-colors"
                 >
                   <Send size={16} />
                 </button>

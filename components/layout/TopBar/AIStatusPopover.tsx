@@ -47,10 +47,10 @@ export function AIStatusPopover({ isOpen, onClose, anchorRef }: AIStatusPopoverP
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -10 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="absolute right-12 top-[calc(100%+8px)] w-64 bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden z-50 flex flex-col"
+          className="absolute right-12 top-[calc(100%+8px)] w-64 bg-base border border-border-subtle rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden z-50 flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center gap-3 p-4 border-b border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]">
+          <div className="flex items-center gap-3 p-4 border-b border-border-subtle bg-surface">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-accent-indigo)]/10">
               <Sparkles size={16} className="text-[var(--color-accent-indigo)]" />
             </div>
@@ -69,7 +69,7 @@ export function AIStatusPopover({ isOpen, onClose, anchorRef }: AIStatusPopoverP
               <Clock size={14} className="text-[var(--color-text-muted)] mt-0.5 shrink-0" />
               <div>
                 <Caption className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Latest Analysis</Caption>
-                <BodyText size="sm" className="font-medium text-[var(--color-text-primary)]">3 minutes ago</BodyText>
+                <BodyText size="sm" className="font-medium text-primary">3 minutes ago</BodyText>
               </div>
             </div>
             
@@ -77,7 +77,7 @@ export function AIStatusPopover({ isOpen, onClose, anchorRef }: AIStatusPopoverP
               <Activity size={14} className="text-[var(--color-text-muted)] mt-0.5 shrink-0" />
               <div>
                 <Caption className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Current Focus</Caption>
-                <BodyText size="sm" className="font-medium text-[var(--color-text-primary)]">Recovery & Sleep</BodyText>
+                <BodyText size="sm" className="font-medium text-primary">Recovery & Sleep</BodyText>
               </div>
             </div>
 
@@ -93,7 +93,7 @@ export function AIStatusPopover({ isOpen, onClose, anchorRef }: AIStatusPopoverP
               <Zap size={14} className="text-[var(--color-text-muted)] mt-0.5 shrink-0" />
               <div>
                 <Caption className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Context Memory</Caption>
-                <BodyText size="sm" className="font-medium text-[var(--color-text-primary)]">14-Day Trajectory</BodyText>
+                <BodyText size="sm" className="font-medium text-primary">14-Day Trajectory</BodyText>
               </div>
             </div>
           </div>

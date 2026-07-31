@@ -50,7 +50,7 @@ export default function TransformationModule() {
         <DashboardLayout>
           <div className="lg:col-span-3 space-y-6 flex items-center justify-center min-h-[50vh]">
              <div className="animate-pulse flex flex-col items-center gap-4">
-               <div className="w-12 h-12 rounded-full border-4 border-[var(--color-glass-border)] border-t-[var(--color-accent-pink)] animate-spin" />
+               <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-pink)] animate-spin" />
                <Caption className="text-[var(--color-text-muted)]">Syncing Repositories...</Caption>
              </div>
           </div>
@@ -121,7 +121,7 @@ export default function TransformationModule() {
               />
             ) : (
               <div className="space-y-4">
-                <div className="flex justify-center p-12 border border-dashed border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]/30 rounded-xl">
+                <div className="flex justify-center p-12 border border-dashed border-border-subtle bg-surface/30 rounded-xl">
                   <Caption className="text-[var(--color-text-muted)]">Photo comparison will appear here once you upload progress photos.</Caption>
                 </div>
               </div>
@@ -174,7 +174,7 @@ export default function TransformationModule() {
                 </div>
                 <div>
                   <Caption className="text-[var(--color-accent-indigo)] font-semibold uppercase tracking-wider text-[10px] mb-1">Coach</Caption>
-                  <BodyText size="sm" className="text-[var(--color-text-primary)] leading-relaxed">
+                  <BodyText size="sm" className="text-primary leading-relaxed">
                     I don't have enough information yet. Let's start by logging your first measurements and progress photos.
                   </BodyText>
                 </div>
@@ -203,9 +203,9 @@ export default function TransformationModule() {
           <WidgetSection title="Monthly Subjective Check-in">
             <GlassCard className="p-4 space-y-3">
               <Caption className="text-[var(--color-text-muted)] mb-2">Track non-visual health metrics to help AI correlate lifestyle to transformation.</Caption>
-              <Button variant="secondary" fullWidth className="justify-start bg-[var(--color-bg-base)]">Energy Level</Button>
-              <Button variant="secondary" fullWidth className="justify-start bg-[var(--color-bg-base)]">Confidence</Button>
-              <Button variant="secondary" fullWidth className="justify-start bg-[var(--color-bg-base)]">Sleep Quality</Button>
+              <Button variant="secondary" fullWidth className="justify-start bg-base">Energy Level</Button>
+              <Button variant="secondary" fullWidth className="justify-start bg-base">Confidence</Button>
+              <Button variant="secondary" fullWidth className="justify-start bg-base">Sleep Quality</Button>
             </GlassCard>
           </WidgetSection>
 

@@ -15,17 +15,17 @@ export interface PreferenceCardProps {
 
 export function PreferenceCard({ title, description, icon, action, className }: PreferenceCardProps) {
   return (
-    <GlassCard className={cn("p-4 flex items-center justify-between gap-4 hover:bg-[var(--color-bg-surface)] transition-colors", className)}>
+    <GlassCard className={cn("p-4 flex items-center justify-between gap-4 hover:bg-surface transition-colors", className)}>
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {icon && (
-          <div className="p-2 rounded-lg bg-[var(--color-bg-base)] text-[var(--color-text-secondary)] border border-[var(--color-glass-border)] shrink-0 mt-0.5">
+          <div className="p-2 rounded-lg bg-base text-secondary border border-border-subtle shrink-0 mt-0.5">
             {icon}
           </div>
         )}
         <div className="flex flex-col gap-0.5 min-w-0">
-          <BodyText size="sm" className="font-semibold text-[var(--color-text-primary)] truncate">{title}</BodyText>
+          <BodyText size="sm" className="font-semibold text-primary truncate">{title}</BodyText>
           {description && (
-            <Caption className="text-[var(--color-text-secondary)] leading-snug line-clamp-2">{description}</Caption>
+            <Caption className="text-secondary leading-snug line-clamp-2">{description}</Caption>
           )}
         </div>
       </div>

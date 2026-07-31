@@ -40,8 +40,8 @@ export function WorkoutSessionCard({
           {status}
         </Badge>
       </div>
-      <div className="pt-2 border-t border-[var(--color-glass-border)]">
-        <BodyText size="sm" className="text-[var(--color-text-secondary)]">
+      <div className="pt-2 border-t border-border-subtle">
+        <BodyText size="sm" className="text-secondary">
           {exercises.join(" • ")}
         </BodyText>
       </div>

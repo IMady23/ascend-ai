@@ -46,7 +46,7 @@ export function MealCard({
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[var(--color-bg-surface)] flex items-center justify-center text-[var(--color-text-secondary)] font-medium">
+          <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-secondary font-medium">
             {type.charAt(0)}
           </div>
           <div>
@@ -62,7 +62,7 @@ export function MealCard({
         
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="font-mono font-bold text-[var(--color-text-primary)]">{totalCalories}</div>
+            <div className="font-mono font-bold text-primary">{totalCalories}</div>
             <Caption className="text-[var(--color-text-muted)] text-[10px] uppercase">kcal</Caption>
           </div>
           <ChevronDown 
@@ -77,7 +77,7 @@ export function MealCard({
 
       {/* Mini Macro Split Bar */}
       {totalMacros > 0 && (
-        <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-[var(--color-bg-surface)]">
+        <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-surface">
           <div style={{ width: `${(macros.protein / totalMacros) * 100}%`, backgroundColor: "var(--color-accent-blue)" }} />
           <div style={{ width: `${(macros.carbs / totalMacros) * 100}%`, backgroundColor: "var(--color-accent-green)" }} />
           <div style={{ width: `${(macros.fat / totalMacros) * 100}%`, backgroundColor: "var(--color-accent-gold)" }} />
@@ -92,22 +92,22 @@ export function MealCard({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="pt-2 flex flex-col gap-2 border-t border-[var(--color-glass-border)] mt-2">
+            <div className="pt-2 flex flex-col gap-2 border-t border-border-subtle mt-2">
               {items.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between py-1">
                   <div>
-                    <BodyText size="sm" className="text-[var(--color-text-secondary)]">{item.name}</BodyText>
+                    <BodyText size="sm" className="text-secondary">{item.name}</BodyText>
                     <Caption className="text-[var(--color-text-muted)]">{item.amount}</Caption>
                   </div>
-                  <span className="font-mono text-sm text-[var(--color-text-secondary)]">{item.calories}</span>
+                  <span className="font-mono text-sm text-secondary">{item.calories}</span>
                 </div>
               ))}
               {(onEdit || onDelete) && (
-                <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-[var(--color-glass-border)]">
+                <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-border-subtle">
                   {onEdit && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                      className="px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)] transition-colors"
+                      className="px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-secondary hover:text-primary hover:bg-surface transition-colors"
                     >
                       Edit
                     </button>

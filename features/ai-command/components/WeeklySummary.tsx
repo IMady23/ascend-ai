@@ -12,11 +12,11 @@ export function WeeklySummary() {
   ];
 
   return (
-    <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8">
+    <section className="bg-surface border border-border-subtle rounded-2xl p-6 md:p-8">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-bold text-white">Weekly Performance</h2>
+        <h2 className="text-xl font-bold text-primary">Weekly Performance</h2>
         <div className="flex items-center gap-3">
-          <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Score</span>
+          <span className="text-secondary text-xs font-bold uppercase tracking-wider">Score</span>
           <span className="text-2xl font-mono font-bold text-violet-400">{overallScore}</span>
         </div>
       </div>
@@ -25,10 +25,10 @@ export function WeeklySummary() {
         {metrics.map((m, i) => (
           <div key={i}>
             <div className="flex justify-between text-sm mb-2">
-              <span className="font-bold text-zinc-300">{m.label}</span>
-              <span className="text-zinc-500 font-mono">{m.value}%</span>
+              <span className="font-bold text-primary">{m.label}</span>
+              <span className="text-secondary font-mono">{m.value}%</span>
             </div>
-            <div className="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-800/50">
+            <div className="w-full bg-base rounded-full h-2 overflow-hidden border border-border-subtle/50">
               <div 
                 className={`h-full rounded-full transition-all duration-1000 ${m.color}`}
                 style={{ width: `${m.value}%` }}

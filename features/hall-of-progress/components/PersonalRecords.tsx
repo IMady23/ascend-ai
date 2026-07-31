@@ -42,18 +42,18 @@ export function PersonalRecords() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6"
+      className="bg-surface/50 border border-border-subtle rounded-xl p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <Medal size={18} className="text-amber-400" />
-        <h2 className="text-lg font-semibold text-white">Personal Records</h2>
+        <h2 className="text-lg font-semibold text-primary">Personal Records</h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {records.map((record, i) => (
-          <div key={record.id} className="bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 flex flex-col justify-between">
+          <div key={record.id} className="bg-base/50 border border-border-subtle/50 rounded-xl p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-zinc-400">
+              <div className="flex items-center gap-2 text-secondary">
                 {getIcon(record.icon)}
                 <span className="text-[10px] font-bold uppercase tracking-wider leading-tight w-20 line-clamp-2">
                   {record.title}
@@ -63,10 +63,10 @@ export function PersonalRecords() {
             
             <div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-white font-mono">{record.value}</span>
-                {record.unit && <span className="text-xs text-zinc-500 font-medium">{record.unit}</span>}
+                <span className="text-2xl font-black text-primary font-mono">{record.value}</span>
+                {record.unit && <span className="text-xs text-secondary font-medium">{record.unit}</span>}
               </div>
-              <span className="text-[10px] text-zinc-600 font-medium block mt-1 uppercase tracking-wider">
+              <span className="text-[10px] text-disabled font-medium block mt-1 uppercase tracking-wider">
                 {new Date(record.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>

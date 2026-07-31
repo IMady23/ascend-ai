@@ -82,7 +82,7 @@ export function ReadinessGauge({
         </motion.div>
         
         {/* Needle Base */}
-        <div className="absolute bottom-0 left-1/2 w-6 h-6 rounded-full bg-[var(--color-bg-surface)] border-4 border-[var(--color-text-primary)] transform -translate-x-1/2 translate-y-1/2 z-30" />
+        <div className="absolute bottom-0 left-1/2 w-6 h-6 rounded-full bg-surface border-4 border-[var(--color-text-primary)] transform -translate-x-1/2 translate-y-1/2 z-30" />
       </div>
 
       <div className="flex flex-col items-center mt-4 relative z-10">
@@ -90,7 +90,7 @@ export function ReadinessGauge({
           <Zap size={18} className={state === "Peak Performance" ? "animate-pulse" : ""} />
           <Heading level="h2" className="text-3xl tracking-tight">{score}</Heading>
         </div>
-        <Caption className="text-[var(--color-text-primary)] font-semibold mt-1 tracking-wider uppercase text-xs">{state}</Caption>
+        <Caption className="text-primary font-semibold mt-1 tracking-wider uppercase text-xs">{state}</Caption>
       </div>
 
     </div>

@@ -6,6 +6,7 @@ import { AuthRepository } from "@/services/repositories/auth.repository";
 import { useUserStore } from "@/stores/user.store";
 import { SyncManager } from "@/services/sync/sync-manager";
 import { resetStoresOnLogout } from "@/lib/auth/reset-stores";
+import { ReminderEngine } from "@/services/notifications/reminder.engine";
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 import type { UserProfile } from "@/types/user";
@@ -42,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setAuthStatus(true, true, false);
         SyncManager.startSync(user.uid);
+        ReminderEngine.start();
 
         setStartupState('READY');
 
@@ -55,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         resetStoresOnLogout();
         setAuthStatus(false, true, false);
         SyncManager.stopSync();
+        ReminderEngine.stop();
 
         setStartupState('READY');
 
@@ -84,19 +87,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   if (showSplash) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950 text-white">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-base text-primary">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="flex flex-col items-center text-center"
         >
-          <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6 relative">
+          <div className="w-16 h-16 rounded-2xl bg-surface border border-border-subtle flex items-center justify-center mb-6 relative">
             <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse" />
             <Rocket size={32} className="text-purple-400 relative z-10" />
           </div>
           <h1 className="text-2xl font-black tracking-tighter mb-2">Initializing Ascend AI</h1>
-          <p className="text-zinc-500 text-sm font-medium animate-pulse">
+          <p className="text-secondary text-sm font-medium animate-pulse">
             Loading your command center...
           </p>
         </motion.div>

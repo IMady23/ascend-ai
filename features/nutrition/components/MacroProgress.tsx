@@ -21,8 +21,8 @@ export function MacroProgress() {
   ];
 
   return (
-    <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8">
-      <h2 className="text-xl font-bold text-white mb-6">Macronutrients</h2>
+    <section className="bg-surface border border-border-subtle rounded-2xl p-6 md:p-8">
+      <h2 className="text-xl font-bold text-primary mb-6">Macronutrients</h2>
       
       <div className="space-y-6">
         {macros.map((macro, i) => {
@@ -34,11 +34,11 @@ export function MacroProgress() {
                 <span className={`font-bold uppercase tracking-wider text-xs ${macro.text}`}>
                   {macro.label}
                 </span>
-                <span className="text-zinc-400 font-mono">
-                  <span className="text-white">{macro.current}g</span> / {macro.target}g
+                <span className="text-secondary font-mono">
+                  <span className="text-primary">{macro.current}g</span> / {macro.target}g
                 </span>
               </div>
-              <div className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden border border-zinc-800">
+              <div className="w-full bg-surface-elevated rounded-full h-3 overflow-hidden border border-border-subtle">
                 <div 
                   className={`h-full rounded-full transition-all duration-1000 ${macro.color}`}
                   style={{ width: `${percentage}%` }}

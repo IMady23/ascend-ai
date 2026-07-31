@@ -48,6 +48,9 @@ export class MemoryContextBuilder {
                 const w = enrichedSnapshot.analytics.weekly;
                 compiledContext += `    - Weekly Analytics: ${w.metrics.workoutsCompleted} workouts, Avg ${Math.round(w.metrics.avgDailyCalories)} cal, Avg ${Math.round(w.metrics.avgDailyProtein)}g protein. Consistency: ${w.consistency.overall}%\n`;
             }
+            if (enrichedSnapshot.insights) {
+                compiledContext += `    - Recent Insights:\n${enrichedSnapshot.insights}\n`;
+            }
             compiledContext += `  </system_snapshot>\n`;
         }
 

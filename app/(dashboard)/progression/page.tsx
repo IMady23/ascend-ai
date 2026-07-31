@@ -44,11 +44,11 @@ export default function ProgressionPage() {
         <div className="md:col-span-2 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Level Card */}
-            <GlassCard className="p-6 relative overflow-hidden flex flex-col justify-between border-[var(--color-glass-border)]">
+            <GlassCard className="p-6 relative overflow-hidden flex flex-col justify-between border-border-subtle">
               <div className="flex items-start justify-between">
                 <div>
                   <Caption className="text-[var(--color-accent-indigo)] font-bold uppercase tracking-wider mb-1">Current Level</Caption>
-                  <Heading level="h1" className="text-5xl font-black text-white">{xp.currentLevel}</Heading>
+                  <Heading level="h1" className="text-5xl font-black text-primary">{xp.currentLevel}</Heading>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-[var(--color-accent-indigo)]/20 flex items-center justify-center">
                   <Star className="text-[var(--color-accent-indigo)]" size={24} />
@@ -56,7 +56,7 @@ export default function ProgressionPage() {
               </div>
               <div className="mt-6">
                 <div className="flex justify-between text-xs mb-2">
-                  <span className="text-[var(--color-text-secondary)]">{xp.xpForCurrentLevel} XP</span>
+                  <span className="text-secondary">{xp.xpForCurrentLevel} XP</span>
                   <span className="text-[var(--color-text-muted)]">{xp.xpToNextLevel} XP</span>
                 </div>
                 <div className="w-full h-2 bg-[var(--color-bg-surface-hover)] rounded-full overflow-hidden">
@@ -69,11 +69,11 @@ export default function ProgressionPage() {
             </GlassCard>
 
             {/* Streak Card */}
-            <GlassCard className="p-6 flex flex-col justify-between border-[var(--color-glass-border)]">
+            <GlassCard className="p-6 flex flex-col justify-between border-border-subtle">
               <div className="flex items-start justify-between">
                 <div>
                   <Caption className="text-[var(--color-accent-orange)] font-bold uppercase tracking-wider mb-1">Active Streak</Caption>
-                  <Heading level="h1" className="text-5xl font-black text-white">{streak.current}</Heading>
+                  <Heading level="h1" className="text-5xl font-black text-primary">{streak.current}</Heading>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-[var(--color-accent-orange)]/20 flex items-center justify-center">
                   <Flame className="text-[var(--color-accent-orange)]" size={24} />
@@ -100,9 +100,9 @@ export default function ProgressionPage() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {achievements.map((a) => (
-                  <div key={a.id} className="flex flex-col items-center text-center p-4 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)]">
+                  <div key={a.id} className="flex flex-col items-center text-center p-4 rounded-xl bg-surface border border-border-subtle">
                     <div className="text-3xl mb-2">{a.icon}</div>
-                    <BodyText size="sm" className="font-bold text-white mb-1">{a.title}</BodyText>
+                    <BodyText size="sm" className="font-bold text-primary mb-1">{a.title}</BodyText>
                     <Caption className="text-[var(--color-text-muted)] text-[10px]">{a.description}</Caption>
                   </div>
                 ))}
@@ -124,9 +124,9 @@ export default function ProgressionPage() {
             ) : (
               <div className="space-y-3">
                 {activeMissions.map((m) => (
-                  <div key={m.id} className="p-3 rounded-lg bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)]">
+                  <div key={m.id} className="p-3 rounded-lg bg-surface border border-border-subtle">
                     <div className="flex justify-between items-start mb-2">
-                      <BodyText size="sm" className="font-bold text-white">{m.title}</BodyText>
+                      <BodyText size="sm" className="font-bold text-primary">{m.title}</BodyText>
                       <span className="text-xs font-medium text-[var(--color-accent-green)]">+{m.xpReward} XP</span>
                     </div>
                     <Caption className="text-[var(--color-text-muted)] mb-3">{m.description}</Caption>
@@ -145,33 +145,33 @@ export default function ProgressionPage() {
           {/* Coach Timeline */}
           <GlassCard className="p-6 flex flex-col max-h-[500px]">
             <div className="flex items-center gap-2 mb-4">
-              <History className="text-[var(--color-text-secondary)]" size={20} />
+              <History className="text-secondary" size={20} />
               <Heading level="h3">Coach Timeline</Heading>
             </div>
             
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 relative">
               {isLoading && events.length === 0 ? (
                 <div className="animate-pulse flex space-x-4">
-                  <div className="rounded-full bg-[var(--color-bg-surface)] h-10 w-10"></div>
+                  <div className="rounded-full bg-surface h-10 w-10"></div>
                   <div className="flex-1 space-y-4 py-1">
-                    <div className="h-4 bg-[var(--color-bg-surface)] rounded w-3/4"></div>
+                    <div className="h-4 bg-surface rounded w-3/4"></div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-[var(--color-bg-surface)] rounded"></div>
+                      <div className="h-4 bg-surface rounded"></div>
                     </div>
                   </div>
                 </div>
               ) : events.length === 0 ? (
                 <BodyText size="sm" className="text-[var(--color-text-muted)] text-center py-8">Your story begins here.</BodyText>
               ) : (
-                <div className="relative border-l border-[var(--color-glass-border)] ml-3 space-y-8 pb-4">
+                <div className="relative border-l border-border-subtle ml-3 space-y-8 pb-4">
                   {events.map((event: TimelineEvent) => (
                     <div key={event.id} className="relative pl-6">
-                      <div className="absolute -left-[17px] top-1 w-8 h-8 rounded-full bg-[var(--color-bg-base)] border-2 border-[var(--color-glass-border)] flex items-center justify-center text-sm z-10">
+                      <div className="absolute -left-[17px] top-1 w-8 h-8 rounded-full bg-base border-2 border-border-subtle flex items-center justify-center text-sm z-10">
                         {event.icon || '✨'}
                       </div>
                       <div>
                         <div className="flex items-baseline justify-between mb-1">
-                          <Heading level="h5" className="text-sm font-bold text-white">{event.title}</Heading>
+                          <Heading level="h5" className="text-sm font-bold text-primary">{event.title}</Heading>
                           {event.xpEarned > 0 && (
                             <span className="text-xs font-bold text-[var(--color-accent-indigo)]">+{event.xpEarned} XP</span>
                           )}
@@ -181,7 +181,7 @@ export default function ProgressionPage() {
                         </Caption>
                         
                         {event.coachCommentary && (
-                          <div className="mt-2 p-3 rounded-lg bg-[var(--color-accent-indigo)]/10 border border-[var(--color-accent-indigo)]/20 text-sm text-[var(--color-text-primary)]">
+                          <div className="mt-2 p-3 rounded-lg bg-[var(--color-accent-indigo)]/10 border border-[var(--color-accent-indigo)]/20 text-sm text-primary">
                             <strong className="text-[var(--color-accent-indigo)] block mb-1">Coach:</strong>
                             "{event.coachCommentary}"
                           </div>

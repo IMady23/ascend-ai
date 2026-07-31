@@ -67,7 +67,7 @@ export default function HallOfAscensionPage() {
   };
   
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#0A0D14]">
+    <div className="relative w-screen h-screen overflow-hidden bg-base">
       {/* Generative Environmental Audio */}
       <HallAudio stage={stage} />
 
@@ -85,7 +85,7 @@ export default function HallOfAscensionPage() {
         transition={{ duration: 2, ease: "easeInOut" }}
       >
         <div 
-          className="w-[200px] h-[600px] bg-white rounded-[100px]"
+          className="w-[200px] h-[600px] bg-[#FFFFFF] rounded-[100px]"
           style={{
             boxShadow: stage >= 2 ? "0 0 100px 20px rgba(255,255,255,0.8)" : "none",
             background: "linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0))"

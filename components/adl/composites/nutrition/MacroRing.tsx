@@ -46,7 +46,7 @@ export function MacroRing({
           </Caption>
         </div>
       </div>
-      <Caption className="text-[var(--color-text-secondary)] font-medium tracking-wide">
+      <Caption className="text-secondary font-medium tracking-wide">
         {label}
       </Caption>
     </div>

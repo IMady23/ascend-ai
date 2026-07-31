@@ -22,10 +22,10 @@ export function TrainingHero() {
             <Dumbbell size={16} />
             <span className="uppercase tracking-wider text-xs font-bold">Training Center</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
             {hasCompletedWorkoutToday ? "Day Conquered." : "Ready to push?"}
           </h1>
-          <p className="text-zinc-400 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-secondary max-w-xl text-sm md:text-base leading-relaxed">
             {hasCompletedWorkoutToday 
               ? "You've crushed today's requirements. Rest, recover, and prepare for tomorrow."
               : "Your next session is waiting. Embrace the friction."}
@@ -33,19 +33,19 @@ export function TrainingHero() {
         </div>
 
         <div className="flex gap-6">
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Flame size={14} className="text-orange-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Streak</span>
             </div>
-            <span className="text-2xl font-black text-white font-mono">{currentStreak}</span>
+            <span className="text-2xl font-black text-primary font-mono">{currentStreak}</span>
           </div>
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Target size={14} className="text-orange-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Weekly</span>
             </div>
-            <span className="text-2xl font-black text-white font-mono">{weeklyCompletion}%</span>
+            <span className="text-2xl font-black text-primary font-mono">{weeklyCompletion}%</span>
           </div>
         </div>
       </div>

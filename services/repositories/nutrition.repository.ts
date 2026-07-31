@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, where } from "firebase/firestore";
 import { firestore } from "@/lib/firebase";
 import { NutritionLog, HydrationLog, MealPlan, nutritionLogConverter, hydrationLogConverter, mealPlanConverter } from "@/types/nutrition";
 import { handleFirestoreError } from "./error-handler";
@@ -18,12 +18,22 @@ export const NutritionRepository = {
     }
   },
 
-  subscribeToNutritionLogs(userId: string, onUpdate: (logs: NutritionLog[]) => void, onError: (error: Error) => void): () => void {
-    const q = query(this.getCollectionRef(userId), orderBy("date", "desc"));
+  subscribeToNutritionLogs(userId: string, currentDate: string, onUpdate: (logs: NutritionLog[]) => void, onError: (error: Error) => void): () => void {
+    const q = query(
+      this.getCollectionRef(userId), 
+      where("date", "==", currentDate)
+    );
     return onSnapshot(
       q,
       (snapshot) => {
-        onUpdate(snapshot.docs.map((doc) => doc.data()));
+        const logs = snapshot.docs.map((doc) => doc.data());
+        // Sort descending by createdAt since we removed orderBy
+        logs.sort((a, b) => {
+          const aTime = a.createdAt?.seconds || 0;
+          const bTime = b.createdAt?.seconds || 0;
+          return bTime - aTime;
+        });
+        onUpdate(logs);
       },
       (error) => {
         onError(error);
@@ -83,12 +93,22 @@ export const NutritionRepository = {
     }
   },
 
-  subscribeToHydrationLogs(userId: string, onUpdate: (logs: HydrationLog[]) => void, onError: (error: Error) => void): () => void {
-    const q = query(this.getHydrationCollectionRef(userId), orderBy("date", "desc"));
+  subscribeToHydrationLogs(userId: string, currentDate: string, onUpdate: (logs: HydrationLog[]) => void, onError: (error: Error) => void): () => void {
+    const q = query(
+      this.getHydrationCollectionRef(userId), 
+      where("date", "==", currentDate)
+    );
     return onSnapshot(
       q,
       (snapshot) => {
-        onUpdate(snapshot.docs.map((doc) => doc.data()));
+        const logs = snapshot.docs.map((doc) => doc.data());
+        // Sort descending by timestamp since we removed orderBy
+        logs.sort((a, b) => {
+          const aTime = a.timestamp?.seconds || 0;
+          const bTime = b.timestamp?.seconds || 0;
+          return bTime - aTime;
+        });
+        onUpdate(logs);
       },
       (error) => onError(error)
     );

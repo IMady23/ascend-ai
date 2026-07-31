@@ -89,7 +89,7 @@ export function RestTimer({
               {remaining > 0 ? (
                 <>
                   <Timer size={16} className="text-[var(--color-text-muted)] mb-1" />
-                  <Heading level="h3" className="text-3xl tracking-tighter tabular-nums font-mono text-[var(--color-text-primary)]">
+                  <Heading level="h3" className="text-3xl tracking-tighter tabular-nums font-mono text-primary">
                     {formatTime(remaining)}
                   </Heading>
                 </>
@@ -138,7 +138,7 @@ export function RestTimer({
                      setRemaining(30);
                      onAddTime(30);
                   }}
-                  className="text-xs text-[var(--color-text-muted)] hover:text-white"
+                  className="text-xs text-[var(--color-text-muted)] hover:text-primary"
                 >
                   +30s
                 </Button>
@@ -175,9 +175,9 @@ export function RestTimer({
               <input 
                 type="text" 
                 placeholder="Ask AI Coach..." 
-                className="w-full bg-[var(--color-bg-base)]/50 border border-[var(--color-glass-border)] rounded-full pl-10 pr-10 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent-indigo)] placeholder:text-[var(--color-text-muted)]"
+                className="w-full bg-base/50 border border-border-subtle rounded-full pl-10 pr-10 py-2.5 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-[var(--color-accent-indigo)] placeholder:text-[var(--color-text-muted)]"
               />
-              <button className="absolute right-2 p-1.5 rounded-full bg-[var(--color-accent-indigo)] text-white hover:bg-[var(--color-accent-indigo-light)] transition-colors">
+              <button className="absolute right-2 p-1.5 rounded-full bg-[var(--color-accent-indigo)] text-primary hover:bg-[var(--color-accent-indigo-light)] transition-colors">
                 <Send size={12} />
               </button>
             </div>

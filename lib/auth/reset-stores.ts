@@ -3,6 +3,9 @@ import { useAiStore } from "@/stores/ai.store";
 import { useActivityStore } from "@/stores/activity.store";
 import { useNutritionStore } from "@/stores/nutrition.store";
 import { useWorkspaceStore } from "@/stores/workspace.store";
+import { useProgressionStore } from "@/stores/progression.store";
+import { useAnalyticsStore } from "@/stores/analytics.store";
+import { useSettingsStore } from "@/stores/settings.store";
 
 /**
  * Clears all user-scoped local state on logout.
@@ -12,6 +15,26 @@ export function resetStoresOnLogout() {
   useUserStore.getState().clearUser();
 
   useWorkspaceStore.getState().reset();
+  
+  if ((useProgressionStore.getState() as any).reset) {
+     (useProgressionStore.getState() as any).reset();
+  }
+
+  useAnalyticsStore.setState({
+    timeRange: 7,
+    hasData: false,
+    workoutVolume: null,
+    workoutSplit: null,
+    nutritionSplit: null,
+    goalCompletion: null,
+    weightTrend: null,
+    consistency: null,
+    personalRecords: null,
+    trendCards: null,
+    aiSummary: null,
+    isLoading: false,
+    error: null,
+  });
 
   useAiStore.setState({
     conversations: [],

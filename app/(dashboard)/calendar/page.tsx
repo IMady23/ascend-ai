@@ -26,10 +26,10 @@ export default function CalendarPage() {
           <Heading level="h2">Calendar</Heading>
           <BodyText className="text-[var(--color-text-muted)]">Adaptive scheduling & AI planning.</BodyText>
         </div>
-        <div className="flex items-center gap-4 bg-[var(--color-bg-surface)] p-2 rounded-lg border border-[var(--color-glass-border)]">
-          <button className="p-1 text-[var(--color-text-secondary)] hover:text-white"><ChevronLeft size={20}/></button>
-          <BodyText className="font-medium text-white">August 2026</BodyText>
-          <button className="p-1 text-[var(--color-text-secondary)] hover:text-white"><ChevronRight size={20}/></button>
+        <div className="flex items-center gap-4 bg-surface p-2 rounded-lg border border-border-subtle">
+          <button className="p-1 text-secondary hover:text-primary"><ChevronLeft size={20}/></button>
+          <BodyText className="font-medium text-primary">August 2026</BodyText>
+          <button className="p-1 text-secondary hover:text-primary"><ChevronRight size={20}/></button>
         </div>
       </div>
 
@@ -40,14 +40,14 @@ export default function CalendarPage() {
             <Heading level="h4" className="text-[var(--color-accent-orange)] mb-1">AI Schedule Conflict Detected</Heading>
             <ul className="space-y-1">
               {conflicts.map((c, i) => (
-                <li key={i} className="text-sm text-white/80">{c}</li>
+                <li key={i} className="text-sm text-primary/80">{c}</li>
               ))}
             </ul>
             <div className="mt-3 flex gap-2">
-              <button className="px-3 py-1 bg-[var(--color-accent-orange)] text-white text-xs font-bold rounded-md hover:bg-orange-600 transition-colors">
+              <button className="px-3 py-1 bg-[var(--color-accent-orange)] text-primary text-xs font-bold rounded-md hover:bg-orange-600 transition-colors">
                 Auto-Resolve
               </button>
-              <button className="px-3 py-1 bg-white/10 text-white text-xs font-bold rounded-md hover:bg-white/20 transition-colors">
+              <button className="px-3 py-1 bg-white/10 text-primary text-xs font-bold rounded-md hover:bg-white/20 transition-colors">
                 Review Options
               </button>
             </div>
@@ -59,9 +59,9 @@ export default function CalendarPage() {
       <div className="grid grid-cols-7 gap-4">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
           <div key={day} className="flex flex-col gap-2">
-            <div className="text-center p-2 border-b border-[var(--color-glass-border)]">
-              <Caption className="text-[var(--color-text-secondary)] uppercase font-bold">{day}</Caption>
-              <BodyText className="text-white font-medium">{27 + i}</BodyText>
+            <div className="text-center p-2 border-b border-border-subtle">
+              <Caption className="text-secondary uppercase font-bold">{day}</Caption>
+              <BodyText className="text-primary font-medium">{27 + i}</BodyText>
             </div>
             
             {/* Render mock events for 'Fri' (index 4 = 31st, let's pretend 1st is Sat index 5) */}

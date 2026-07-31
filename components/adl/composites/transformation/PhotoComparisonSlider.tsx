@@ -38,7 +38,7 @@ export function PhotoComparisonSlider({
   
   if (!beforeImage || !afterImage) {
     return (
-      <div className={cn("w-full aspect-[3/4] md:aspect-video rounded-[var(--radius-xl)] bg-[var(--color-bg-surface)] border border-dashed border-[var(--color-glass-border)] flex flex-col items-center justify-center text-[var(--color-text-muted)] hover:border-[var(--color-accent-indigo)] hover:text-[var(--color-accent-indigo)] transition-colors cursor-pointer group", className)}>
+      <div className={cn("w-full aspect-[3/4] md:aspect-video rounded-[var(--radius-xl)] bg-surface border border-dashed border-border-subtle flex flex-col items-center justify-center text-[var(--color-text-muted)] hover:border-[var(--color-accent-indigo)] hover:text-[var(--color-accent-indigo)] transition-colors cursor-pointer group", className)}>
         <Camera size={48} className="mb-4 opacity-50 group-hover:opacity-100 transition-opacity" />
         <span className="font-semibold">Log First Transformation Photo</span>
         <Caption className="mt-2 text-center max-w-xs">Your future self will thank you for documenting day one.</Caption>
@@ -55,23 +55,23 @@ export function PhotoComparisonSlider({
     >
       {/* Before Image (Left) */}
       <motion.div 
-        className="absolute inset-0 bg-[var(--color-bg-surface)]"
+        className="absolute inset-0 bg-surface"
         style={{ clipPath: clipPathLeft }}
       >
         <img src={beforeImage} alt={beforeLabel} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-        <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-          <Caption className="text-white font-semibold tracking-wider uppercase text-[10px]">{beforeLabel}</Caption>
+        <div className="absolute top-4 left-4 bg-base/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+          <Caption className="text-primary font-semibold tracking-wider uppercase text-[10px]">{beforeLabel}</Caption>
         </div>
       </motion.div>
 
       {/* After Image (Right) */}
       <motion.div 
-        className="absolute inset-0 bg-[var(--color-bg-surface)]"
+        className="absolute inset-0 bg-surface"
         style={{ clipPath: clipPathRight }}
       >
         <img src={afterImage} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-          <Caption className="text-white font-semibold tracking-wider uppercase text-[10px]">{afterLabel}</Caption>
+        <div className="absolute top-4 right-4 bg-base/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+          <Caption className="text-primary font-semibold tracking-wider uppercase text-[10px]">{afterLabel}</Caption>
         </div>
       </motion.div>
 
@@ -85,7 +85,7 @@ export function PhotoComparisonSlider({
         dragMomentum={false}
         onDrag={handleDrag}
       >
-        <div className="w-8 h-8 rounded-full bg-white shadow-xl flex items-center justify-center text-black">
+        <div className="w-8 h-8 rounded-full bg-white shadow-xl flex items-center justify-center text-primary">
           <ChevronLeft size={16} className="-mr-1" />
           <ChevronRight size={16} className="-ml-1" />
         </div>
@@ -95,7 +95,7 @@ export function PhotoComparisonSlider({
       <motion.button 
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
-        className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors z-20"
+        className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-base/50 backdrop-blur-md border border-white/10 flex items-center justify-center text-primary hover:bg-base/80 transition-colors z-20"
       >
         <Maximize2 size={18} />
       </motion.button>

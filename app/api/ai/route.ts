@@ -7,7 +7,7 @@ const orchestrator = new AIOrchestrator();
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messageText, contextSnapshot, chatHistory, userId } = body;
+    const { messageText, contextSnapshot, chatHistory, userId, confirmedToolCall } = body;
 
     if (!messageText) {
       return NextResponse.json({ error: "Missing message text" }, { status: 400 });
@@ -34,9 +34,12 @@ export async function POST(req: Request) {
     const progressionProfile = await ProgressionRepository.getProfile(userId);
 
     const { InsightRepository } = await import("@/services/repositories/insight.repository");
+    const { InsightEngine } = await import("@/lib/intelligence/InsightEngine");
     const { format, startOfWeek } = await import("date-fns");
     const weeklyId = format(startOfWeek(new Date()), 'yyyy-MM-dd');
     const weeklyAnalytics = await InsightRepository.getStats(userId, 'weekly', weeklyId);
+    
+    const insightsStr = await InsightEngine.generateContextString(userId);
 
     const enrichedSnapshot = {
       ...contextSnapshot,
@@ -47,11 +50,22 @@ export async function POST(req: Request) {
       progression: progressionProfile,
       analytics: {
         weekly: weeklyAnalytics
-      }
+      },
+      insights: insightsStr
     };
 
     const currentModule = enrichedSnapshot?.coachingScenario || "general";
     const startTime = Date.now();
+    
+    // If we have a confirmed tool call, execute it first before generating AI response
+    if (confirmedToolCall) {
+        const { tool, params } = confirmedToolCall;
+        if (tool === 'Log_Meal') {
+            const { LogMealTool } = await import("@/lib/ai/tools/actions/LogMeal");
+            const logTool = new LogMealTool();
+            await logTool.execute({ ...params, userId }, true);
+        }
+    }
     
     const structuredResponse = await orchestrator.executeAICommand(
       context,

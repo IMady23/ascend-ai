@@ -20,37 +20,37 @@ export function ChapterManagement() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6"
+      className="bg-surface/30 border border-border-subtle/50 rounded-xl p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <BookOpen size={18} className="text-indigo-400" />
-        <h2 className="text-lg font-semibold text-white">Chapter Management</h2>
+        <h2 className="text-lg font-semibold text-primary">Chapter Management</h2>
       </div>
 
       <div className="space-y-3">
         {chapters.map((chapter) => (
           <div key={chapter.id} className={`flex items-center justify-between p-3 rounded-lg border ${
             chapter.status === 'current' ? 'bg-indigo-500/10 border-indigo-500/30' : 
-            chapter.status === 'completed' ? 'bg-zinc-950/50 border-zinc-800/50' : 
-            'bg-zinc-950/20 border-zinc-900 opacity-50'
+            chapter.status === 'completed' ? 'bg-base/50 border-border-subtle/50' : 
+            'bg-base/20 border-border-subtle opacity-50'
           }`}>
             <div className="flex items-center gap-3">
               <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                 chapter.status === 'current' ? 'bg-indigo-500/20 text-indigo-400' :
-                chapter.status === 'completed' ? 'bg-zinc-800 text-zinc-400' :
-                'bg-zinc-900 text-zinc-600'
+                chapter.status === 'completed' ? 'bg-surface-elevated text-secondary' :
+                'bg-surface text-disabled'
               }`}>
                 {chapter.status === 'locked' ? <Lock size={12} /> : <BookOpen size={12} />}
               </div>
-              <span className={`text-sm font-semibold ${chapter.status === 'locked' ? 'text-zinc-500' : 'text-zinc-200'}`}>
+              <span className={`text-sm font-semibold ${chapter.status === 'locked' ? 'text-secondary' : 'text-primary'}`}>
                 {chapter.title}
               </span>
             </div>
             
             <span className={`text-[10px] font-bold uppercase tracking-wider ${
               chapter.status === 'current' ? 'text-indigo-400' :
-              chapter.status === 'completed' ? 'text-zinc-500' :
-              'text-zinc-600'
+              chapter.status === 'completed' ? 'text-secondary' :
+              'text-disabled'
             }`}>
               {chapter.status}
             </span>

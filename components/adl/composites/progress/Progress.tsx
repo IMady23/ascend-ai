@@ -27,12 +27,12 @@ export function ProgressBar({
   return (
     <div className={cn("w-full flex flex-col gap-1.5", className)} {...props}>
       {showLabel && (
-        <div className="flex justify-between items-center text-xs font-medium text-[var(--color-text-secondary)] font-mono">
+        <div className="flex justify-between items-center text-xs font-medium text-secondary font-mono">
           <span>{value}</span>
           <span>{max}</span>
         </div>
       )}
-      <div className="h-2 w-full rounded-full bg-[var(--color-bg-surface)] overflow-hidden border border-[var(--color-glass-border)]">
+      <div className="h-2 w-full rounded-full bg-surface overflow-hidden border border-border-subtle">
         <motion.div
           className="h-full rounded-full"
           style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}80` }}
@@ -107,7 +107,7 @@ export function ProgressRing({
         />
       </svg>
       {/* Center Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--color-text-primary)]">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-primary">
         {icon ? icon : (
           <span className="font-mono text-sm font-bold tracking-tighter">
             {Math.round(percentage)}%

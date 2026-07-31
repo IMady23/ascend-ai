@@ -38,7 +38,7 @@ export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -53,36 +53,36 @@ export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
               </div>
               <Heading level="h4">Log Daily Steps</Heading>
             </div>
-            <button onClick={onClose} className="p-1 rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)] transition-colors">
+            <button onClick={onClose} className="p-1 rounded-md text-[var(--color-text-muted)] hover:text-primary hover:bg-surface transition-colors">
               <X size={20} />
             </button>
           </div>
 
           <div className="space-y-6">
             <div>
-              <Caption className="mb-1 text-[var(--color-text-secondary)]">Total Steps</Caption>
+              <Caption className="mb-1 text-secondary">Total Steps</Caption>
               <input 
                 type="number" 
                 value={stepsInput} 
                 onChange={(e) => setStepsInput(e.target.value)}
                 placeholder="0"
-                className="w-full bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-lg text-2xl font-mono py-4 px-4 text-center focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                className="w-full bg-base border border-border-subtle rounded-lg text-2xl font-mono py-4 px-4 text-center focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 autoFocus
               />
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <div className="bg-[var(--color-bg-base)]/50 border border-[var(--color-glass-border)] rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="bg-base/50 border border-border-subtle rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <Footprints size={16} className="text-[var(--color-accent-blue)] mb-2" />
                 <span className="font-mono text-sm font-bold">{distanceKm}</span>
                 <span className="text-[10px] text-[var(--color-text-muted)] uppercase">KM</span>
               </div>
-              <div className="bg-[var(--color-bg-base)]/50 border border-[var(--color-glass-border)] rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="bg-base/50 border border-border-subtle rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <Flame size={16} className="text-[var(--color-accent-orange)] mb-2" />
                 <span className="font-mono text-sm font-bold">{caloriesBurned}</span>
                 <span className="text-[10px] text-[var(--color-text-muted)] uppercase">KCAL</span>
               </div>
-              <div className="bg-[var(--color-bg-base)]/50 border border-[var(--color-glass-border)] rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="bg-base/50 border border-border-subtle rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <Timer size={16} className="text-[var(--color-accent-green)] mb-2" />
                 <span className="font-mono text-sm font-bold">{formatTime(activeTimeMin)}</span>
                 <span className="text-[10px] text-[var(--color-text-muted)] uppercase">ACTIVE</span>

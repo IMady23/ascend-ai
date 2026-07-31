@@ -5,7 +5,9 @@ import { Providers } from "@/components/providers/Providers";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SplashProvider } from "@/components/providers/SplashProvider";
-import { PremiumBackground } from "@/components/adl/system/PremiumBackground";
+import { AmbientBackground } from "@/components/layout/AmbientBackground";
+import { Toaster } from "@/components/notifications/Toaster";
+import { InitAudio } from "@/components/providers/InitAudio";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -75,9 +77,34 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         {/* Preload handled via Next.js or ReactDOM implicitly where needed */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                let theme = 'system';
+                const localStr = localStorage.getItem('ascend-settings-storage');
+                if (localStr) {
+                  const parsed = JSON.parse(localStr);
+                  if (parsed && parsed.state && parsed.state.appearance && parsed.state.appearance.theme) {
+                    theme = parsed.state.appearance.theme;
+                  }
+                }
+                
+                let effectiveTheme = theme;
+                if (theme === 'system') {
+                  effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+                document.documentElement.style.colorScheme = effectiveTheme;
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col">
         <script
@@ -97,10 +124,14 @@ export default function RootLayout({
         />
         <Providers>
           <ThemeProvider>
-            <PremiumBackground />
-            <SplashProvider>
-              <AuthProvider>{children}</AuthProvider>
-            </SplashProvider>
+            <AuthProvider>
+              <SplashProvider>
+                <InitAudio />
+                <AmbientBackground />
+                {children}
+                <Toaster />
+              </SplashProvider>
+            </AuthProvider>
           </ThemeProvider>
         </Providers>
       </body>

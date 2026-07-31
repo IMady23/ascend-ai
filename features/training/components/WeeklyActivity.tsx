@@ -51,23 +51,23 @@ export function WeeklyActivity() {
   }, [activities]);
 
   return (
-    <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8 h-full flex flex-col">
-      <h2 className="text-xl font-bold text-white mb-8">Weekly Output</h2>
+    <section className="bg-surface border border-border-subtle rounded-2xl p-6 md:p-8 h-full flex flex-col">
+      <h2 className="text-xl font-bold text-primary mb-8">Weekly Output</h2>
       
       <div className="flex items-end justify-between gap-2 h-48 mt-auto">
         {weeklyData.map((day, i) => (
           <div key={i} className="flex flex-col items-center flex-1 gap-3 group">
-            <div className="w-full bg-zinc-800/50 rounded-t-lg relative flex flex-col justify-end min-h-[120px]">
+            <div className="w-full bg-surface-elevated/50 rounded-t-lg relative flex flex-col justify-end min-h-[120px]">
               <div 
                 className={`w-full rounded-t-lg transition-all duration-500 ${
-                  day.hasWorkout ? "bg-orange-500" : "bg-zinc-700"
+                  day.hasWorkout ? "bg-orange-500" : "bg-surface-elevated"
                 }`}
                 style={{ height: `${Math.max(day.intensity, 5)}%` }}
               />
             </div>
             
             <span className={`text-xs font-bold uppercase ${
-              day.isToday ? "text-orange-400" : "text-zinc-500"
+              day.isToday ? "text-orange-400" : "text-secondary"
             }`}>
               {day.day}
             </span>

@@ -17,16 +17,16 @@ export function AIHero() {
             <Cpu size={16} />
             <span className="uppercase tracking-wider text-xs font-bold">AI Command Center</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
             Hello, {name}.
           </h1>
-          <p className="text-zinc-400 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-secondary max-w-xl text-sm md:text-base leading-relaxed">
             I am Ascend AI. Your central intelligence system. Ready to analyze, strategize, and execute.
           </p>
         </div>
 
         <div className="flex flex-col items-start md:items-end">
-          <div className="flex items-center gap-2 bg-zinc-950/50 border border-zinc-800/50 px-4 py-2 rounded-xl backdrop-blur-sm">
+          <div className="flex items-center gap-2 bg-base/50 border border-border-subtle/50 px-4 py-2 rounded-xl backdrop-blur-sm">
             <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
             <span className="text-violet-400 font-mono text-xs font-bold uppercase tracking-wider">System Online</span>
           </div>

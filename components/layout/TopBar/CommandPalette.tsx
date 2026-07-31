@@ -69,7 +69,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-base/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -78,20 +78,20 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -10 }}
             transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-            className="relative w-full max-w-2xl bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden flex flex-col"
+            className="relative w-full max-w-2xl bg-base border border-border-subtle rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden flex flex-col"
             role="dialog"
             aria-modal="true"
           >
             {/* Search Input */}
-            <div className="flex items-center px-4 py-4 border-b border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]">
-              <Search size={20} className="text-[var(--color-text-secondary)] mr-3" />
+            <div className="flex items-center px-4 py-4 border-b border-border-subtle bg-surface">
+              <Search size={20} className="text-secondary mr-3" />
               <input 
                 type="text" 
                 placeholder="Search Ascend AI..." 
-                className="flex-1 bg-transparent border-none outline-none text-[var(--color-text-primary)] text-lg placeholder-[var(--color-text-muted)]"
+                className="flex-1 bg-transparent border-none outline-none text-primary text-lg placeholder-[var(--color-text-muted)]"
                 autoFocus
               />
-              <kbd className="hidden sm:inline-flex items-center h-6 px-2 text-xs font-medium bg-[var(--color-bg-base)] text-[var(--color-text-muted)] rounded border border-[var(--color-glass-border)] font-mono">
+              <kbd className="hidden sm:inline-flex items-center h-6 px-2 text-xs font-medium bg-base text-[var(--color-text-muted)] rounded border border-border-subtle font-mono">
                 ESC
               </kbd>
             </div>
@@ -107,9 +107,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                     {group.items.map((item, i) => (
                       <button 
                         key={i}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-bg-glass-hover)] transition-colors text-left text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] group focus-visible:bg-[var(--color-bg-glass-hover)] focus-visible:outline-none"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-bg-glass-hover)] transition-colors text-left text-secondary hover:text-primary group focus-visible:bg-[var(--color-bg-glass-hover)] focus-visible:outline-none"
                       >
-                        <div className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-colors">
+                        <div className="text-[var(--color-text-muted)] group-hover:text-primary transition-colors">
                           {item.icon}
                         </div>
                         <span className="text-sm font-medium">{item.label}</span>
@@ -119,7 +119,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 </div>
               ))}
               
-              <div className="mt-2 pt-2 border-t border-[var(--color-glass-border)]">
+              <div className="mt-2 pt-2 border-t border-border-subtle">
                  <Caption className="px-3 py-2 text-[10px] font-semibold tracking-widest uppercase text-[var(--color-text-muted)]">
                     Recent
                   </Caption>

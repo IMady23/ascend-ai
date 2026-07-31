@@ -2,21 +2,27 @@
 
 import React, { useRef } from "react";
 import { useUserStore } from "@/stores/user.store";
+import { useProgressionStore } from "@/stores/progression.store";
 import { useUiStore } from "@/stores/ui.store";
 import { Avatar } from "@/components/adl/primitives/Avatar";
 import { ProfileMenu } from "./ProfileMenu";
-import { NotificationCenter } from "./NotificationCenter";
-import { Bell, Command, Menu, Sparkles, Clock, Sun, Moon, Monitor } from "lucide-react";
+import { NotificationCenter } from "../NotificationCenter/NotificationCenter";
+import { Bell, Command, Menu, Sparkles, Clock, Sun, Moon, Monitor, WifiOff } from "lucide-react";
 import { AICoachDrawer } from "@/features/ai/components/AICoachDrawer";
 import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
-import { useThemeStore } from "@/stores/theme.store";
+import { useSettingsStore } from "@/stores/settings.store";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useReminderStore } from "@/stores/reminder.store";
 
 export function TopBar() {
   const { profile } = useUserStore();
+  const { profile: progressionProfile } = useProgressionStore();
   const userName = profile?.identity?.fullName || "Commander";
   
   const { setMobileDrawerOpen } = useUiStore();
-  const { theme, toggleTheme } = useThemeStore();
+  const { appearance, updateAppearance } = useSettingsStore();
+  const theme = appearance.theme;
+  const isOnline = useNetworkStatus();
 
   const [isCommandOpen, setIsCommandOpen] = React.useState(false);
   const [isNotifOpen, setIsNotifOpen] = React.useState(false);
@@ -27,28 +33,35 @@ export function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[var(--color-bg-base)]/80 backdrop-blur-xl border-b border-[var(--color-glass-border)] pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-40 w-full bg-base/80 backdrop-blur-xl border-b border-border-subtle pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
           
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setMobileDrawerOpen(true)}
-              className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              className="p-2 md:hidden text-text-secondary hover:text-text-primary transition-colors"
               aria-label="Open Mobile Menu"
             >
               <Menu size={20} />
             </button>
+
+            {!isOnline && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-danger/10 border border-danger/20 rounded-full">
+                <WifiOff size={12} className="text-danger" />
+                <span className="text-[10px] font-semibold text-danger tracking-wide uppercase">Offline</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 relative">
             {/* Command Palette Trigger */}
             <button 
               onClick={() => setIsCommandOpen(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-surface-hover)] border border-[var(--color-glass-border)] rounded-lg text-sm text-[var(--color-text-muted)] transition-colors group"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-surface hover:bg-surface-elevated border border-border-subtle rounded-lg text-sm text-text-secondary transition-colors group"
             >
-              <Sparkles size={14} className="group-hover:text-[var(--color-accent-blue)] transition-colors" />
-              <span className="group-hover:text-white transition-colors">Ask Ascend</span>
-              <kbd className="ml-8 hidden lg:inline-flex px-1.5 py-0.5 text-[10px] bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded shadow-sm text-[var(--color-text-secondary)] font-mono">
+              <Sparkles size={14} className="group-hover:text-info transition-colors" />
+              <span className="group-hover:text-text-primary transition-colors">Ask Ascend</span>
+              <kbd className="ml-8 hidden lg:inline-flex px-1.5 py-0.5 text-[10px] bg-base border border-border-subtle rounded shadow-sm text-text-secondary font-mono">
                 ⌘K
               </kbd>
             </button>
@@ -56,7 +69,7 @@ export function TopBar() {
             {/* Mobile Search Button */}
             <button 
               onClick={() => setIsCommandOpen(true)}
-              className="p-2 md:hidden text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              className="p-2 md:hidden text-text-secondary hover:text-text-primary transition-colors"
               aria-label="Open Ask Ascend"
             >
               <Command size={18} />
@@ -64,8 +77,11 @@ export function TopBar() {
 
             {/* Theme Toggle */}
             <button
-              onClick={toggleTheme}
-              className="p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors"
+              onClick={() => {
+                const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
+                updateAppearance({ theme: nextTheme });
+              }}
+              className="p-2 text-text-secondary hover:text-text-primary transition-colors"
               title={`Current Theme: ${theme}`}
               aria-label="Toggle Theme"
             >
@@ -73,45 +89,32 @@ export function TopBar() {
             </button>
 
             {/* Notifications */}
-            <div className="relative">
-              <button 
-                ref={notifRef}
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
-                className="relative p-2 text-[var(--color-text-secondary)] hover:text-white transition-colors hidden sm:block"
-                aria-label="Notifications"
-              >
-                <Bell size={18} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--color-accent-blue)] rounded-full border border-[var(--color-bg-base)]" />
-              </button>
-              <NotificationCenter 
-                isOpen={isNotifOpen} 
-                onClose={() => setIsNotifOpen(false)} 
-                anchorRef={notifRef} 
-              />
+            <div className="relative flex items-center">
+              <NotificationCenter />
             </div>
 
             {/* Reminders Schedule */}
             <button 
               onClick={() => setIsReminderOpen(true)}
-              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)] transition-colors"
+              className="p-2 text-text-secondary hover:text-info transition-colors"
               title="Manage Reminders"
               aria-label="Manage Reminders"
             >
               <Clock size={18} />
             </button>
 
-            <div className="w-px h-6 bg-[var(--color-glass-border)] mx-1" />
+            <div className="w-px h-6 bg-border-subtle mx-1" />
 
             {/* Profile Dropdown */}
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className="flex items-center gap-3 hover:bg-[var(--color-bg-surface-hover)] p-1.5 rounded-full md:rounded-xl transition-colors md:pr-4"
+              className="flex items-center gap-3 hover:bg-surface-elevated p-1.5 rounded-full md:rounded-xl transition-colors md:pr-4"
               aria-label="Profile Menu"
             >
               <Avatar fallback={userName.charAt(0)} />
               <div className="hidden md:flex flex-col items-start">
-                <span className="text-sm font-semibold tracking-tight leading-none text-white">{userName}</span>
-                <span className="text-[10px] text-[var(--color-text-muted)] font-medium mt-1">Level 11 Commander</span>
+                <span className="text-sm font-semibold tracking-tight leading-none text-text-primary">{userName}</span>
+                <span className="text-[10px] text-text-secondary font-medium mt-1">Level {progressionProfile?.xp?.currentLevel || 1} Commander</span>
               </div>
             </button>
           </div>

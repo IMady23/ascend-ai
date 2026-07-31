@@ -20,6 +20,7 @@ import {
   Moon,
   Sun,
   Laptop,
+  Volume2,
   Target
 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer/PageContainer";
@@ -34,8 +35,10 @@ import { SystemHealthPanel } from "@/components/adl/composites/settings/SystemHe
 import { AIProviderCard } from "@/components/adl/composites/settings/AIProviderCard";
 import { PreferenceCard } from "@/components/adl/composites/settings/PreferenceCard";
 import { UsageMeter } from "@/components/adl/composites/settings/UsageMeter";
+import { CustomGoalsPanel } from "@/components/adl/composites/settings/CustomGoalsPanel";
 import { useWorkspaceStore, WorkspaceProfile } from "@/stores/workspace.store";
 import { useToastStore } from "@/stores/toast.store";
+import { useNotificationStore } from "@/stores/notification.store";
 
 const SYSTEM_HEALTH = [
   { label: "Ascend AI Core", status: "Healthy" as const },
@@ -89,7 +92,7 @@ export default function ControlRoomModule() {
                   <input
                     type="text"
                     placeholder="Search settings, AI models, privacy..."
-                    className="block w-full pl-10 pr-3 py-2 border border-[var(--color-glass-border)] rounded-lg leading-5 bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-gold)] focus:ring-1 focus:ring-[var(--color-accent-gold)] sm:text-sm transition-colors"
+                    className="block w-full pl-10 pr-3 py-2 border border-border-subtle rounded-lg leading-5 bg-surface text-primary placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-gold)] focus:ring-1 focus:ring-[var(--color-accent-gold)] sm:text-sm transition-colors"
                   />
                 </div>
               </div>
@@ -107,7 +110,7 @@ export default function ControlRoomModule() {
                 <div className="flex flex-col items-start">
                   <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Version</Caption>
                   <Heading level="h3" className="text-xl font-mono whitespace-nowrap">Ascend AI 1.0.0</Heading>
-                  <Caption className="text-[var(--color-text-secondary)] mt-1">Pro Membership</Caption>
+                  <Caption className="text-secondary mt-1">Pro Membership</Caption>
                 </div>
               </div>
 
@@ -117,6 +120,10 @@ export default function ControlRoomModule() {
 
         {/* LEFT COLUMN: Personalization & AI Config (60%) */}
         <div className="lg:col-span-2 space-y-6">
+
+          <WidgetSection title="Custom Goals & Targets">
+             <CustomGoalsPanel />
+          </WidgetSection>
           
           <WidgetSection title="Workspace Profiles">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -143,7 +150,7 @@ export default function ControlRoomModule() {
               />
             </div>
             <div className="mt-3 flex justify-end">
-              <Button variant="ghost" size="sm" className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
+              <Button variant="ghost" size="sm" className="text-xs text-[var(--color-text-muted)] hover:text-primary">
                 Manage Profiles...
               </Button>
             </div>
@@ -185,10 +192,28 @@ export default function ControlRoomModule() {
                 description="System default."
                 icon={<Paintbrush size={18} />}
                 action={
-                  <div className="flex bg-[var(--color-bg-base)] rounded-lg p-1 border border-[var(--color-glass-border)]">
-                    <div className="p-1.5 rounded-md text-[var(--color-text-muted)] cursor-pointer hover:bg-[var(--color-bg-surface)]"><Sun size={14} /></div>
-                    <div className="p-1.5 rounded-md text-[var(--color-text-muted)] cursor-pointer hover:bg-[var(--color-bg-surface)]"><Moon size={14} /></div>
-                    <div className="p-1.5 rounded-md bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-sm"><Laptop size={14} /></div>
+                  <div className="flex bg-base rounded-lg p-1 border border-border-subtle">
+                    <div className="p-1.5 rounded-md text-[var(--color-text-muted)] cursor-pointer hover:bg-surface"><Sun size={14} /></div>
+                    <div className="p-1.5 rounded-md text-[var(--color-text-muted)] cursor-pointer hover:bg-surface"><Moon size={14} /></div>
+                    <div className="p-1.5 rounded-md bg-surface text-primary shadow-sm"><Laptop size={14} /></div>
+                  </div>
+                }
+              />
+              <PreferenceCard 
+                title="Master Volume"
+                description="System-wide notification sounds."
+                icon={<Volume2 size={18} />}
+                action={
+                  <div className="w-32 flex items-center">
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="1" 
+                      step="0.05"
+                      value={useNotificationStore().preferences.masterVolume}
+                      onChange={(e) => useNotificationStore.getState().updatePreferences({ masterVolume: parseFloat(e.target.value) })}
+                      className="w-full accent-[var(--color-accent-gold)] h-1.5 bg-border-subtle rounded-lg appearance-none cursor-pointer"
+                    />
                   </div>
                 }
               />

@@ -14,7 +14,15 @@ import { motion } from "framer-motion";
 import { HeroMotion, PageMotion } from "@/utils/motion";
 import { useUserStore } from "@/stores/user.store";
 import { useActivityStore } from "@/stores/activity.store";
+import { InsightCards } from "@/components/analytics/InsightCards";
 import { useAnalyticsStore } from "@/stores/analytics.store";
+import { 
+  LivingHydrationWidget, 
+  LivingFlameWidget, 
+  LivingTrailWidget, 
+  LivingHeartbeat,
+  LivingEnergyCore
+} from "@/components/dashboard/LivingWidgets";
 import { 
   Dumbbell, 
   Flame, 
@@ -63,20 +71,60 @@ export default function MissionControl() {
   const [isReminderModalOpen, setIsReminderModalOpen] = React.useState(false);
   const [isActionLoading, setIsActionLoading] = React.useState<string | null>(null);
   const { dailySteps, workoutState } = useActivityStore();
-  const { weeklyStats, lifetimeStats, fetchStats } = useAnalyticsStore();
+  const { aiSummary, goalCompletion, fetchStats, inspectionMode, hoveredDate, selectedDate } = useAnalyticsStore();
   
+  const [displayMetrics, setDisplayMetrics] = React.useState({
+    calories: 0,
+    waterMl: 0,
+    steps: 0,
+    protein: 0,
+    workoutStatus: "neutral" as "neutral" | "warning" | "achieved",
+    workoutText: "Not Started"
+  });
+
   useEffect(() => {
     if (userId) {
-      // Mocking period IDs for now. In a real scenario, we'd compute the current week/month IDs.
-      fetchStats(userId, {
-        dailyId: new Date().toISOString().split('T')[0],
-        weeklyId: 'current-week',
-        monthlyId: 'current-month',
-        yearlyId: 'current-year',
-        lifetimeId: 'lifetime'
-      });
+      fetchStats(userId);
     }
   }, [userId, fetchStats]);
+
+  // Sync metrics with interaction state
+  useEffect(() => {
+    if (inspectionMode === 'live') {
+      setDisplayMetrics({
+        calories: dailyCalories,
+        waterMl: dailyWaterMl,
+        steps: dailySteps,
+        protein: dailyProtein,
+        workoutStatus: workoutState === "completed" ? "achieved" : workoutState === "in_progress" ? "warning" : "neutral",
+        workoutText: workoutState === "completed" ? "Completed" : workoutState === "in_progress" ? "In Progress" : "Not Started"
+      });
+    } else {
+      const dateToInspect = hoveredDate || selectedDate;
+      if (dateToInspect) {
+        import('@/services/analytics/AnalyticsService').then(({ AnalyticsService }) => {
+          const cache = AnalyticsService.getCache();
+          const dailyLog = cache.dailyLogs.find(d => d.date === dateToInspect);
+          const hydrationLogs = cache.hydrationLogs.filter(h => h.date === dateToInspect);
+          const nutritionLogs = cache.nutritionLogs.filter(n => n.date === dateToInspect);
+          const activities = cache.activities.filter(a => a.date.toDate().toISOString().split("T")[0] === dateToInspect);
+          
+          let totalWater = 0; hydrationLogs.forEach(h => totalWater += (h.amountMl || 0));
+          let totalCalories = 0; nutritionLogs.forEach(n => totalCalories += (n.calories || 0));
+          let totalProtein = 0; nutritionLogs.forEach(n => totalProtein += (n.protein || 0));
+          
+          setDisplayMetrics({
+            calories: totalCalories,
+            waterMl: totalWater,
+            steps: dailyLog?.steps || 0,
+            protein: totalProtein,
+            workoutStatus: activities.length > 0 ? "achieved" : "neutral",
+            workoutText: activities.length > 0 ? "Completed" : "No Workout"
+          });
+        });
+      }
+    }
+  }, [inspectionMode, hoveredDate, selectedDate, dailyCalories, dailyWaterMl, dailySteps, dailyProtein, workoutState]);
 
   const handleRoute = (path: string, actionId: string) => {
     setIsActionLoading(actionId);
@@ -104,16 +152,16 @@ export default function MissionControl() {
   const { identity, targets } = profile;
   const userName = identity?.nickname || identity?.fullName.split(" ")[0] || "Commander";
   
-  const targetCalories = targets?.dailyCalories || 2000;
-  const targetWater = (targets?.water || 3000) / 1000; // in L
-  const targetSteps = profile.preferences?.stepGoal || 10000;
-  const targetProtein = targets?.protein || 150;
+  const targetCalories = profile.preferences?.goals?.calories || profile.targets?.dailyCalories || 2000;
+  const targetWater = ((profile.preferences?.goals?.waterMl || profile.targets?.water || 3000)) / 1000; // in L
+  const targetSteps = profile.preferences?.goals?.steps || 10000;
+  const targetProtein = profile.preferences?.goals?.proteinGrams || profile.targets?.protein || 150;
 
-  // Dynamic Score Calculation
-  const waterProgress = Math.min(1, dailyWaterMl / (targetWater * 1000));
-  const stepsProgress = Math.min(1, dailySteps / targetSteps);
-  const proteinProgress = Math.min(1, dailyProtein / targetProtein);
-  const calorieProgress = targetCalories > 0 ? Math.min(1, dailyCalories / targetCalories) : 0;
+  // Dynamic Score Calculation (using displayMetrics so it syncs with hover)
+  const waterProgress = targetWater > 0 ? Math.min(1, displayMetrics.waterMl / (targetWater * 1000)) : 0;
+  const stepsProgress = targetSteps > 0 ? Math.min(1, displayMetrics.steps / targetSteps) : 0;
+  const proteinProgress = targetProtein > 0 ? Math.min(1, displayMetrics.protein / targetProtein) : 0;
+  const calorieProgress = (targetCalories ?? 0) > 0 ? Math.min(1, displayMetrics.calories / (targetCalories ?? 1)) : 0;
   const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
   return (
@@ -122,21 +170,21 @@ export default function MissionControl() {
         
         {/* 1. DAILY BRIEFING HERO */}
         <motion.div variants={HeroMotion.reveal} initial="initial" animate="animate">
-          <HeroSection className="mt-4 md:mt-8 mb-8 md:mb-12 rounded-[var(--radius-2xl)] border border-[var(--color-glass-border)] bg-[var(--color-bg-glass-standard)] backdrop-blur-xl p-5 md:p-8">
+          <HeroSection className="mt-4 md:mt-8 mb-8 md:mb-12 glass-premium p-5 md:p-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
               
               <div className="space-y-2 md:space-y-4 text-center md:text-left w-full md:w-auto">
                 <Heading level="h2" className="text-3xl md:text-5xl lg:text-6xl">
                   Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'} <span className="hidden md:inline">, {userName}</span> 👋
                 </Heading>
-                <Subheading size="md" className="hidden md:block text-base text-[var(--color-text-secondary)]">Welcome back!</Subheading>
+                <Subheading size="md" className="hidden md:block text-base text-text-secondary">Welcome back!</Subheading>
                 
                 <div className="mt-3 md:mt-6">
-                  <Caption className="uppercase tracking-widest text-[var(--color-accent-blue)] mb-2 md:mb-3 font-semibold text-xs md:text-sm">Active Mission</Caption>
-                  <ul className="space-y-1.5 md:space-y-2 text-[var(--color-text-primary)] text-sm md:text-base flex flex-col items-center md:items-start">
-                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-blue)]" /> Hit your protein goal ({targets?.protein || 150}g)</li>
-                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-green)]" /> Drink {targetWater}L water</li>
-                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-accent-indigo)]" /> Complete Push Workout</li>
+                  <Caption className="uppercase tracking-widest text-accent-dashboard mb-2 md:mb-3 font-semibold text-xs md:text-sm">Active Mission</Caption>
+                  <ul className="space-y-1.5 md:space-y-2 text-text-primary text-sm md:text-base flex flex-col items-center md:items-start">
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-accent-dashboard" /> Hit your protein goal ({targetProtein}g)</li>
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-accent-nutrition" /> Drink {targetWater}L water</li>
+                    <li className="flex items-center gap-2"><div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-accent-mission" /> Complete Push Workout</li>
                   </ul>
                 </div>
               </div>
@@ -146,60 +194,65 @@ export default function MissionControl() {
                 
                 {/* Mobile Ring (25% smaller) */}
                 <div className="md:hidden">
-                  <ProgressRing value={dailyScore} size={90} strokeWidth={6} color="var(--color-accent-blue)" icon={<Statistic className="text-3xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
+                  <ProgressRing value={dailyScore} size={90} strokeWidth={6} color="var(--color-accent-dashboard, #3B82F6)" icon={<Statistic className="text-3xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
                 </div>
                 
                 {/* Desktop Ring */}
                 <div className="hidden md:block">
-                  <ProgressRing value={dailyScore} size={120} strokeWidth={8} color="var(--color-accent-blue)" icon={<Statistic className="text-4xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
+                  <ProgressRing value={dailyScore} size={120} strokeWidth={8} color="var(--color-accent-dashboard, #3B82F6)" icon={<Statistic className="text-4xl"><AnimatedNumber value={dailyScore} /></Statistic>} />
                 </div>
               </div>
             </div>
           </HeroSection>
         </motion.div>
 
-        {/* 2. DAILY SNAPSHOT */}
+        {/* 2. INSIGHTS */}
         <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
+          <InsightCards userId={userId || ""} />
+        </motion.div>
+
+        {/* 3. DAILY SNAPSHOT */}
+        <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
+          {inspectionMode !== 'live' && (
+             <div className="mb-2 flex items-center justify-center bg-accent-blue/10 text-accent-blue py-1 px-3 rounded-full text-xs font-bold animate-pulse w-max mx-auto">
+                <Clock size={12} className="mr-1" /> Inspecting: {hoveredDate || selectedDate}
+             </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
-            <div onClick={() => handleRoute('/nutrition', 'calories-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <MetricCard 
-                label="Calories" 
-                value={`${dailyCalories} / ${targetCalories}`} 
-                icon={<Flame size={18} />} 
-                status="neutral"
-              />
+            <div onClick={() => handleRoute('/nutrition', 'calories-card')} className="cursor-pointer">
+              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
+                <LivingFlameWidget progress={calorieProgress} size={50} />
+                <h4 className="mt-4 font-semibold text-text-primary text-sm">Calories</h4>
+                <p className="text-xs text-text-secondary">{displayMetrics.calories} / {targetCalories}</p>
+              </InteractiveCard>
             </div>
-            <div onClick={() => setIsWaterLoggerOpen(true)} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <MetricCard 
-                label="Hydration" 
-                value={`${dailyWaterMl} / ${targetWater * 1000}ml`} 
-                icon={<Droplet size={18} />} 
-                status="neutral"
-              />
+            <div onClick={() => setIsWaterLoggerOpen(true)} className="cursor-pointer">
+              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
+                <LivingHydrationWidget progress={waterProgress} width={50} height={60} />
+                <h4 className="mt-4 font-semibold text-text-primary text-sm">Hydration</h4>
+                <p className="text-xs text-text-secondary">{displayMetrics.waterMl} / {targetWater * 1000}ml</p>
+              </InteractiveCard>
             </div>
-            <div onClick={() => setIsStepsLoggerOpen(true)} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <MetricCard 
-                label="Steps" 
-                value={`${dailySteps} / ${targetSteps}`} 
-                icon={<Activity size={18} />} 
-                status="neutral"
-              />
+            <div onClick={() => setIsStepsLoggerOpen(true)} className="cursor-pointer">
+              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
+                <LivingTrailWidget progress={stepsProgress} width={80} />
+                <h4 className="mt-4 font-semibold text-text-primary text-sm">Steps</h4>
+                <p className="text-xs text-text-secondary">{displayMetrics.steps} / {targetSteps}</p>
+              </InteractiveCard>
             </div>
-            <div onClick={() => handleRoute('/training', 'workout-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <MetricCard 
-                label="Workout" 
-                value={workoutState === "completed" ? "Completed" : workoutState === "in_progress" ? "In Progress" : "Not Started"} 
-                icon={<Dumbbell size={18} />} 
-                status={workoutState === "completed" ? "achieved" : workoutState === "in_progress" ? "warning" : "neutral"}
-              />
+            <div onClick={() => handleRoute('/training', 'workout-card')} className="cursor-pointer">
+              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
+                <LivingEnergyCore progress={workoutState === 'completed' ? 1 : 0} size={50} />
+                <h4 className="mt-4 font-semibold text-text-primary text-sm">Workout</h4>
+                <p className="text-xs text-text-secondary">{displayMetrics.workoutText}</p>
+              </InteractiveCard>
             </div>
-            <div onClick={() => handleRoute('/recovery', 'recovery-card')} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <MetricCard 
-                label="Recovery" 
-                value="Pending" 
-                icon={<Moon size={18} />} 
-                status="neutral"
-              />
+            <div onClick={() => handleRoute('/recovery', 'recovery-card')} className="cursor-pointer">
+              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
+                <LivingHeartbeat progress={0.5} size={50} />
+                <h4 className="mt-4 font-semibold text-text-primary text-sm">Recovery</h4>
+                <p className="text-xs text-text-secondary">Pending</p>
+              </InteractiveCard>
             </div>
           </div>
         </motion.div>
@@ -209,15 +262,15 @@ export default function MissionControl() {
           
           <div className="md:col-span-2 space-y-6">
             <WidgetSection title="Today's AI Coach">
-              <GlassCard className="p-4 md:p-6 border-[var(--color-accent-indigo)]/30 bg-gradient-to-br from-[var(--color-accent-indigo)]/5 to-transparent">
+              <GlassCard className="p-4 md:p-6 border-accent-mission/30 bg-gradient-to-br from-accent-mission/5 to-transparent">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent-indigo)]/10 flex items-center justify-center">
-                    <Sparkles size={20} className="text-[var(--color-accent-indigo)]" />
+                  <div className="w-10 h-10 rounded-full bg-accent-mission/10 flex items-center justify-center">
+                    <Sparkles size={20} className="text-accent-mission" />
                   </div>
                   <Heading level="h4">Next Focus</Heading>
                 </div>
                 
-                <BodyText size="md" className="leading-relaxed text-[var(--color-text-secondary)] mb-6">
+                <BodyText size="md" className="leading-relaxed text-text-secondary mb-6">
                   You've already logged breakfast. To stay on track for your daily activity, try to reach 5,000 steps before evening.
                 </BodyText>
                 
@@ -253,48 +306,52 @@ export default function MissionControl() {
         <div className="mb-12">
           <WidgetSection title="Overview & Reports">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InteractiveCard title="Current Streak" onClick={() => handleRoute('/progress', 'progress-streak')}>
+              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-streak')} className="flex flex-col justify-between min-h-[140px]">
+                <span className="text-base font-semibold text-text-primary">Current Streak</span>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-zinc-400">Days Active</span>
-                  <span className="font-semibold text-orange-400">{lifetimeStats?.metrics?.streakDays || 0} Days</span>
+                  <span className="text-sm text-text-secondary">Days Active</span>
+                  <span className="font-semibold text-accent-dashboard">{aiSummary?.currentStreak || 0} Days</span>
                 </div>
                 <div className="flex gap-1 mt-3">
                   {[1, 2, 3, 4, 5, 6, 7].map((day, idx) => (
                     <div 
                       key={day} 
-                      className={`h-2 flex-1 rounded-full ${idx < (lifetimeStats?.metrics?.streakDays || 0) % 7 ? 'bg-orange-500' : 'bg-zinc-800'}`} 
+                      className={`h-2 flex-1 rounded-full ${idx < (aiSummary?.currentStreak || 0) % 7 ? 'bg-accent-dashboard' : 'bg-border'}`} 
                     />
                   ))}
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard title="Active Reminder" onClick={() => setIsReminderModalOpen(true)}>
+              <InteractiveCard onClick={() => setIsReminderModalOpen(true)} className="flex flex-col justify-between min-h-[140px]">
+                <span className="text-base font-semibold text-text-primary">Active Reminder</span>
                 <div className="flex flex-col gap-1 mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-zinc-400">Next Alert</span>
-                    <span className="font-semibold text-[var(--color-accent-blue)]">2:00 PM</span>
+                    <span className="text-sm text-text-secondary">Next Alert</span>
+                    <span className="font-semibold text-accent-dashboard">2:00 PM</span>
                   </div>
-                  <span className="text-base font-medium mt-1">Hydration Check</span>
+                  <span className="text-base font-medium mt-1 text-text-primary">Hydration Check</span>
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard title="Latest Report" onClick={() => handleRoute('/progress', 'latest-report')}>
+              <InteractiveCard onClick={() => handleRoute('/progress', 'latest-report')} className="flex flex-col justify-between min-h-[140px]">
+                <span className="text-base font-semibold text-text-primary">Latest Report</span>
                 <div className="flex flex-col gap-1 mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-zinc-400">Weekly Summary</span>
-                    <span className="font-semibold text-emerald-400">Available</span>
+                    <span className="text-sm text-text-secondary">Weekly Summary</span>
+                    <span className="font-semibold text-success">Available</span>
                   </div>
-                  <span className="text-sm mt-1 text-[var(--color-text-secondary)]">View your progress from last week.</span>
+                  <span className="text-sm mt-1 text-text-secondary">View your progress from last week.</span>
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard title="Workout Consistency" onClick={() => handleRoute('/progress', 'progress-card')}>
+              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-card')} className="flex flex-col justify-between min-h-[140px]">
+                <span className="text-base font-semibold text-text-primary">Workout Consistency</span>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-zinc-400">Weekly Goal</span>
-                  <span className="font-semibold text-emerald-400">{weeklyStats?.consistency?.workout || 0}%</span>
+                  <span className="text-sm text-text-secondary">Weekly Goal</span>
+                  <span className="font-semibold text-success">{goalCompletion?.workouts || 0}%</span>
                 </div>
-                <div className="w-full bg-zinc-800 rounded-full h-2 mt-2">
-                  <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${weeklyStats?.consistency?.workout || 0}%` }} />
+                <div className="w-full bg-border rounded-full h-2 mt-2">
+                  <div className="bg-success h-2 rounded-full" style={{ width: `${goalCompletion?.workouts || 0}%` }} />
                 </div>
               </InteractiveCard>
             </div>

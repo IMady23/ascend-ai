@@ -12,7 +12,7 @@ const getColor = (intensity: number) => {
     case 3: return "bg-purple-600";
     case 2: return "bg-purple-800";
     case 1: return "bg-purple-950";
-    default: return "bg-zinc-900 border border-zinc-800/50";
+    default: return "bg-surface border border-border-subtle/50";
   }
 };
 
@@ -57,11 +57,11 @@ export function JourneyCalendar() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 overflow-hidden"
+      className="bg-surface/50 border border-border-subtle rounded-xl p-6 overflow-hidden"
     >
       <div className="flex items-center gap-2 mb-6">
         <Calendar size={18} className="text-purple-400" />
-        <h2 className="text-lg font-semibold text-white">Journey Heatmap</h2>
+        <h2 className="text-lg font-semibold text-primary">Journey Heatmap</h2>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -78,12 +78,12 @@ export function JourneyCalendar() {
           </div>
         </div>
         
-        <div className="flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+        <div className="flex justify-between items-center text-[10px] text-secondary font-bold uppercase tracking-wider">
           <span>90 Days Ago</span>
           <div className="flex items-center gap-1.5">
             <span>Less</span>
             <div className="flex gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm bg-zinc-900 border border-zinc-800/50" />
+              <div className="w-2.5 h-2.5 rounded-sm bg-surface border border-border-subtle/50" />
               <div className="w-2.5 h-2.5 rounded-sm bg-purple-950" />
               <div className="w-2.5 h-2.5 rounded-sm bg-purple-800" />
               <div className="w-2.5 h-2.5 rounded-sm bg-purple-600" />

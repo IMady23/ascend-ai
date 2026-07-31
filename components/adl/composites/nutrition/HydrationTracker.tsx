@@ -25,7 +25,7 @@ export function HydrationTracker({
   return (
     <GlassCard className={cn("p-5 flex items-center justify-between overflow-hidden relative", className)}>
       {/* Background Liquid Fill Effect */}
-      <div className="absolute inset-0 z-0 bg-[var(--color-bg-surface)] opacity-50" />
+      <div className="absolute inset-0 z-0 bg-surface opacity-50" />
       <motion.div 
         className="absolute bottom-0 left-0 right-0 z-0 bg-blue-500/10 backdrop-blur-sm"
         initial={{ height: 0 }}
@@ -49,13 +49,13 @@ export function HydrationTracker({
       <div className="relative z-10 flex gap-2">
         <button 
           onClick={() => onAdd(250)}
-          className="px-3 py-1.5 rounded-lg bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-glass-hover)] border border-[var(--color-glass-border)] flex items-center gap-1 transition-colors text-xs font-medium"
+          className="px-3 py-1.5 rounded-lg bg-surface hover:bg-[var(--color-bg-glass-hover)] border border-border-subtle flex items-center gap-1 transition-colors text-xs font-medium"
         >
           <Plus size={14} /> 250
         </button>
         <button 
           onClick={() => onAdd(500)}
-          className="px-3 py-1.5 rounded-lg bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-glass-hover)] border border-[var(--color-glass-border)] flex items-center gap-1 transition-colors text-xs font-medium"
+          className="px-3 py-1.5 rounded-lg bg-surface hover:bg-[var(--color-bg-glass-hover)] border border-border-subtle flex items-center gap-1 transition-colors text-xs font-medium"
         >
           <Plus size={14} /> 500
         </button>

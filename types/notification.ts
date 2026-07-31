@@ -5,6 +5,8 @@ export interface Notification {
   title: string;
   body: string;
   type: string; // e.g., 'reminder', 'system', 'achievement'
+  priority?: 'low' | 'medium' | 'high';
+  pinned?: boolean;
   read: boolean;
   link: string | null;
   createdAt: Timestamp;

@@ -35,7 +35,7 @@ export function AuthLayout({ children, title, subtitle }: { children: React.Reac
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.7, ease: "easeOut" }}
-            className="text-2xl font-light tracking-[0.2em] text-white uppercase mb-2"
+            className="text-2xl font-light tracking-[0.2em] text-primary uppercase mb-2"
           >
             {title}
           </motion.h1>
@@ -43,7 +43,7 @@ export function AuthLayout({ children, title, subtitle }: { children: React.Reac
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.9, ease: "easeOut" }}
-            className="text-[var(--color-text-secondary)] text-sm tracking-widest uppercase opacity-70"
+            className="text-secondary text-sm tracking-widest uppercase opacity-70"
           >
             {subtitle}
           </motion.p>

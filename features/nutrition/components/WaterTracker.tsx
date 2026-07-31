@@ -20,13 +20,13 @@ export function WaterTracker() {
         <Droplet className="text-cyan-400" size={32} />
       </div>
       
-      <h2 className="text-xl font-bold text-white mb-2">Hydration Status</h2>
-      <p className="text-zinc-400 text-sm mb-6">
-        <span className="text-white font-bold text-lg font-mono">{currentWater}</span> / {target} ml
+      <h2 className="text-xl font-bold text-primary mb-2">Hydration Status</h2>
+      <p className="text-secondary text-sm mb-6">
+        <span className="text-primary font-bold text-lg font-mono">{currentWater}</span> / {target} ml
       </p>
 
       {/* Progress Circle could go here, using a bar for simplicity */}
-      <div className="w-full max-w-xs bg-zinc-900 rounded-full h-4 overflow-hidden border border-zinc-800 mb-8 relative">
+      <div className="w-full max-w-xs bg-surface rounded-full h-4 overflow-hidden border border-border-subtle mb-8 relative">
         <div 
           className="bg-cyan-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
           style={{ width: `${percentage}%` }}

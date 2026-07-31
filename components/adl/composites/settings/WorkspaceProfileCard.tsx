@@ -38,7 +38,7 @@ export function WorkspaceProfileCard({
       )}
       
       <div className="flex justify-between items-start mb-2 pl-2">
-        <div className="p-2 rounded-lg bg-[var(--color-bg-base)] text-[var(--color-text-primary)] border border-[var(--color-glass-border)]">
+        <div className="p-2 rounded-lg bg-base text-primary border border-border-subtle">
           {icon}
         </div>
         {isActive && (
@@ -50,7 +50,7 @@ export function WorkspaceProfileCard({
       
       <div className="pl-2">
         <Heading level="h4" className="text-sm mb-1">{name}</Heading>
-        <Caption className="text-[var(--color-text-secondary)] line-clamp-2">{description}</Caption>
+        <Caption className="text-secondary line-clamp-2">{description}</Caption>
       </div>
     </GlassCard>
   );

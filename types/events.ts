@@ -22,6 +22,10 @@ export type EventType =
   | 'DISTANCE_LOGGED'
   | 'WEIGHT_UPDATED'
   | 'STEPS_UPDATED'
+  | 'GOAL_UPDATED'
+  | 'RECOVERY_UPDATED'
+  | 'SLEEP_LOGGED'
+  | 'PROFILE_UPDATED'
   | 'DAY_RESET';
 
 export interface BaseEvent {

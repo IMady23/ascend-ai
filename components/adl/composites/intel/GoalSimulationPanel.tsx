@@ -38,7 +38,7 @@ export function GoalSimulationPanel({
         {/* Slider 1 */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <BodyText size="sm" className="font-semibold text-[var(--color-text-primary)]">Average Sleep</BodyText>
+            <BodyText size="sm" className="font-semibold text-primary">Average Sleep</BodyText>
             <Caption className="font-mono">{sleep} hrs/night</Caption>
           </div>
           <input 
@@ -55,7 +55,7 @@ export function GoalSimulationPanel({
         {/* Slider 2 */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <BodyText size="sm" className="font-semibold text-[var(--color-text-primary)]">Workout Frequency</BodyText>
+            <BodyText size="sm" className="font-semibold text-primary">Workout Frequency</BodyText>
             <Caption className="font-mono">{workouts} sessions/wk</Caption>
           </div>
           <input 

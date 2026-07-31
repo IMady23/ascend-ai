@@ -80,17 +80,17 @@ export function PersonalInsights() {
       title: "Protein Adherence",
       description: "Protein is slightly below target. Consider a post-workout shake.",
       icon: Info,
-      color: "text-zinc-400",
+      color: "text-secondary",
       bg: "bg-zinc-500/10",
       border: "border-zinc-500/20"
     });
   }
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+    <div className="bg-surface/50 border border-border-subtle rounded-xl p-6">
       <div className="flex items-center gap-2 mb-6">
-        <Lightbulb size={18} className="text-zinc-400" />
-        <h2 className="text-lg font-semibold text-white">Personal Insights</h2>
+        <Lightbulb size={18} className="text-secondary" />
+        <h2 className="text-lg font-semibold text-primary">Personal Insights</h2>
       </div>
 
       <div className="space-y-3">
@@ -104,7 +104,7 @@ export function PersonalInsights() {
             </div>
             <div>
               <h3 className={`text-sm font-semibold mb-1 ${insight.color}`}>{insight.title}</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">{insight.description}</p>
+              <p className="text-sm text-secondary leading-relaxed">{insight.description}</p>
             </div>
           </div>
         ))}

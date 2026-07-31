@@ -21,10 +21,10 @@ export function NutritionTrend() {
   ];
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+    <div className="bg-surface/50 border border-border-subtle rounded-xl p-6">
       <div className="flex items-center gap-2 mb-6">
-        <Leaf size={18} className="text-zinc-400" />
-        <h2 className="text-lg font-semibold text-white">Nutrition Trend</h2>
+        <Leaf size={18} className="text-secondary" />
+        <h2 className="text-lg font-semibold text-primary">Nutrition Trend</h2>
       </div>
 
       <div className="space-y-5">
@@ -34,13 +34,13 @@ export function NutritionTrend() {
           return (
             <div key={i} className="flex flex-col gap-2">
               <div className="flex justify-between items-end">
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">{metric.label}</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-secondary">{metric.label}</span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-lg font-bold text-white font-mono">{metric.value}</span>
-                  <span className="text-xs text-zinc-500 font-medium">/ {metric.target} {metric.unit}</span>
+                  <span className="text-lg font-bold text-primary font-mono">{metric.value}</span>
+                  <span className="text-xs text-secondary font-medium">/ {metric.target} {metric.unit}</span>
                 </div>
               </div>
-              <div className="h-1.5 w-full bg-zinc-950 rounded-full overflow-hidden flex">
+              <div className="h-1.5 w-full bg-base rounded-full overflow-hidden flex">
                 <div 
                   className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
                   style={{ width: `${progress}%` }}

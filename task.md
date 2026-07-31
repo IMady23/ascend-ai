@@ -79,3 +79,37 @@
 ## Phase 5: Error Handling
 - `[x]` Create app/not-found.tsx, app/error.tsx, and app/global-error.tsx
 - `[x]` Ensure graceful API failures
+
+# Final Readiness (v1.0)
+
+## Phase 1: Progression Synchronization
+- `[x]` Update TopBar.tsx with real level
+- `[x]` Update ProfileMenu.tsx with real XP and Level
+- `[x]` Add XPBar to ProfileMenu.tsx
+- `[x]` Update ProgressHero.tsx with real streak and XP
+
+## Phase 2: Dashboard Cards Standardization
+- `[x]` Standardize MetricCard to have min-h-[140px], strict paddings, and consistent typography
+- `[x]` Update Dashboard overview section to use min-h-[140px] for even grid display
+
+## Phase 3: Cardio Engine Core
+- `[x]` Create lib/calculations/metrics.ts
+- `[x]` Update activity store for cardio state
+- `[x]` Create CardioHUD.tsx
+- `[x]` Update training page for cardio flow
+
+## Phase 4: Post-Workout Summary
+- `[x]` Create SessionSummary.tsx
+- `[x]` Integrate SessionSummary into training page
+
+## Phase 5: AI Nutrition Engine
+- `[x]` LogMealTool: requiresConfirmation and bypass client store on server
+- `[x]` Update api/ai/route.ts for execution of confirmed tool calls
+- `[x]` Create MealConfirmationWidget.tsx
+- `[x]` Update nutrition/page.tsx to render widget and handle confirmation flow
+
+## Phase 2: Email System
+- `[x]` Install nodemailer
+- `[x]` Create mail.service.ts
+- `[x]` Create email API route
+- `[x]` Create email templates

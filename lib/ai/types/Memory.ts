@@ -14,7 +14,7 @@ export interface MemoryMetadata {
     createdAt: number;
     updatedAt: number;
     lastReferencedAt?: number;
-    expiresAt?: number;
+    expiresAt?: number | null;
 }
 
 export interface MemoryItem {

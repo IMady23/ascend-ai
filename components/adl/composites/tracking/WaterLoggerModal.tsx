@@ -22,8 +22,8 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
   const [customAmount, setCustomAmount] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const targetWater = profile?.targets?.water || 3000;
-  const progress = Math.min((dailyWaterMl / targetWater) * 100, 100);
+  const targetWater = profile?.preferences?.goals?.waterMl || profile?.targets?.water || 3000;
+  const progress = targetWater > 0 ? Math.min((dailyWaterMl / targetWater) * 100, 100) : 0;
 
   const handleAdd = async (amount: number) => {
     setIsSubmitting(true);
@@ -57,7 +57,7 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -72,7 +72,7 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
               </div>
               <Heading level="h4">Log Hydration</Heading>
             </div>
-            <button onClick={onClose} className="p-1 rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)] transition-colors">
+            <button onClick={onClose} className="p-1 rounded-md text-[var(--color-text-muted)] hover:text-primary hover:bg-surface transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -106,7 +106,7 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
               placeholder="Custom (ml)"
               value={customAmount}
               onChange={e => setCustomAmount(e.target.value)}
-              className="flex-1 bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-lg font-mono py-2.5 px-4 text-center focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+              className="flex-1 bg-base border border-border-subtle rounded-lg font-mono py-2.5 px-4 text-center focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
             />
             <Button 
               onClick={handleCustomAdd} 

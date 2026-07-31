@@ -33,7 +33,7 @@ export function WeightTrendCard({
     : Math.max(0, Math.min(100, ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100));
 
   const TrendIcon = trend === "down" ? TrendingDown : trend === "up" ? TrendingUp : Minus;
-  const trendColor = trend === "down" ? "text-blue-400" : trend === "up" ? "text-orange-400" : "text-slate-400";
+  const trendColor = trend === "down" ? "text-blue-400" : trend === "up" ? "text-orange-400" : "text-secondary";
 
   return (
     <GlassCard className={cn("p-6 flex flex-col gap-6", className)}>
@@ -56,7 +56,7 @@ export function WeightTrendCard({
           <span>{startWeight}{unit}</span>
           <span>{targetWeight}{unit}</span>
         </div>
-        <div className="h-2 w-full bg-[var(--color-bg-surface)] rounded-full overflow-hidden border border-[var(--color-glass-border)] relative">
+        <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-border-subtle relative">
           <div 
             className="absolute top-0 bottom-0 left-0 bg-[var(--color-text-primary)] rounded-full transition-all duration-1000"
             style={{ width: `${progress}%` }}
@@ -65,7 +65,7 @@ export function WeightTrendCard({
       </div>
       
       {/* Chart Placeholder */}
-      <div className="h-24 w-full border border-dashed border-[var(--color-glass-border)] rounded-lg flex items-center justify-center text-[var(--color-text-muted)] text-xs">
+      <div className="h-24 w-full border border-dashed border-border-subtle rounded-lg flex items-center justify-center text-[var(--color-text-muted)] text-xs">
         [Recharts Trendline Implementation]
       </div>
     </GlassCard>

@@ -44,7 +44,7 @@ export function ExperimentLabCard({
         </Badge>
       </div>
 
-      <div className="bg-[var(--color-bg-base)]/50 rounded-lg p-3 border border-[var(--color-glass-border)] flex items-center justify-between mb-4">
+      <div className="bg-base/50 rounded-lg p-3 border border-border-subtle flex items-center justify-between mb-4">
         <div className="text-center flex-1">
           <Caption className="text-[var(--color-text-muted)] uppercase text-[9px] mb-1">Baseline</Caption>
           <div className="font-mono text-sm font-bold">{beforeMetric}</div>
@@ -59,7 +59,7 @@ export function ExperimentLabCard({
       </div>
       
       <div className="flex items-center justify-between">
-        <Caption className="text-[var(--color-text-secondary)] text-xs">Tracking: {metricLabel}</Caption>
+        <Caption className="text-secondary text-xs">Tracking: {metricLabel}</Caption>
         {status === "Active" && (
           <Caption className="font-mono text-[10px]">{progress}% Done</Caption>
         )}

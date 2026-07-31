@@ -110,16 +110,29 @@ export const useNutritionStore = create<NutritionState>()(
         ).catch(console.error);
 
         // Dispatch Event to Progression Engine
-        const dailyProteinTarget = useUserStore.getState().profile?.targets?.protein || 150;
-        const currentDailyProtein = get().dailyProtein;
-        const isGoalMet = currentDailyProtein >= dailyProteinTarget;
+        const profile = useUserStore.getState().profile;
+        const progress = (await import("@/lib/ai/NutritionCoach")).NutritionCoach.generateGoalProgress(
+          get().dailyCalories,
+          get().dailyProtein,
+          get().dailyWaterMl,
+          get().meals,
+          profile
+        );
+        const aiAnalysis = (await import("@/lib/ai/NutritionCoach")).NutritionCoach.generateMealAnalysis(newMeal, progress);
         
         eventBus.dispatch({
           id: crypto.randomUUID(),
           userId,
           type: 'MEAL_LOGGED',
           timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any,
-          metadata: { mealId: newMeal.id, calories: newMeal.calories, protein: newMeal.protein, isGoalMet },
+          metadata: { 
+            mealId: newMeal.id, 
+            calories: newMeal.calories, 
+            protein: newMeal.protein, 
+            isGoalMet: progress.protein.percentage >= 100,
+            aiAnalysis,
+            log: newMeal
+          },
           processed: false
         });
       },
@@ -208,7 +221,7 @@ export const useNutritionStore = create<NutritionState>()(
           userId,
           type: 'WATER_LOGGED',
           timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any,
-          metadata: { amountMl, totalDailyMl: currentDailyWater, isGoalMet },
+          metadata: { amountMl, totalDailyMl: currentDailyWater, isGoalMet, log: newLog },
           processed: false
         });
       },
@@ -296,7 +309,13 @@ export const useNutritionStore = create<NutritionState>()(
       partialize: (state) => ({
         favoriteFoods: state.favoriteFoods,
         recentFoods: state.recentFoods,
-        customFoods: state.customFoods
+        customFoods: state.customFoods,
+        meals: state.meals,
+        hydrationLogs: state.hydrationLogs,
+        dailyCalories: state.dailyCalories,
+        dailyProtein: state.dailyProtein,
+        dailyWaterMl: state.dailyWaterMl,
+        currentDate: state.currentDate
       })
     }
   )

@@ -48,12 +48,12 @@ export function NotificationPopover({ isOpen, onClose, anchorRef }: Notification
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -10 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="absolute right-0 top-[calc(100%+8px)] w-80 bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden z-50 flex flex-col"
+          className="absolute right-0 top-[calc(100%+8px)] w-80 bg-base border border-border-subtle rounded-[var(--radius-xl)] shadow-[var(--shadow-2xl)] overflow-hidden z-50 flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-[var(--color-glass-border)] bg-[var(--color-bg-surface)]">
+          <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-surface">
             <div className="flex items-center gap-2">
-              <Bell size={16} className="text-[var(--color-text-primary)]" />
+              <Bell size={16} className="text-primary" />
               <Heading level="h4" className="text-sm">Notifications</Heading>
             </div>
             <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Mark all read</Button>
@@ -65,24 +65,24 @@ export function NotificationPopover({ isOpen, onClose, anchorRef }: Notification
               <CheckCircle2 size={24} className="text-[var(--color-success)]" />
             </div>
             <Heading level="h4" className="text-base mb-2">You're all caught up.</Heading>
-            <BodyText size="sm" className="text-[var(--color-text-secondary)] mb-6">
+            <BodyText size="sm" className="text-secondary mb-6">
               Future reminders include:
             </BodyText>
             
             <ul className="flex flex-col gap-2 text-left w-full">
-              <li className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <li className="flex items-center gap-2 text-xs text-secondary">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-blue)]" />
                 Workout reminders
               </li>
-              <li className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <li className="flex items-center gap-2 text-xs text-secondary">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-green)]" />
                 Nutrition alerts
               </li>
-              <li className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <li className="flex items-center gap-2 text-xs text-secondary">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-indigo)]" />
                 AI recommendations
               </li>
-              <li className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <li className="flex items-center gap-2 text-xs text-secondary">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-gold)]" />
                 Weekly reports
               </li>

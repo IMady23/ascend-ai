@@ -27,7 +27,7 @@ export default function IntegrationsPage() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                <Apple size={24} className="text-white" />
+                <Apple size={24} className="text-primary" />
               </div>
               <div>
                 <Heading level="h4">Apple Health</Heading>
@@ -36,24 +36,24 @@ export default function IntegrationsPage() {
                 </Caption>
               </div>
             </div>
-            <button className="text-xs text-[var(--color-text-secondary)] hover:text-white underline">Disconnect</button>
+            <button className="text-xs text-secondary hover:text-primary underline">Disconnect</button>
           </div>
           
           <div className="mt-6 space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-[var(--color-text-secondary)]">Last Synced</span>
-              <span className="text-white">Just now</span>
+              <span className="text-secondary">Last Synced</span>
+              <span className="text-primary">Just now</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-[var(--color-text-secondary)]">Imported</span>
-              <span className="text-white">HRV, Sleep, Steps</span>
+              <span className="text-secondary">Imported</span>
+              <span className="text-primary">HRV, Sleep, Steps</span>
             </div>
           </div>
 
           <button 
             onClick={simulateSync}
             disabled={isSyncing}
-            className="w-full mt-6 bg-white/5 hover:bg-white/10 text-white rounded-lg py-2 flex items-center justify-center gap-2 transition"
+            className="w-full mt-6 bg-white/5 hover:bg-white/10 text-primary rounded-lg py-2 flex items-center justify-center gap-2 transition"
           >
             <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
             {isSyncing ? "Syncing..." : "Sync Now"}
@@ -64,18 +64,18 @@ export default function IntegrationsPage() {
         <GlassCard className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-[var(--color-glass-border)]">
+              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-border-subtle">
                 <Watch size={24} className="text-[var(--color-text-muted)]" />
               </div>
               <div>
                 <Heading level="h4" className="text-[var(--color-text-muted)]">Garmin Connect</Heading>
-                <Caption className="text-[var(--color-text-secondary)]">Not Connected</Caption>
+                <Caption className="text-secondary">Not Connected</Caption>
               </div>
             </div>
           </div>
           
           <div className="mt-6">
-            <BodyText className="text-sm text-[var(--color-text-secondary)]">
+            <BodyText className="text-sm text-secondary">
               Connect your Garmin device to automatically import workouts, heart rate, and training readiness data.
             </BodyText>
           </div>
@@ -94,10 +94,10 @@ export default function IntegrationsPage() {
           </div>
           <div>
             <Heading level="h4">Data Permissions</Heading>
-            <BodyText className="text-sm text-[var(--color-text-secondary)]">Manage what data Ascend AI is allowed to read and analyze.</BodyText>
+            <BodyText className="text-sm text-secondary">Manage what data Ascend AI is allowed to read and analyze.</BodyText>
           </div>
         </div>
-        <button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm transition">
+        <button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-primary rounded-md text-sm transition">
           Manage Access
         </button>
       </GlassCard>

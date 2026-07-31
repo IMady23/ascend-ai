@@ -61,29 +61,29 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-base/60 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
             initial={{ opacity: 0, y: 100, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.95 }}
-            className="fixed inset-x-4 bottom-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50 md:w-full max-w-2xl bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-2xl)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="fixed inset-x-4 bottom-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50 md:w-full max-w-2xl bg-base border border-border-subtle rounded-[var(--radius-2xl)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-[var(--color-glass-border)] bg-gradient-to-br from-[var(--color-bg-glass-standard)] to-transparent">
+            <div className="flex items-center justify-between p-6 border-b border-border-subtle bg-gradient-to-br from-[var(--color-bg-glass-standard)] to-transparent">
               <div>
                 <Heading level="h2" className="text-xl">Communication Schedule</Heading>
-                <BodyText className="text-[var(--color-text-secondary)] mt-1">Configure when and how Ascend AI alerts you.</BodyText>
+                <BodyText className="text-secondary mt-1">Configure when and how Ascend AI alerts you.</BodyText>
               </div>
-              <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] hover:text-white transition-colors">
+              <button onClick={onClose} className="p-2 rounded-full hover:bg-surface text-[var(--color-text-muted)] hover:text-primary transition-colors">
                 <X size={20} />
               </button>
             </div>
 
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
               {/* Sidebar Tabs */}
-              <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-[var(--color-glass-border)] p-4 overflow-y-auto bg-[var(--color-bg-surface)]/30">
+              <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-border-subtle p-4 overflow-y-auto bg-surface/30">
                 <div className="space-y-1 flex md:block overflow-x-auto md:overflow-visible pb-2 md:pb-0">
                   {schedules.map(schedule => (
                     <button
@@ -93,7 +93,7 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
                         "flex-shrink-0 md:w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-between",
                         activeTab === schedule.id 
                           ? "bg-[var(--color-accent-blue)]/10 text-[var(--color-accent-blue)]" 
-                          : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-surface-hover)] hover:text-white"
+                          : "text-secondary hover:bg-[var(--color-bg-surface-hover)] hover:text-primary"
                       )}
                     >
                       {schedule.type}
@@ -123,7 +123,7 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
                             type="time" 
                             value={currentSchedule.time === "every_2h" ? "00:00" : currentSchedule.time}
                             onChange={handleTimeChange}
-                            className="bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-lg px-3 py-2 text-white outline-none focus:border-[var(--color-accent-blue)]"
+                            className="bg-surface border border-border-subtle rounded-lg px-3 py-2 text-primary outline-none focus:border-[var(--color-accent-blue)]"
                           />
                           {currentSchedule.time === "every_2h" && (
                             <span className="text-sm text-[var(--color-accent-blue)] font-medium bg-[var(--color-accent-blue)]/10 px-2 py-1 rounded-md">Interval Mode (Every 2h)</span>
@@ -141,7 +141,7 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
                               "flex flex-col items-center justify-center p-3 rounded-xl border transition-all",
                               currentSchedule.channels.includes("in-app") 
                                 ? "border-[var(--color-accent-blue)] bg-[var(--color-accent-blue)]/10 text-[var(--color-accent-blue)]"
-                                : "border-[var(--color-glass-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
+                                : "border-border-subtle bg-surface text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
                             )}
                           >
                             <Bell size={20} className="mb-2" />
@@ -154,7 +154,7 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
                               "flex flex-col items-center justify-center p-3 rounded-xl border transition-all",
                               currentSchedule.channels.includes("push") 
                                 ? "border-[var(--color-accent-purple)] bg-[var(--color-accent-purple)]/10 text-[var(--color-accent-purple)]"
-                                : "border-[var(--color-glass-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
+                                : "border-border-subtle bg-surface text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
                             )}
                           >
                             <Smartphone size={20} className="mb-2" />
@@ -167,7 +167,7 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
                               "flex flex-col items-center justify-center p-3 rounded-xl border transition-all",
                               currentSchedule.channels.includes("email") 
                                 ? "border-[var(--color-accent-gold)] bg-[var(--color-accent-gold)]/10 text-[var(--color-accent-gold)]"
-                                : "border-[var(--color-glass-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
+                                : "border-border-subtle bg-surface text-[var(--color-text-muted)] hover:border-[var(--color-text-secondary)]"
                             )}
                           >
                             <Mail size={20} className="mb-2" />
@@ -183,14 +183,14 @@ export function ReminderScheduleModal({ isOpen, onClose }: ReminderScheduleModal
             </div>
 
             {/* Daily Preview Footer */}
-            <div className="p-4 bg-[var(--color-bg-surface)] border-t border-[var(--color-glass-border)] flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="p-4 bg-surface border-t border-border-subtle flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="flex-1 overflow-x-auto w-full">
                 <div className="flex items-center gap-3 min-w-max pb-1">
                   <span className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-semibold mr-2">Today's Flow</span>
                   {schedules.filter(s => s.enabled).sort((a, b) => a.time.localeCompare(b.time)).map(s => (
-                    <div key={s.id} className="flex items-center gap-1.5 text-xs bg-[var(--color-bg-base)] px-2 py-1 rounded-md border border-[var(--color-glass-border)]">
+                    <div key={s.id} className="flex items-center gap-1.5 text-xs bg-base px-2 py-1 rounded-md border border-border-subtle">
                       <span className="text-[var(--color-accent-blue)] font-medium">{s.time}</span>
-                      <span className="text-[var(--color-text-secondary)]">{s.type}</span>
+                      <span className="text-secondary">{s.type}</span>
                     </div>
                   ))}
                 </div>

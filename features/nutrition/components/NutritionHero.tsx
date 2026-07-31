@@ -24,40 +24,40 @@ export function NutritionHero() {
             <Leaf size={16} />
             <span className="uppercase tracking-wider text-xs font-bold">Nutrition Lab</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
             Fuel the Machine.
           </h1>
-          <p className="text-zinc-400 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-secondary max-w-xl text-sm md:text-base leading-relaxed">
             Every meal is an opportunity to optimize performance. Stay precise.
           </p>
         </div>
 
         <div className="flex gap-4">
           {/* Calorie Progress */}
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Flame size={14} className="text-emerald-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Calories</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white font-mono">{calPercent}%</span>
+              <span className="text-2xl font-black text-primary font-mono">{calPercent}%</span>
             </div>
           </div>
           
           {/* Hydration Progress */}
-          <div className="flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
-            <div className="flex items-center gap-2 text-zinc-400 mb-1">
+          <div className="flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[120px]">
+            <div className="flex items-center gap-2 text-secondary mb-1">
               <Droplets size={14} className="text-cyan-400" />
               <span className="text-xs font-bold uppercase tracking-wider">Hydration</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white font-mono">{waterPercent}%</span>
+              <span className="text-2xl font-black text-primary font-mono">{waterPercent}%</span>
             </div>
           </div>
 
-          <div className="hidden sm:flex flex-col items-start bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-4 backdrop-blur-sm min-w-[100px]">
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Streak</span>
-            <span className="text-2xl font-black text-white font-mono">{streak}</span>
+          <div className="hidden sm:flex flex-col items-start bg-base/50 border border-border-subtle/50 rounded-xl p-4 backdrop-blur-sm min-w-[100px]">
+            <span className="text-xs font-bold uppercase tracking-wider text-secondary mb-1">Streak</span>
+            <span className="text-2xl font-black text-primary font-mono">{streak}</span>
           </div>
         </div>
       </div>

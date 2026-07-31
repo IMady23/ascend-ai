@@ -50,49 +50,49 @@ export function SignupForm() {
       )}
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Name</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Name</label>
         <input 
           type="text"
           required
           value={name}
           onChange={e => setName(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="Commander Name"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Email</label>
         <input 
           type="email"
           required
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="commander@ascend.ai"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Password</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Password</label>
         <input 
           type="password"
           required
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="••••••••"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Confirm Password</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Confirm Password</label>
         <input 
           type="password"
           required
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="••••••••"
         />
       </div>
@@ -100,14 +100,14 @@ export function SignupForm() {
       <button 
         type="submit" 
         disabled={loading}
-        className="w-full bg-white text-black font-bold rounded-lg p-3 flex items-center justify-center hover:bg-zinc-200 transition-colors disabled:opacity-50 mt-4"
+        className="w-full bg-primary text-primary-foreground font-bold rounded-lg p-3 flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 mt-4"
       >
         {loading ? <Loader2 size={18} className="animate-spin" /> : "Commit to Protocol"}
       </button>
 
       <div className="text-center mt-6">
-        <span className="text-xs text-zinc-500">Already enlisted? </span>
-        <Link href="/login" className="text-xs font-bold text-white hover:text-purple-400 transition-colors">
+        <span className="text-xs text-secondary">Already enlisted? </span>
+        <Link href="/login" className="text-xs font-bold text-primary hover:text-purple-400 transition-colors">
           Sign In
         </Link>
       </div>

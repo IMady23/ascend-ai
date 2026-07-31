@@ -23,15 +23,15 @@ export function SidebarItem({ id, label, icon: Icon, route, accentColor, isSideb
     <Link
       href={route}
       className={cn(
-        "group relative flex items-center h-11 px-3 rounded-[var(--radius-md)] transition-colors duration-150 outline-none",
-        isActive ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-glass-standard)]"
+        "group relative flex items-center h-11 px-3 rounded-md transition-colors duration-fast ease-ui outline-none",
+        isActive ? "text-text-primary" : "text-text-secondary hover:text-text-primary hover:bg-white/5"
       )}
     >
       {/* Active Indicator Background */}
       {isActive && (
         <motion.div
           layoutId="sidebar-active-indicator"
-          className="absolute inset-0 rounded-[var(--radius-md)] bg-[var(--color-bg-glass-active)] glass-highlight border border-[var(--color-glass-border)] -z-10"
+          className="absolute inset-0 rounded-md bg-white/10 glass-highlight border border-white/10 -z-10"
           initial={false}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
         />
@@ -49,7 +49,7 @@ export function SidebarItem({ id, label, icon: Icon, route, accentColor, isSideb
       <Icon 
         size={20} 
         className={cn(
-          "shrink-0 z-10 transition-transform duration-200", 
+          "shrink-0 z-10 transition-transform duration-normal ease-ui", 
           isActive ? "ml-3" : "ml-1 group-hover:scale-110",
           !isSidebarOpen && isActive && "ml-0 mx-auto"
         )} 

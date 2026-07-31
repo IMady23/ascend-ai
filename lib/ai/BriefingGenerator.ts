@@ -4,6 +4,9 @@ import { useCommunicationStore } from "@/stores/communication.store";
 import { CommunicationRepository } from "@/services/repositories/communication.repository";
 import { useUserStore } from "@/stores/user.store";
 
+import { NutritionCoach } from "@/lib/ai/NutritionCoach";
+import { useNutritionStore } from "@/stores/nutrition.store";
+
 export class BriefingGenerator {
   static async generateDailyBriefing() {
     const userId = useUserStore.getState().userId;
@@ -21,42 +24,21 @@ export class BriefingGenerator {
 
     if (alreadyExists) return null;
 
-    const contextSnapshot = ContextBuilder.build(type.toLowerCase());
+    // Use NutritionCoach instead of LLM simulation
+    const nutritionState = useNutritionStore.getState();
+    const userProfile = useUserStore.getState().profile;
     
-    let prompt = "";
-    if (type === 'MORNING_BRIEFING') {
-      prompt = `Generate a highly personalized Morning Briefing as an AI Fitness Coach. 
-      Do NOT output JSON. Output a structured, motivating text.
-      Include:
-      1. A short greeting (e.g., "Good morning!")
-      2. Recovery score/status
-      3. Today's focus
-      4. Workout recommendation
-      5. Nutrition & Hydration targets
-      6. Active mission
-      7. Coach insight
-      8. End with one concrete recommendation.
-      
-      Context: ${JSON.stringify(contextSnapshot)}`;
-    } else {
-      prompt = `Generate a highly personalized Evening Briefing as an AI Fitness Coach. 
-      Do NOT output JSON. Output a structured, reflective text.
-      Include:
-      1. Today's Wins (what they did well)
-      2. Areas to Improve
-      3. Progress (XP earned, etc.)
-      4. Tomorrow's Focus
-      5. Coach Reflection (e.g., "You stayed consistent today...")
-      
-      Context: ${JSON.stringify(contextSnapshot)}`;
-    }
+    const progress = NutritionCoach.generateGoalProgress(
+      nutritionState.dailyCalories,
+      nutritionState.dailyProtein,
+      nutritionState.dailyWaterMl,
+      nutritionState.meals,
+      userProfile
+    );
 
-    try {
-      // For V1, we simulate the LLM call or hit our actual OpenRouter endpoint.
-      // Assuming aiService.getCoachingResponse could handle raw text if we adjusted it, 
-      // but let's simulate the generation for now to ensure reliability during the freeze.
-      const generatedText = await this.simulateLLM(prompt, type);
+    const generatedText = this.generateBriefingText(type, progress, userProfile);
       
+    try {
       const item = {
         id: crypto.randomUUID(),
         userId,
@@ -79,12 +61,17 @@ export class BriefingGenerator {
     }
   }
 
-  private static async simulateLLM(prompt: string, type: string) {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  private static generateBriefingText(type: string, progress: any, profile: any) {
+    const dailyInsights = NutritionCoach.generateDailyInsights(progress);
+
     if (type === 'MORNING_BRIEFING') {
-      return `Recovery: Good\n\nToday's Workout: Pull Day\nProtein Goal: 160g\nWater Goal: 3L\n\nYour focus today is completing your upper-body workout and reaching 160g of protein. Those two actions will move you closest to your weekly goal. Let's make today count.`;
+      return `Good morning! Your focus today is reaching ${progress.protein.target}g of protein and ${progress.water.target}L of water.\n\nNutrition Coach: ${dailyInsights}\n\nLet's make today count.`;
     } else {
-      return `Today's Wins: You logged all your meals and hit your protein target.\nAreas to Improve: You missed your daily hydration goal.\n\nYou stayed consistent today by meeting your calorie target. Tomorrow, prioritizing hydration will help support recovery. Keep it up!`;
+      let reflection = "You stayed consistent today.";
+      if (progress.calories.percentage > 100) reflection = "You were a bit over your calorie target today.";
+      if (progress.protein.percentage >= 100) reflection = "Excellent work hitting your protein goal!";
+
+      return `Evening Summary:\n\n${dailyInsights}\n\nCoach Reflection: ${reflection}`;
     }
   }
 }

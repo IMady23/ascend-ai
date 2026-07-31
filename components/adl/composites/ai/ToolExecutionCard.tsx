@@ -18,7 +18,7 @@ export function ToolExecutionCard({ toolName, status, resultMessage, data }: Too
       case "LogMeal": return <Utensils size={14} className="text-[var(--color-accent-blue)]" />;
       case "UpdateWorkout": return <Dumbbell size={14} className="text-[var(--color-accent-orange)]" />;
       case "UpdateGoal": return <Target size={14} className="text-[var(--color-success)]" />;
-      default: return <CheckCircle2 size={14} className="text-[var(--color-text-secondary)]" />;
+      default: return <CheckCircle2 size={14} className="text-secondary" />;
     }
   };
 
@@ -47,13 +47,13 @@ export function ToolExecutionCard({ toolName, status, resultMessage, data }: Too
     <motion.div 
       initial={{ opacity: 0, y: 5, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      className="w-full max-w-[85%] rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] overflow-hidden"
+      className="w-full max-w-[85%] rounded-2xl bg-surface border border-border-subtle overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[var(--color-bg-base)] to-transparent border-b border-[var(--color-glass-border)]">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[var(--color-bg-base)] to-transparent border-b border-border-subtle">
         <div className="flex items-center gap-2">
           {getIcon()}
-          <span className="text-xs font-bold text-white uppercase tracking-wider">{getTitle()}</span>
+          <span className="text-xs font-bold text-primary uppercase tracking-wider">{getTitle()}</span>
         </div>
         {getStatusIcon()}
       </div>
@@ -62,7 +62,7 @@ export function ToolExecutionCard({ toolName, status, resultMessage, data }: Too
       {status === "success" && data && (
         <div className="p-4 space-y-3">
           {resultMessage && (
-            <p className="text-sm text-[var(--color-text-secondary)]">{resultMessage}</p>
+            <p className="text-sm text-secondary">{resultMessage}</p>
           )}
           
           {/* Specific Data Formatting */}
@@ -77,7 +77,7 @@ export function ToolExecutionCard({ toolName, status, resultMessage, data }: Too
             </div>
           )}
 
-          <button className="text-xs font-bold text-[var(--color-accent-blue)] hover:text-white transition-colors flex items-center gap-1 mt-2">
+          <button className="text-xs font-bold text-[var(--color-accent-blue)] hover:text-primary transition-colors flex items-center gap-1 mt-2">
             View Details <ChevronRight size={12} />
           </button>
         </div>
@@ -91,7 +91,7 @@ export function ToolExecutionCard({ toolName, status, resultMessage, data }: Too
       
       {status === "pending" && (
         <div className="p-4">
-          <div className="h-2 w-full bg-[var(--color-bg-base)] rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-base rounded-full overflow-hidden">
              <div className="h-full bg-[var(--color-accent-blue)] w-1/3 animate-pulse rounded-full" />
           </div>
         </div>

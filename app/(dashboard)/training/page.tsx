@@ -25,11 +25,12 @@ import { ThinkingIndicator } from "@/components/adl/composites/ai/AI";
 
 import { ExerciseCard, ExerciseSet } from "@/components/adl/composites/training/ExerciseCard";
 import { RestTimer } from "@/components/adl/composites/training/RestTimer";
+import { CardioHUD } from "@/components/adl/composites/training/CardioHUD";
+import { SessionSummary } from "@/components/adl/composites/training/SessionSummary";
 import { useUserStore } from "@/stores/user.store";
 import { useActivityStore } from "@/stores/activity.store";
+import { useMissionStore } from "@/stores/mission.store";
 import { useDataReadiness } from "@/hooks/useDataReadiness";
-
-// --- Mock Data ---
 const MOCK_WORKOUT = {
   name: "Upper Body Power",
   split: "Hypertrophy Phase • Week 3",
@@ -89,6 +90,9 @@ const INITIAL_EXERCISES = [
 
 export default function TrainingModule() {
   const { profile, isLoading: isUserLoading } = useUserStore();
+  const { getActiveMission } = useMissionStore();
+  const activeMission = getActiveMission();
+  
   const { 
     currentActivity, 
     activeExercises, 
@@ -99,6 +103,8 @@ export default function TrainingModule() {
     startExercise,
     setWorkoutState,
     finishWorkout, 
+    setCurrentActivity,
+    elapsedTime,
     isLoading: isActivityLoading 
   } = useActivityStore() as any;
   const readiness = useDataReadiness();
@@ -107,18 +113,22 @@ export default function TrainingModule() {
 
   const [activeExerciseIndex, setActiveExerciseIndex] = React.useState(0);
 
-  // Initialize mock exercises if empty
+  // Initialize exercises if empty
   React.useEffect(() => {
-    if (currentActivity && activeExercises.length === 0) {
-      setActiveExercises(INITIAL_EXERCISES);
+    if (currentActivity && activeExercises.length === 0 && activeMission) {
+      setActiveExercises(activeMission.exercises || []);
     }
-  }, [currentActivity, activeExercises.length, setActiveExercises]);
+  }, [currentActivity, activeExercises.length, setActiveExercises, activeMission]);
 
-  const exercises = activeExercises.length > 0 ? activeExercises : INITIAL_EXERCISES;
+  const exercises = activeExercises.length > 0 ? activeExercises : (activeMission?.exercises || []);
   
   // Rest Timer State
   const [isResting, setIsResting] = React.useState(false);
   const [restDuration, setRestDuration] = React.useState(90);
+  const [restTimeLeft, setRestTimeLeft] = React.useState(0);
+  
+  const activities = (useActivityStore.getState() as any).activities || [];
+  const lastActivity = activities.length > 0 ? activities[0] : null;
 
   // Stats
   const totalSets = exercises.reduce((acc: number, ex: any) => acc + ex.sets.length, 0);
@@ -140,7 +150,7 @@ export default function TrainingModule() {
         <DashboardLayout>
           <div className="lg:col-span-3 space-y-6 flex items-center justify-center min-h-[50vh]">
              <div className="animate-pulse flex flex-col items-center gap-4">
-               <div className="w-12 h-12 rounded-full border-4 border-[var(--color-glass-border)] border-t-[var(--color-accent-orange)] animate-spin" />
+               <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-orange)] animate-spin" />
                <Caption className="text-[var(--color-text-muted)]">Syncing Repositories...</Caption>
              </div>
           </div>
@@ -180,6 +190,26 @@ export default function TrainingModule() {
     setWorkoutState("not_started");
   };
 
+  const startQuickActivity = (type: string, name: string) => {
+    setCurrentActivity({
+      id: crypto.randomUUID(),
+      name,
+      type,
+      category: "cardio",
+      durationMinutes: 30,
+      calories: 300,
+      xp: 600,
+      difficulty: "Medium",
+      description: `A quick ${name.toLowerCase()} session.`,
+      metrics: {
+        totalVolume: 0,
+        completedSets: 0,
+        durationSeconds: 0
+      }
+    });
+    setWorkoutState("ready");
+  };
+
   // --- Render Helpers ---
 
   const renderPlanningMode = () => (
@@ -195,18 +225,18 @@ export default function TrainingModule() {
                 <Caption className="text-[var(--color-accent-orange)] uppercase tracking-widest font-bold">Mission Control</Caption>
               </div>
               
-              {!hasWorkout ? (
+              {!activeMission ? (
                  <>
                    <Heading level="h2" className="text-3xl tracking-tight mb-2">Recovery Day</Heading>
-                   <BodyText size="lg" className="text-[var(--color-text-secondary)] mb-6">
+                   <BodyText size="lg" className="text-secondary mb-6">
                      No mission scheduled today. Rest and recover.
                    </BodyText>
                  </>
               ) : (
                  <>
-                   <Heading level="h2" className="text-3xl tracking-tight mb-2">{currentActivity.name || "Today's Mission"}</Heading>
-                   <BodyText size="lg" className="text-[var(--color-text-secondary)] mb-6">
-                     {currentActivity.description || "Get ready to train."}
+                   <Heading level="h2" className="text-3xl tracking-tight mb-2">{activeMission.title || "Today's Mission"}</Heading>
+                   <BodyText size="lg" className="text-secondary mb-6">
+                     {activeMission.description || "Get ready to train."}
                    </BodyText>
                  </>
               )}
@@ -219,33 +249,47 @@ export default function TrainingModule() {
       {/* LEFT COLUMN: Execution Overview */}
       <div className="lg:col-span-2 space-y-6">
         {/* Workout Hero */}
-        {hasWorkout && (
+        {activeMission && (
           <HeroSection>
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
               <div className="space-y-4 max-w-2xl">
                 <Caption className="text-[var(--color-accent-orange)] font-semibold tracking-widest uppercase">
-                  {currentActivity.type || "Workout"}
+                  {activeMission.type || "Workout"}
                 </Caption>
-                <Heading level="h1" className="text-4xl md:text-5xl font-bold tracking-tight text-[var(--color-text-primary)]">
-                  {currentActivity.name}
+                <Heading level="h1" className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
+                  {activeMission.title}
                 </Heading>
                 
                 <div className="flex flex-wrap items-center gap-3">
-                  <Badge variant="secondary"><Clock size={14} className="mr-1.5" /> {currentActivity.durationMinutes || 60} Min</Badge>
-                  <Badge variant="secondary"><Flame size={14} className="mr-1.5 text-[var(--color-accent-orange)]" /> {currentActivity.calories || 0} kcal</Badge>
-                  <Badge variant="secondary"><Trophy size={14} className="mr-1.5 text-[var(--color-accent-gold)]" /> +{currentActivity.xp || 1200} XP</Badge>
-                  <Badge variant="outline">{currentActivity.difficulty || "Medium"}</Badge>
+                  <Badge variant="secondary"><Clock size={14} className="mr-1.5" /> {activeMission.durationMinutes || 60} Min</Badge>
+                  <Badge variant="secondary"><Flame size={14} className="mr-1.5 text-[var(--color-accent-orange)]" /> {activeMission.calories || 0} kcal</Badge>
+                  <Badge variant="secondary"><Trophy size={14} className="mr-1.5 text-[var(--color-accent-gold)]" /> +{activeMission.xp || 1200} XP</Badge>
+                  <Badge variant="outline">{activeMission.difficulty || "Medium"}</Badge>
                 </div>
 
-                <BodyText size="lg" className="text-[var(--color-text-secondary)]">
-                  {currentActivity.description}
+                <BodyText size="lg" className="text-secondary">
+                  {activeMission.description}
                 </BodyText>
               </div>
 
               <Button 
                 variant="primary" 
                 size="lg" 
-                onClick={startWarmup}
+                onClick={() => {
+                  setCurrentActivity({
+                    id: crypto.randomUUID(),
+                    name: activeMission.title,
+                    type: activeMission.type,
+                    category: "strength",
+                    durationMinutes: activeMission.durationMinutes,
+                    calories: activeMission.calories,
+                    xp: activeMission.xp,
+                    difficulty: activeMission.difficulty,
+                    description: activeMission.description,
+                    metrics: { totalVolume: 0, completedSets: 0, durationSeconds: 0 }
+                  });
+                  startWarmup();
+                }}
                 className="w-full md:w-auto h-14 px-10 text-lg bg-[var(--color-accent-orange)] hover:bg-[var(--color-accent-orange-light)] shadow-[0_0_30px_rgba(var(--color-accent-orange-rgb),0.3)] border-none"
                 rightIcon={<Play size={20} className="ml-2" />}
               >
@@ -270,7 +314,7 @@ export default function TrainingModule() {
               <div className="flex items-end gap-3 mt-4">
                 <div>
                   <Caption className="text-[var(--color-text-muted)]">Current</Caption>
-                  <div className="font-mono text-lg text-[var(--color-text-secondary)]">30</div>
+                  <div className="font-mono text-lg text-secondary">30</div>
                 </div>
                 <ChevronRight size={16} className="text-[var(--color-text-muted)] mb-1" />
                 <div>
@@ -283,44 +327,81 @@ export default function TrainingModule() {
         )}
 
         {/* Exercise Preview List */}
-        <WidgetSection title="Mission Briefing">
-          <div className="space-y-3">
-            {exercises.map((ex: any, i: number) => (
-              <GlassCard key={ex.id} className="p-4 flex items-center gap-4 hover:bg-[var(--color-bg-glass-hover)] transition-colors">
-                <div className="w-8 h-8 rounded-full bg-[var(--color-bg-surface)] flex items-center justify-center text-[var(--color-text-muted)] font-mono text-sm">
-                  {i + 1}
-                </div>
-                <div className="flex-1">
-                  <Heading level="h5" className="text-base">{ex.name}</Heading>
-                  <Caption className="text-[var(--color-text-muted)]">
-                    {ex.targetSets} Sets • {ex.targetReps} Reps
-                  </Caption>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        </WidgetSection>
+        {activeMission ? (
+          <WidgetSection title="Mission Briefing">
+            <div className="space-y-3">
+              {exercises.map((ex: any, i: number) => (
+                <GlassCard key={ex.id} className="p-4 flex items-center gap-4 hover:bg-[var(--color-bg-glass-hover)] transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-[var(--color-text-muted)] font-mono text-sm">
+                    {i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <Heading level="h5" className="text-base">{ex.name}</Heading>
+                    <Caption className="text-[var(--color-text-muted)]">
+                      {ex.targetSets} Sets • {ex.targetReps} Reps
+                    </Caption>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          </WidgetSection>
+        ) : (
+          <WidgetSection title="Quick Start">
+            <div className="grid grid-cols-2 gap-4">
+              <Button onClick={() => startQuickActivity("Walking", "Outdoor Walk")} variant="secondary" className="h-24 flex-col gap-2 bg-surface hover:bg-[var(--color-bg-glass-hover)] border-border-subtle">
+                <TrendingUp size={24} className="text-[var(--color-accent-blue)]" />
+                <span>Walk</span>
+              </Button>
+              <Button onClick={() => startQuickActivity("Running", "Outdoor Run")} variant="secondary" className="h-24 flex-col gap-2 bg-surface hover:bg-[var(--color-bg-glass-hover)] border-border-subtle">
+                <Flame size={24} className="text-[var(--color-accent-orange)]" />
+                <span>Run</span>
+              </Button>
+              <Button onClick={() => startQuickActivity("Cycling", "Outdoor Cycle")} variant="secondary" className="h-24 flex-col gap-2 bg-surface hover:bg-[var(--color-bg-glass-hover)] border-border-subtle">
+                <Clock size={24} className="text-[var(--color-accent-green)]" />
+                <span>Cycle</span>
+              </Button>
+              <Button onClick={() => startQuickActivity("Jogging", "Outdoor Jog")} variant="secondary" className="h-24 flex-col gap-2 bg-surface hover:bg-[var(--color-bg-glass-hover)] border-border-subtle">
+                <Dumbbell size={24} className="text-primary" />
+                <span>Jog</span>
+              </Button>
+            </div>
+          </WidgetSection>
+        )}
       </div>
 
       {/* RIGHT COLUMN: History & HUD */}
       <div className="lg:col-span-1 space-y-6">
         <WidgetSection title="History & Trends">
-          <GlassCard className="p-4 mb-4 flex flex-col gap-1">
-             <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider text-[10px] font-semibold">Last Session</Caption>
-             <Heading level="h5" className="text-sm">Lower Body Power</Heading>
-             <div className="flex items-center gap-2 mt-2">
-               <Badge variant="outline" className="text-[10px]"><CheckCircle2 size={12} className="mr-1 text-[var(--color-success)]" /> Completed</Badge>
-               <span className="text-xs text-[var(--color-text-muted)]">2 days ago</span>
-             </div>
-          </GlassCard>
-          
-          <GlassCard className="p-4 flex items-center justify-between bg-gradient-to-r from-[var(--color-bg-glass-standard)] to-[var(--color-bg-surface)]">
-            <div>
-              <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider text-[10px] font-semibold">Average Volume</Caption>
-              <div className="text-xl font-mono mt-1 font-semibold">12,450 kg</div>
-            </div>
-            <TrendingUp size={24} className="text-[var(--color-success)] opacity-50" />
-          </GlassCard>
+          {lastActivity ? (
+            <>
+              <GlassCard className="p-4 mb-4 flex flex-col gap-1">
+                 <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider text-[10px] font-semibold">Last Session</Caption>
+                 <Heading level="h5" className="text-sm">{lastActivity.name}</Heading>
+                 <div className="flex items-center gap-2 mt-2">
+                   <Badge variant="outline" className="text-[10px]"><CheckCircle2 size={12} className="mr-1 text-[var(--color-success)]" /> Completed</Badge>
+                   <span className="text-xs text-[var(--color-text-muted)]">
+                     {new Date(lastActivity.date.toDate ? lastActivity.date.toDate() : lastActivity.date).toLocaleDateString()}
+                   </span>
+                 </div>
+              </GlassCard>
+              
+              <GlassCard className="p-4 flex items-center justify-between bg-gradient-to-r from-[var(--color-bg-glass-standard)] to-[var(--color-bg-surface)]">
+                <div>
+                  <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider text-[10px] font-semibold">Avg Duration</Caption>
+                  <div className="text-xl font-mono mt-1 font-semibold">{lastActivity.durationMinutes} min</div>
+                </div>
+                <TrendingUp size={24} className="text-[var(--color-success)] opacity-50" />
+              </GlassCard>
+            </>
+          ) : (
+            <GlassCard className="p-4 text-center">
+               <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center mx-auto mb-2 text-border">
+                 <Dumbbell size={20} />
+               </div>
+               <Heading level="h5" className="text-sm">No History</Heading>
+               <Caption className="text-[var(--color-text-muted)] mt-1">Complete your first mission to track progress.</Caption>
+            </GlassCard>
+          )}
         </WidgetSection>
 
         <WidgetSection title="Quick Actions">
@@ -341,14 +422,48 @@ export default function TrainingModule() {
       </div>
       <div>
         <Heading level="h1" className="text-4xl tracking-tight mb-2">Warm-up Phase</Heading>
-        <BodyText className="text-[var(--color-text-secondary)] max-w-md mx-auto">
+        <BodyText className="text-secondary max-w-md mx-auto">
           Prepare your central nervous system for {currentActivity?.name || "the session"}. Perform 5-10 minutes of light cardio followed by dynamic stretching of the chest and shoulders.
         </BodyText>
       </div>
       <div className="flex gap-4 pt-4">
-        <Button variant="ghost" size="lg" onClick={startExercise} className="text-[var(--color-text-muted)] hover:text-white">Skip Warm-up</Button>
+        <Button variant="ghost" size="lg" onClick={startExercise} className="text-[var(--color-text-muted)] hover:text-primary">Skip Warm-up</Button>
         <Button variant="primary" size="lg" onClick={startExercise} className="bg-[var(--color-accent-orange)] hover:bg-[var(--color-accent-orange-light)] border-none px-8">
           I'm Ready
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderReadyMode = () => (
+    <div className="min-h-[calc(100vh-72px)] flex flex-col items-center justify-center p-6 text-center space-y-8">
+      <div className="w-20 h-20 rounded-full bg-[var(--color-accent-orange)]/10 flex items-center justify-center">
+        {currentActivity?.type === "Walking" ? (
+          <TrendingUp size={40} className="text-[var(--color-accent-orange)]" />
+        ) : (
+          <Flame size={40} className="text-[var(--color-accent-orange)]" />
+        )}
+      </div>
+      <div>
+        <Heading level="h1" className="text-4xl tracking-tight mb-2">{currentActivity?.name || "Activity"} Overview</Heading>
+        <BodyText className="text-secondary max-w-md mx-auto">
+          {currentActivity?.description || "Get ready to start your session."}
+        </BodyText>
+      </div>
+      <div className="grid grid-cols-2 gap-4 max-w-md w-full my-4">
+         <GlassCard className="p-4 bg-surface">
+            <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Target</Caption>
+            <Heading level="h3" className="text-xl">{currentActivity?.durationMinutes || 30} min</Heading>
+         </GlassCard>
+         <GlassCard className="p-4 bg-surface">
+            <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Est. Calories</Caption>
+            <Heading level="h3" className="text-xl">{currentActivity?.calories || 300} kcal</Heading>
+         </GlassCard>
+      </div>
+      <div className="flex gap-4 pt-4 w-full max-w-md">
+        <Button variant="ghost" size="lg" onClick={() => setWorkoutState("not_started")} className="flex-1 text-[var(--color-text-muted)] hover:text-primary">Cancel</Button>
+        <Button variant="primary" size="lg" onClick={startExercise} className="flex-1 bg-[var(--color-accent-orange)] hover:bg-[var(--color-accent-orange-light)] border-none">
+          Start {currentActivity?.type || "Mission"}
         </Button>
       </div>
     </div>
@@ -361,7 +476,7 @@ export default function TrainingModule() {
       <div className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 space-y-8 overflow-y-auto pb-32">
         
         {/* Sticky Header */}
-        <div className="sticky top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-4 bg-[var(--color-bg-base)]/80 backdrop-blur-xl border-b border-[var(--color-glass-border)] flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="sticky top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-4 bg-base/80 backdrop-blur-xl border-b border-border-subtle flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[var(--color-success)] animate-pulse" />
@@ -370,23 +485,31 @@ export default function TrainingModule() {
             <Heading level="h2" className="text-xl md:text-2xl mt-1">{currentActivity?.name || "Workout"}</Heading>
           </div>
           
-          <Button 
-            variant="ghost" 
-            className="text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] border border-[var(--color-danger)]/20"
-            onClick={endWorkout}
-          >
-            End Workout
-          </Button>
+          {!(currentActivity?.category === "cardio" || ["Walking", "Running", "Jogging", "Cycling", "Trekking", "Dancing"].includes(currentActivity?.type || "")) && (
+            <Button 
+              variant="ghost" 
+              className="text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] border border-[var(--color-danger)]/20"
+              onClick={endWorkout}
+            >
+              End Workout
+            </Button>
+          )}
         </div>
 
         {/* Offline Banner */}
-        <div className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-lg)] p-3 flex items-center justify-center gap-2 text-xs text-[var(--color-text-secondary)]">
+        <div className="w-full bg-surface border border-border-subtle rounded-[var(--radius-lg)] p-3 flex items-center justify-center gap-2 text-xs text-secondary">
           <CheckCircle2 size={14} className="text-[var(--color-success)]" />
           Offline Mode active. Changes will sync automatically.
         </div>
 
-        {/* Dynamic AI Coach (Mid-workout) */}
-        <AnimatePresence mode="wait">
+        {currentActivity?.category === "cardio" || ["Walking", "Running", "Jogging", "Cycling", "Trekking", "Dancing"].includes(currentActivity?.type || "") ? (
+          <div className="mt-8">
+            <CardioHUD />
+          </div>
+        ) : (
+          <>
+            {/* Dynamic AI Coach (Mid-workout) */}
+            <AnimatePresence mode="wait">
           {!isResting ? (
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
@@ -399,7 +522,7 @@ export default function TrainingModule() {
               </div>
               <div>
                 <Heading level="h4" className="text-sm mb-1 text-[var(--color-accent-indigo-light)]">Technique Focus</Heading>
-                <BodyText size="sm" className="text-[var(--color-text-secondary)]">
+                <BodyText size="sm" className="text-secondary">
                   Maintain strict form on these compound lifts. Don't let your hips shoot up early on the eccentric phase.
                 </BodyText>
               </div>
@@ -441,12 +564,13 @@ export default function TrainingModule() {
               onUpdateSet={(setId, updates) => handleUpdateSet(ex.id, setId, updates)}
             />
           ))}
-        </div>
-
+            </div>
+          </>
+        )}
       </div>
 
       {/* RIGHT HUD / SIDEBAR (Floating on desktop) */}
-      <div className="hidden md:block w-80 shrink-0 border-l border-[var(--color-glass-border)] bg-[var(--color-bg-base)]/50 p-6 sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto">
+      <div className="hidden md:block w-80 shrink-0 border-l border-border-subtle bg-base/50 p-6 sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto">
         <Heading level="h4" className="text-sm text-[var(--color-text-muted)] uppercase tracking-widest mb-6">Live Status</Heading>
         
         <div className="flex flex-col items-center justify-center mb-8">
@@ -457,6 +581,7 @@ export default function TrainingModule() {
               strokeWidth={10}
               color="var(--color-accent-orange)"
               className="absolute inset-0"
+              icon={<></>}
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <Heading level="h2" className="text-3xl font-mono">{Math.round(progressPercent)}%</Heading>
@@ -465,116 +590,43 @@ export default function TrainingModule() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <GlassCard className="p-4 flex items-center justify-between">
-            <Caption className="text-[var(--color-text-muted)]">Remaining</Caption>
-            <div className="font-mono font-medium">{totalSets - completedSets} Sets</div>
-          </GlassCard>
-          
-          <GlassCard className="p-4 flex items-center justify-between">
-            <Caption className="text-[var(--color-text-muted)]">Earned XP</Caption>
-            <div className="font-mono font-bold text-[var(--color-accent-gold)]">+{currentXP}</div>
-          </GlassCard>
-          
-          <GlassCard className="p-4 flex flex-col gap-1">
-            <Caption className="text-[var(--color-text-muted)]">Elapsed Time</Caption>
-            <div className="font-mono text-xl">24:15</div>
-            <Caption className="text-[var(--color-text-muted)] text-[10px]">Est. Finish: 9:45 AM</Caption>
-          </GlassCard>
-        </div>
+        {currentActivity?.category === "cardio" || ["Walking", "Running", "Jogging", "Cycling", "Trekking", "Dancing"].includes(currentActivity?.type || "") ? (
+          <div className="space-y-4">
+            <GlassCard className="p-4 flex items-center justify-between">
+              <Caption className="text-[var(--color-text-muted)]">Elapsed</Caption>
+              <div className="font-mono font-medium">{Math.floor(elapsedTime / 60)} min</div>
+            </GlassCard>
+            <GlassCard className="p-4 flex items-center justify-between">
+              <Caption className="text-[var(--color-text-muted)]">Goal</Caption>
+              <div className="font-mono font-bold text-primary">
+                {currentActivity?.type === "Walking" ? "10,000 Steps" : `${currentActivity?.durationMinutes || 30} Min`}
+              </div>
+            </GlassCard>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <GlassCard className="p-4 flex items-center justify-between">
+              <Caption className="text-[var(--color-text-muted)]">Remaining</Caption>
+              <div className="font-mono font-medium">{totalSets - completedSets} Sets</div>
+            </GlassCard>
+            
+            <GlassCard className="p-4 flex items-center justify-between">
+              <Caption className="text-[var(--color-text-muted)]">Earned XP</Caption>
+              <div className="font-mono font-bold text-[var(--color-accent-gold)]">+{currentXP}</div>
+            </GlassCard>
+            
+            <GlassCard className="p-4 flex flex-col gap-1">
+              <Caption className="text-[var(--color-text-muted)]">Elapsed Time</Caption>
+              <div className="font-mono text-xl">{Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}</div>
+              <Caption className="text-[var(--color-text-muted)] text-[10px]">Active Session</Caption>
+            </GlassCard>
+          </div>
+        )}
       </div>
     </div>
   );
 
-  const renderCelebration = () => (
-    <div className="fixed inset-0 z-50 bg-[var(--color-bg-base)] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-orange)]/10 via-[var(--color-bg-base)] to-[var(--color-accent-gold)]/10" />
-      
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
-        className="relative z-10 w-full max-w-lg bg-[var(--color-bg-glass-active)] backdrop-blur-3xl border border-[var(--color-glass-border)] rounded-[var(--radius-2xl)] p-8 md:p-12 text-center shadow-2xl flex flex-col items-center"
-      >
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--color-accent-gold)] to-[var(--color-accent-orange)] flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(var(--color-accent-gold-rgb),0.4)]">
-          <Trophy size={40} className="text-black" />
-        </div>
-        
-        <Caption className="text-[var(--color-accent-orange)] tracking-widest uppercase font-bold mb-2">Mission Complete</Caption>
-        <Heading level="h1" className="text-4xl md:text-5xl font-bold mb-8">{currentActivity?.name || "Workout"}</Heading>
-        
-        <div className="grid grid-cols-2 gap-4 w-full mb-8">
-          <div className="bg-[var(--color-bg-surface)] p-4 rounded-[var(--radius-lg)] border border-[var(--color-glass-border)]">
-            <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">XP Earned</Caption>
-            <div className="text-2xl font-mono text-[var(--color-accent-gold)] font-bold">+{currentXP}</div>
-          </div>
-          <div className="bg-[var(--color-bg-surface)] p-4 rounded-[var(--radius-lg)] border border-[var(--color-glass-border)]">
-            <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Volume</Caption>
-            <div className="text-2xl font-mono font-bold">6,420<span className="text-sm font-normal text-[var(--color-text-muted)] ml-1">kg</span></div>
-          </div>
-          <div className="bg-[var(--color-bg-surface)] p-4 rounded-[var(--radius-lg)] border border-[var(--color-glass-border)]">
-            <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-1">New PRs</Caption>
-            <div className="text-2xl font-mono font-bold text-[var(--color-success)]">1</div>
-          </div>
-        </div>
-
-        <div className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-lg)] p-5 mb-8 text-left">
-          <div className="flex justify-between items-center mb-3">
-            <Heading level="h4" className="text-lg">Workout Quality</Heading>
-            <div className="text-[var(--color-success)] font-mono text-xl font-bold">95%</div>
-          </div>
-          <BodyText size="sm" className="text-[var(--color-text-secondary)] mb-5">Excellent Session. All sets completed with consistent rest periods.</BodyText>
-          
-          <div className="space-y-5 pt-5 border-t border-[var(--color-glass-border)]">
-            <div>
-              <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-2">Personal Records</Caption>
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text-primary)]">
-                🏆 <span className="font-semibold text-[var(--color-accent-gold)]">Weight PR</span> • Barbell Bench Press (85kg)
-              </div>
-            </div>
-
-            <div>
-              <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-2">Recovery Estimate</Caption>
-              <div className="flex items-center gap-6 text-sm">
-                <div><span className="text-[var(--color-text-muted)]">Time:</span> <span className="font-semibold text-[var(--color-text-primary)]">36 Hours</span></div>
-                <div><span className="text-[var(--color-text-muted)]">Next:</span> <span className="font-semibold text-[var(--color-text-primary)]">Tomorrow (Legs)</span></div>
-              </div>
-            </div>
-
-            <div>
-              <Caption className="text-[var(--color-text-muted)] uppercase tracking-wider mb-2">AI Progression</Caption>
-              <div className="bg-[var(--color-bg-base)] rounded-[var(--radius-md)] p-3 border border-[var(--color-accent-indigo)]/20">
-                <div className="flex items-start gap-2">
-                  <Sparkles size={16} className="text-[var(--color-accent-indigo)] shrink-0 mt-0.5" />
-                  <div>
-                    <div className="text-sm font-semibold">Barbell Bench Press</div>
-                    <div className="text-xs text-[var(--color-text-secondary)] mt-1">
-                      Current: 85kg × 5 &nbsp;&rarr;&nbsp; <span className="text-[var(--color-accent-indigo-light)] font-medium">Suggested: 85kg × 6</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3 w-full">
-          <Button 
-            variant="primary" 
-            size="lg" 
-            fullWidth 
-            onClick={dismissCelebration}
-            className="bg-[var(--color-accent-orange)] hover:bg-[var(--color-accent-orange-light)] border-none"
-          >
-            Return to Mission Control
-          </Button>
-          <Button variant="ghost" size="lg" fullWidth className="text-[var(--color-text-secondary)]">
-            Review Workout
-          </Button>
-        </div>
-      </motion.div>
-    </div>
-  );
+  const renderCelebration = () => <SessionSummary />;
 
   return (
     <PageContainer>
@@ -588,6 +640,7 @@ export default function TrainingModule() {
           className="w-full"
         >
           {(workoutState === "not_started" || workoutState === "saved") && renderPlanningMode()}
+          {workoutState === "ready" && renderReadyMode()}
           {workoutState === "warm_up" && renderWarmupMode()}
           {["in_progress", "paused", "rest_timer", "exercise_transition"].includes(workoutState) && renderActiveMode()}
           {workoutState === "completed" && renderCelebration()}

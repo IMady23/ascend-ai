@@ -39,7 +39,7 @@ export class MemoryClassifier {
             updatedAt: now,
             lastReferencedAt: now,
             // Session memories expire after 24 hours by default
-            expiresAt: layer === 'session' ? now + 86400000 : undefined
+            expiresAt: layer === 'session' ? now + 86400000 : null
         };
 
         return {

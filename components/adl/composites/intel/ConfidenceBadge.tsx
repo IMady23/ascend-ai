@@ -27,7 +27,7 @@ export function ConfidenceBadge({ level, className }: ConfidenceBadgeProps) {
   const label = level === "High" ? "Strong signal" : level === "Medium" ? "Growing signal" : "Early signal";
 
   return (
-    <Badge variant="outline" className={cn("flex items-center gap-1.5 px-2 py-0.5 shadow-sm bg-[var(--color-bg-base)]/80 backdrop-blur-sm", colorClass, className)}>
+    <Badge variant="outline" className={cn("flex items-center gap-1.5 px-2 py-0.5 shadow-sm bg-base/80 backdrop-blur-sm", colorClass, className)}>
       <Icon size={12} />
       <span className="font-semibold tracking-wider uppercase text-[9px]">
         {label}

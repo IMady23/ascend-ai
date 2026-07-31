@@ -33,15 +33,16 @@ export function PremiumBackground() {
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-[var(--color-bg-base)]">
       
-      {/* Animated Blue Ambient Blob */}
+      {/* Animated Gold Ambient Blob */}
       <motion.div
         className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full will-change-transform"
         style={{
-          background: "radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 60%)",
+          background: "radial-gradient(circle, var(--color-accent-gold) 0%, transparent 60%)",
+          opacity: 0.04
         }}
         animate={{
           scale: [1, 1.15, 1],
-          opacity: [0.3, 0.5, 0.3],
+          opacity: [0.03, 0.05, 0.03],
           x: ["0%", "5%", "0%"],
           y: ["0%", "5%", "0%"],
         }}
@@ -52,35 +53,45 @@ export function PremiumBackground() {
         }}
       />
 
-      {/* Animated Emerald Ambient Blob */}
+      {/* Animated Violet Ambient Blob */}
       <motion.div
         className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full will-change-transform"
         style={{
-          background: "radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 60%)",
+          background: "radial-gradient(circle, var(--color-accent-workout) 0%, transparent 60%)",
+          opacity: 0.03
         }}
         animate={{
-          scale: [1, 1.15, 1],
-          opacity: [0.2, 0.4, 0.2],
+          scale: [1, 1.2, 1],
+          opacity: [0.02, 0.04, 0.02],
           x: ["0%", "-5%", "0%"],
           y: ["0%", "-5%", "0%"],
         }}
         transition={{
-          duration: 35,
+          duration: 40,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: 5,
         }}
       />
       
-      {/* Dynamic Mouse Glow */}
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-60 will-change-transform pointer-events-none"
+      {/* Subtle Grid Overlay for Texture */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,255,0.05), transparent 40%)",
+          backgroundImage: 'linear-gradient(var(--color-text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-text-primary) 1px, transparent 1px)',
+          backgroundSize: '64px 64px'
+        }}
+      />
+
+      {/* Mouse Follower Glow */}
+      <motion.div
+        className="absolute w-[400px] h-[400px] rounded-full will-change-transform mix-blend-screen"
+        style={{
           x: glowX,
           y: glowY,
           translateX: "-50%",
           translateY: "-50%",
+          background: "radial-gradient(circle, var(--color-accent-gold) 0%, transparent 60%)",
+          opacity: 0.02
         }}
       />
     </div>

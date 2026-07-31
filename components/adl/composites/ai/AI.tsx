@@ -58,7 +58,7 @@ export const SuggestionChip = React.forwardRef<HTMLButtonElement, SuggestionChip
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-indigo)]/30 bg-[var(--color-accent-indigo)]/10 px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-indigo)]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-indigo)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)] glass-highlight",
+          "inline-flex items-center gap-2 rounded-full border border-[var(--color-accent-indigo)]/30 bg-[var(--color-accent-indigo)]/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-[var(--color-accent-indigo)]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-indigo)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)] glass-highlight",
           className
         )}
         {...props}

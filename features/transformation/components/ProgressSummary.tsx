@@ -27,13 +27,13 @@ export function ProgressSummary() {
       {stats.map((stat, i) => {
         const Icon = stat.icon;
         return (
-          <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col items-start gap-4 transition-transform hover:scale-[1.02] duration-300">
+          <div key={i} className="bg-surface border border-border-subtle rounded-2xl p-5 flex flex-col items-start gap-4 transition-transform hover:scale-[1.02] duration-300">
             <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color}`}>
               <Icon size={20} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white font-mono">{stat.value}</p>
-              <p className="text-zinc-500 text-xs font-semibold uppercase tracking-wider mt-1">{stat.label}</p>
+              <p className="text-2xl font-bold text-primary font-mono">{stat.value}</p>
+              <p className="text-secondary text-xs font-semibold uppercase tracking-wider mt-1">{stat.label}</p>
             </div>
           </div>
         );

@@ -30,11 +30,11 @@ export function ForgotPasswordForm() {
     return (
       <div className="flex flex-col items-center text-center space-y-4 py-4">
         <CheckCircle2 size={48} className="text-emerald-500" />
-        <h2 className="text-xl font-bold text-white">Reset Link Sent</h2>
-        <p className="text-sm text-zinc-400">
+        <h2 className="text-xl font-bold text-primary">Reset Link Sent</h2>
+        <p className="text-sm text-secondary">
           Check your email for instructions to reset your password.
         </p>
-        <Link href="/login" className="mt-4 w-full bg-zinc-900 text-white font-bold rounded-lg p-3 flex items-center justify-center hover:bg-zinc-800 transition-colors">
+        <Link href="/login" className="mt-4 w-full bg-surface text-primary font-bold rounded-lg p-3 flex items-center justify-center hover:bg-surface-elevated transition-colors">
           Return to Login
         </Link>
       </div>
@@ -50,13 +50,13 @@ export function ForgotPasswordForm() {
       )}
 
       <div className="space-y-1">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email</label>
+        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Email</label>
         <input 
           type="email"
           required
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:outline-none focus:border-purple-500 transition-colors"
           placeholder="commander@ascend.ai"
         />
       </div>
@@ -64,13 +64,13 @@ export function ForgotPasswordForm() {
       <button 
         type="submit" 
         disabled={loading}
-        className="w-full bg-white text-black font-bold rounded-lg p-3 flex items-center justify-center hover:bg-zinc-200 transition-colors disabled:opacity-50 mt-4"
+        className="w-full bg-primary text-primary-foreground font-bold rounded-lg p-3 flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 mt-4"
       >
         {loading ? <Loader2 size={18} className="animate-spin" /> : "Send Reset Link"}
       </button>
 
       <div className="text-center mt-6">
-        <Link href="/login" className="text-xs font-bold text-zinc-400 hover:text-white transition-colors">
+        <Link href="/login" className="text-xs font-bold text-secondary hover:text-primary transition-colors">
           Back to Login
         </Link>
       </div>

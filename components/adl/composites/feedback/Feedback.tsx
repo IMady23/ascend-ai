@@ -50,7 +50,7 @@ export function Tooltip({ content, children, position = "top", delay = 0.3 }: To
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              "absolute z-50 px-3 py-1.5 text-xs font-medium text-[var(--color-text-primary)] bg-[var(--color-bg-glass-active)] backdrop-blur-md border border-[var(--color-glass-border)] rounded-[var(--radius-md)] shadow-lg whitespace-nowrap pointer-events-none",
+              "absolute z-50 px-3 py-1.5 text-xs font-medium text-primary bg-[var(--color-bg-glass-active)] backdrop-blur-md border border-border-subtle rounded-[var(--radius-md)] shadow-lg whitespace-nowrap pointer-events-none",
               positionStyles[position]
             )}
             role="tooltip"
@@ -79,13 +79,13 @@ export function EmptyState({ icon, title, description, action, className, ...pro
       className={cn("flex flex-col items-center justify-center p-8 text-center", className)}
       {...props}
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] mb-4 border border-[var(--color-glass-border)]">
+      <div className="flex h-16 w-16 items-center justify-center rounded-[var(--radius-full)] bg-surface text-[var(--color-text-muted)] mb-4 border border-border-subtle">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
+      <h3 className="text-lg font-semibold text-primary mb-2">
         {title}
       </h3>
-      <p className="text-sm text-[var(--color-text-secondary)] max-w-sm mb-6">
+      <p className="text-sm text-secondary max-w-sm mb-6">
         {description}
       </p>
       {action && <div>{action}</div>}

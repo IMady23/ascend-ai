@@ -29,7 +29,7 @@ export function HolisticJourneyCard({
     <GlassCard className={cn("p-5 flex flex-col gap-4", className)}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] flex items-center justify-center text-[var(--color-accent-pink)]">
+          <div className="w-10 h-10 rounded-xl bg-surface border border-border-subtle flex items-center justify-center text-[var(--color-accent-pink)]">
             {icon}
           </div>
           <div>
@@ -38,13 +38,13 @@ export function HolisticJourneyCard({
           </div>
         </div>
         <div className="text-right">
-          <div className="font-mono text-2xl font-bold text-[var(--color-text-primary)]">{score}</div>
+          <div className="font-mono text-2xl font-bold text-primary">{score}</div>
           <Caption className="text-[var(--color-text-muted)]">Score</Caption>
         </div>
       </div>
       
-      <div className="p-3 rounded-[var(--radius-lg)] bg-[var(--color-bg-surface)]/50 border border-[var(--color-glass-border)]">
-        <BodyText size="sm" className="text-[var(--color-text-secondary)] italic">"{insights}"</BodyText>
+      <div className="p-3 rounded-[var(--radius-lg)] bg-surface/50 border border-border-subtle">
+        <BodyText size="sm" className="text-secondary italic">"{insights}"</BodyText>
       </div>
       
       <div className="flex items-start gap-1.5 mt-auto">

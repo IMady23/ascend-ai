@@ -33,7 +33,7 @@ export function XPBar({
             </Caption>
           )}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">LVL {level}</span>
+            <span className="text-3xl font-bold tracking-tight text-primary">LVL {level}</span>
           </div>
         </div>
         <div className="text-right">
@@ -42,7 +42,7 @@ export function XPBar({
         </div>
       </div>
       
-      <div className="h-3 w-full bg-[var(--color-bg-surface)] rounded-full overflow-hidden border border-[var(--color-glass-border)] relative">
+      <div className="h-3 w-full bg-surface rounded-full overflow-hidden border border-border-subtle relative">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}

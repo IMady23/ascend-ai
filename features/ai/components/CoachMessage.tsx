@@ -30,7 +30,7 @@ export function CoachMessage({ response, fallbackContent }: CoachMessageProps) {
           </p>
           <ul className="space-y-1">
             {response.recommendations.map((rec, i) => (
-              <li key={i} className="text-sm text-[var(--color-text-secondary)] flex gap-2">
+              <li key={i} className="text-sm text-secondary flex gap-2">
                 <span className="text-[var(--color-accent-blue)] shrink-0">→</span>
                 <span>{rec}</span>
               </li>
@@ -50,7 +50,7 @@ export function CoachMessage({ response, fallbackContent }: CoachMessageProps) {
       )}
 
       {response.encouragement && (
-        <p className="text-sm italic text-[var(--color-text-secondary)] border-l-2 border-[var(--color-accent-blue)]/40 pl-3">
+        <p className="text-sm italic text-secondary border-l-2 border-[var(--color-accent-blue)]/40 pl-3">
           {response.encouragement}
         </p>
       )}

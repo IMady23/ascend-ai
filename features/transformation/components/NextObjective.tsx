@@ -11,14 +11,14 @@ export function NextObjective() {
     return (
       <div className="bg-gradient-to-r from-indigo-900/40 to-violet-900/40 border border-indigo-900/50 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          <div className="p-4 bg-zinc-950/50 rounded-2xl backdrop-blur-sm hidden sm:block">
-            <Target className="text-zinc-500" size={32} />
+          <div className="p-4 bg-base/50 rounded-2xl backdrop-blur-sm hidden sm:block">
+            <Target className="text-secondary" size={32} />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-zinc-400 mb-2">
+            <h2 className="text-xl md:text-2xl font-bold text-secondary mb-2">
               Next Objective: Awaiting Assignment
             </h2>
-            <p className="text-zinc-500 text-sm md:text-base">
+            <p className="text-secondary text-sm md:text-base">
               Start a new chapter to receive your next major objective.
             </p>
           </div>
@@ -31,10 +31,10 @@ export function NextObjective() {
     <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
       <div className="flex items-center gap-6">
         <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm hidden sm:block">
-          <Target className="text-white" size={32} />
+          <Target className="text-primary" size={32} />
         </div>
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
+          <h2 className="text-xl md:text-2xl font-bold text-primary mb-2">
             Next Objective: Maintain Momentum
           </h2>
           <p className="text-indigo-100 text-sm md:text-base">

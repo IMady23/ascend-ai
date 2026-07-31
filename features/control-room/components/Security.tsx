@@ -6,7 +6,7 @@ import { ShieldAlert, Key, HardDrive, RefreshCw, Lock } from "lucide-react";
 export function Security() {
   const securityItems = [
     { label: "Authentication", value: "Offline Mode", icon: Key, color: "text-amber-400" },
-    { label: "Last Sync", value: "Never", icon: RefreshCw, color: "text-zinc-500" },
+    { label: "Last Sync", value: "Never", icon: RefreshCw, color: "text-secondary" },
     { label: "Encryption", value: "AES-256 Enabled", icon: Lock, color: "text-emerald-400" },
     { label: "Local Storage", value: "Active", icon: HardDrive, color: "text-indigo-400" },
     { label: "Repository Layer", value: "Mock Mode", icon: DatabaseIcon, color: "text-purple-400" },
@@ -18,22 +18,22 @@ export function Security() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.9 }}
-      className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-6"
+      className="bg-surface/30 border border-border-subtle/50 rounded-xl p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <ShieldAlert size={18} className="text-rose-400" />
-        <h2 className="text-lg font-semibold text-white">Security & Architecture</h2>
+        <h2 className="text-lg font-semibold text-primary">Security & Architecture</h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {securityItems.map((item, i) => (
-          <div key={i} className="p-3 bg-zinc-950/50 border border-zinc-800/50 rounded-lg flex items-center gap-3">
-            <div className={`p-1.5 bg-zinc-900 rounded ${item.color}`}>
+          <div key={i} className="p-3 bg-base/50 border border-border-subtle/50 rounded-lg flex items-center gap-3">
+            <div className={`p-1.5 bg-surface rounded ${item.color}`}>
               <item.icon size={14} />
             </div>
             <div>
-              <span className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">{item.label}</span>
-              <span className="block text-xs font-semibold text-zinc-300">{item.value}</span>
+              <span className="block text-[10px] font-bold text-secondary uppercase tracking-wider mb-0.5">{item.label}</span>
+              <span className="block text-xs font-semibold text-primary">{item.value}</span>
             </div>
           </div>
         ))}

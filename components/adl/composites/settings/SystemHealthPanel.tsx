@@ -24,9 +24,9 @@ export function SystemHealthPanel({ metrics, className }: SystemHealthPanelProps
       
       <div className="flex flex-col gap-3">
         {metrics.map((metric, i) => (
-          <div key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--color-bg-surface)] transition-colors group border border-transparent hover:border-[var(--color-glass-border)]">
+          <div key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors group border border-transparent hover:border-border-subtle">
             <div className="flex flex-col">
-              <BodyText size="sm" className="font-semibold text-[var(--color-text-primary)]">{metric.label}</BodyText>
+              <BodyText size="sm" className="font-semibold text-primary">{metric.label}</BodyText>
               {metric.detail && (
                 <Caption className="text-[var(--color-text-muted)] text-[10px]">{metric.detail}</Caption>
               )}

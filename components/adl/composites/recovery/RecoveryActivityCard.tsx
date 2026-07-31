@@ -30,9 +30,9 @@ export function RecoveryActivityCard({
     "var(--color-accent-indigo)";
 
   return (
-    <GlassCard className={cn("p-4 flex gap-4 items-center group cursor-pointer hover:bg-[var(--color-bg-surface)] transition-colors", className)}>
+    <GlassCard className={cn("p-4 flex gap-4 items-center group cursor-pointer hover:bg-surface transition-colors", className)}>
       <div 
-        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-[var(--color-glass-border)]"
+        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-border-subtle"
         style={{ backgroundColor: `color-mix(in srgb, ${intensityColor} 10%, transparent)`, color: intensityColor }}
       >
         {icon}
@@ -42,7 +42,7 @@ export function RecoveryActivityCard({
           <Heading level="h4" className="text-base">{title}</Heading>
           <Caption className="text-[var(--color-text-muted)] font-mono">{duration}</Caption>
         </div>
-        <BodyText size="sm" className="text-[var(--color-text-secondary)] line-clamp-1">{description}</BodyText>
+        <BodyText size="sm" className="text-secondary line-clamp-1">{description}</BodyText>
       </div>
     </GlassCard>
   );

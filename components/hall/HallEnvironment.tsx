@@ -60,7 +60,7 @@ export function HallEnvironment({ stage }: HallEnvironmentProps) {
       {!isTransitioning && particles.map((p, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-white opacity-20 will-change-transform"
+          className="absolute w-1 h-1 rounded-full bg-[#FFFFFF] opacity-20 will-change-transform"
           style={{ left: `${p.x}%`, top: `${p.y}%` }}
           animate={{
             y: [0, -50, 0],
@@ -79,8 +79,8 @@ export function HallEnvironment({ stage }: HallEnvironmentProps) {
       {/* Foreground Depth Elements (No mouse tracking) */}
       <div className="absolute inset-0 z-50 pointer-events-none opacity-40">
         {/* Abstract geometrical shapes suggesting architecture near the camera */}
-        <div className="absolute top-[-10%] left-[-5%] w-[30vh] h-[80vh] bg-[var(--color-bg-glass-standard)] border-r border-[var(--color-glass-border)] rounded-full rotate-12" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[40vh] h-[60vh] bg-[var(--color-bg-glass-standard)] border-l border-[var(--color-glass-border)] rounded-full -rotate-12" />
+        <div className="absolute top-[-10%] left-[-5%] w-[30vh] h-[80vh] bg-[var(--color-bg-glass-standard)] border-r border-border-subtle rounded-full rotate-12" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40vh] h-[60vh] bg-[var(--color-bg-glass-standard)] border-l border-border-subtle rounded-full -rotate-12" />
       </div>
       
       {/* Volumetric center light */}

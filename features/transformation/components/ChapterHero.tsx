@@ -8,8 +8,8 @@ export function ChapterHero() {
 
   if (!chapter) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
-        <p className="text-zinc-400">No active chapter found.</p>
+      <div className="bg-surface border border-border-subtle rounded-2xl p-8 text-center">
+        <p className="text-secondary">No active chapter found.</p>
       </div>
     );
   }
@@ -28,25 +28,25 @@ export function ChapterHero() {
             <Flag size={16} />
             <span className="uppercase tracking-wider text-xs font-bold">Active Chapter</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary mb-4 tracking-tight">
             {chapter.title}
           </h1>
-          <p className="text-zinc-400 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-secondary max-w-xl text-sm md:text-base leading-relaxed">
             {chapter.description || "Embrace the journey. Every step counts towards your ultimate transformation."}
           </p>
         </div>
 
         <div className="flex flex-col items-start md:items-end min-w-[120px]">
-          <span className="text-4xl md:text-5xl font-black text-white font-mono tracking-tighter">
+          <span className="text-4xl md:text-5xl font-black text-primary font-mono tracking-tighter">
             {progress}%
           </span>
-          <span className="text-zinc-500 text-sm font-medium uppercase tracking-wider">
+          <span className="text-secondary text-sm font-medium uppercase tracking-wider">
             Completed
           </span>
         </div>
       </div>
 
-      <div className="mt-8 w-full bg-zinc-900/80 rounded-full h-3 overflow-hidden border border-zinc-800/50 relative z-10">
+      <div className="mt-8 w-full bg-surface/80 rounded-full h-3 overflow-hidden border border-border-subtle/50 relative z-10">
         <div 
           className="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${progress}%` }}

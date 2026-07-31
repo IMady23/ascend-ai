@@ -26,7 +26,8 @@ import { aiService } from "@/services/ai/ai.service";
 
 import { MacroRing } from "@/components/adl/composites/nutrition/MacroRing";
 import { MealCard, MealItem } from "@/components/adl/composites/nutrition/MealCard";
-import { HydrationTracker } from "@/components/adl/composites/nutrition/HydrationTracker";
+import { HydrationBeakerWidget } from "@/components/ui/widgets/HydrationBeakerWidget";
+import { triggerCelebration } from "@/components/ui/CelebrationSystem";
 import { FoodChip } from "@/components/adl/composites/nutrition/FoodChip";
 import { EmptyState } from "@/components/adl/composites/feedback/EmptyState";
 import { MealLoggerModal } from "@/components/adl/composites/nutrition/MealLoggerModal";
@@ -34,6 +35,7 @@ import { MealPlanGenerator } from "@/components/adl/composites/nutrition/MealPla
 import { useUserStore } from "@/stores/user.store";
 import { useNutritionStore } from "@/stores/nutrition.store";
 import { useDataReadiness } from "@/hooks/useDataReadiness";
+import { MealConfirmationWidget } from "@/features/ai/components/MealConfirmationWidget";
 
 export default function NutritionModule() {
   const { profile, isLoading: isUserLoading } = useUserStore();
@@ -49,6 +51,7 @@ export default function NutritionModule() {
   const [isPlanGeneratorOpen, setIsPlanGeneratorOpen] = React.useState(false);
   const [isOmniProcessing, setIsOmniProcessing] = React.useState(false);
   const [omniFeedback, setOmniFeedback] = React.useState<string | null>(null);
+  const [pendingToolCall, setPendingToolCall] = React.useState<any>(null);
 
   const handleOmniSend = async (text: string) => {
     if (!text.trim()) return;
@@ -62,9 +65,16 @@ export default function NutritionModule() {
       );
       if (response) {
         setOmniFeedback(response.summary);
+        const logMealTool = response.tool_calls?.find((t: any) => t.tool === 'Log_Meal');
+        if (logMealTool) {
+            setPendingToolCall(logMealTool);
+        } else {
+            setPendingToolCall(null);
+        }
       }
     } catch (e) {
       setOmniFeedback("Failed to process your request.");
+      setPendingToolCall(null);
     } finally {
       setIsOmniProcessing(false);
     }
@@ -80,12 +90,12 @@ export default function NutritionModule() {
     return () => document.documentElement.style.setProperty("--current-accent", "var(--color-accent-blue)");
   }, []);
 
-  const targets = (profile?.goals as any)?.nutrition || {
-    dailyCalories: 2000,
-    protein: 150,
-    carbs: 200,
-    fat: 65,
-    water: 3000
+  const targets = {
+    dailyCalories: profile?.preferences?.goals?.calories || profile?.targets?.dailyCalories || 2000,
+    protein: profile?.preferences?.goals?.proteinGrams || profile?.targets?.protein || 150,
+    carbs: profile?.preferences?.goals?.carbsGrams || profile?.targets?.carbs || 200,
+    fat: profile?.preferences?.goals?.fatGrams || profile?.targets?.fat || 65,
+    water: profile?.preferences?.goals?.waterMl || profile?.targets?.water || 3000
   };
 
   const todaysMeals = meals.filter(m => m.date === currentDate);
@@ -101,7 +111,7 @@ export default function NutritionModule() {
         <DashboardLayout>
           <div className="lg:col-span-3 space-y-6 flex items-center justify-center min-h-[50vh]">
              <div className="animate-pulse flex flex-col items-center gap-4">
-               <div className="w-12 h-12 rounded-full border-4 border-[var(--color-glass-border)] border-t-[var(--color-accent-green)] animate-spin" />
+               <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-green)] animate-spin" />
                <Caption className="text-[var(--color-text-muted)]">Syncing Repositories...</Caption>
              </div>
           </div>
@@ -133,13 +143,13 @@ export default function NutritionModule() {
                   <span className="text-[var(--color-text-muted)] text-3xl"> / {targets.dailyCalories} kcal</span>
                 </Heading>
                 
-                <BodyText size="lg" className="text-[var(--color-text-secondary)]">
+                <BodyText size="lg" className="text-secondary">
                   {profile?.goals?.primaryGoal ? `Fueling for ${profile.goals.primaryGoal}` : "Fueling your day."}
                 </BodyText>
               </div>
 
               {/* Primary Macros */}
-              <div className="flex items-center gap-6 shrink-0 bg-[var(--color-bg-surface)]/50 p-6 rounded-[var(--radius-xl)] border border-[var(--color-glass-border)]">
+              <div className="flex items-center gap-6 shrink-0 bg-surface/50 p-6 rounded-[var(--radius-xl)] border border-border-subtle">
                 <MacroRing 
                   label="Protein"
                   current={dailyProtein}
@@ -169,20 +179,20 @@ export default function NutritionModule() {
               </div>
               
               {!hasMeals ? (
-                <BodyText size="sm" className="text-[var(--color-text-primary)] leading-relaxed mb-4">
+                <BodyText size="sm" className="text-primary leading-relaxed mb-4">
                   I'm still learning about your eating habits. Log your first meal and I'll begin providing personalized strategy recommendations.
                 </BodyText>
               ) : (
                 <>
-                  <BodyText size="sm" className="text-[var(--color-text-primary)] leading-relaxed mb-4">
+                  <BodyText size="sm" className="text-primary leading-relaxed mb-4">
                     Based on your recent meals, prioritize fast-digesting carbs and at least 40g of protein for dinner to maximize muscle glycogen replenishment.
                   </BodyText>
                   <div 
                     onClick={() => setIsPlanGeneratorOpen(true)}
-                    className="p-3 bg-[var(--color-bg-base)]/50 rounded-[var(--radius-lg)] border border-[var(--color-glass-border)] flex items-center justify-between hover:border-[var(--color-accent-indigo)]/50 cursor-pointer transition-colors group"
+                    className="p-3 bg-base/50 rounded-[var(--radius-lg)] border border-border-subtle flex items-center justify-between hover:border-[var(--color-accent-indigo)]/50 cursor-pointer transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[var(--color-bg-surface)] flex items-center justify-center group-hover:bg-[var(--color-accent-indigo)]/10 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center group-hover:bg-[var(--color-accent-indigo)]/10 transition-colors">
                         <Sparkles size={14} className="text-[var(--color-accent-indigo)]" />
                       </div>
                       <div>
@@ -215,13 +225,21 @@ export default function NutritionModule() {
           </div>
 
           {/* Hydration Tracker */}
-          <HydrationTracker 
-            currentMl={hydration}
-            targetMl={targets.water}
-            onAdd={(ml) => {
-              const newHydration = Math.min(hydration + ml, targets.water);
+          <HydrationBeakerWidget 
+            currentOunces={hydration}
+            goalOunces={targets.water}
+            onClick={() => {
+              const newHydration = Math.min(hydration + 250, targets.water);
               setHydration(newHydration);
               setDailyWater(newHydration);
+              
+              if (newHydration >= targets.water && hydration < targets.water) {
+                triggerCelebration({
+                  title: 'Hydration Goal Met!',
+                  message: 'You crushed your daily water target. Stay hydrated!',
+                  xpBurst: 50
+                });
+              }
             }}
           />
 
@@ -274,7 +292,7 @@ export default function NutritionModule() {
                     setMealToEdit(null);
                     setIsLoggerOpen(true);
                   }}
-                  className="w-full p-4 border border-dashed border-[var(--color-glass-border)] rounded-[var(--radius-xl)] flex items-center justify-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-glass-hover)]"
+                  className="w-full p-4 border border-dashed border-border-subtle rounded-[var(--radius-xl)] flex items-center justify-center gap-2 text-[var(--color-text-muted)] hover:text-primary hover:border-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-glass-hover)]"
                 >
                   <Plus size={18} />
                   <span className="font-medium text-sm">Log Next Meal</span>
@@ -327,10 +345,10 @@ export default function NutritionModule() {
           </WidgetSection>
 
           <WidgetSection title="AI Nutrition Workspace">
-            <div className="flex flex-col gap-3 p-4 bg-[var(--color-bg-surface)]/50 rounded-[var(--radius-xl)] border border-[var(--color-glass-border)]">
+            <div className="flex flex-col gap-3 p-4 bg-surface/50 rounded-[var(--radius-xl)] border border-border-subtle">
               <Caption className="text-[var(--color-text-muted)]">Describe what you ate or what you want to achieve.</Caption>
               
-              <div className="bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] relative overflow-hidden focus-within:border-[var(--color-accent-blue)] transition-colors">
+              <div className="bg-base border border-border-subtle rounded-[var(--radius-md)] relative overflow-hidden focus-within:border-[var(--color-accent-blue)] transition-colors">
                 <Omnibar 
                   onSend={handleOmniSend}
                   placeholder="e.g. I had two eggs and a toast"
@@ -350,6 +368,80 @@ export default function NutritionModule() {
                    <Sparkles size={14} className="text-[var(--color-accent-green)] shrink-0" />
                    <BodyText size="sm" className="text-[var(--color-accent-green)]">{omniFeedback}</BodyText>
                 </div>
+              )}
+              
+              {pendingToolCall && !isOmniProcessing && (
+                  <MealConfirmationWidget 
+                    toolCall={pendingToolCall}
+                    onConfirm={async (params) => {
+                       const now = Date.now();
+                       const newMeal = {
+                         id: crypto.randomUUID(),
+                         date: new Date().toISOString().split("T")[0],
+                         timestamp: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any,
+                         mealType: params.mealType || "snack",
+                         calories: params.calories,
+                         protein: params.protein || 0,
+                         carbs: params.carbs || 0,
+                         fat: params.fat || 0,
+                         foods: [{
+                           id: crypto.randomUUID(),
+                           name: params.description || "Quick log",
+                           quantity: 1,
+                           servingSize: "serving",
+                           calories: params.calories,
+                           protein: params.protein || 0,
+                           carbs: params.carbs || 0,
+                           fat: params.fat || 0,
+                           source: "ai" as const
+                         }],
+                         source: "ai" as const,
+                         updatedAt: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any
+                       };
+                       useNutritionStore.getState().addMeal(newMeal);
+                       setPendingToolCall(null);
+                       setOmniFeedback("Meal confirmed! Updating...");
+                       
+                       try {
+                           const followUpRes = await fetch('/api/ai', {
+                               method: 'POST',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify({
+                                   messageText: "I have confirmed the meal log. Please give me brief follow-up guidance on how it helps my goals.",
+                                   userId: useUserStore.getState().userId,
+                                   confirmedToolCall: { tool: 'Log_Meal', params }
+                               })
+                           });
+                           if (followUpRes.ok) {
+                               const followUpData = await followUpRes.json();
+                               if (followUpData.data?.summary) {
+                                   setOmniFeedback(followUpData.data.summary);
+                               }
+                           }
+                       } catch(e) {
+                           console.error(e);
+                       }
+                    }}
+                    onEdit={() => {
+                        setPendingToolCall(null);
+                        setMealToEdit({
+                          id: "temp",
+                          mealType: pendingToolCall.params.mealType || "snack",
+                          calories: pendingToolCall.params.calories,
+                          protein: pendingToolCall.params.protein || 0,
+                          carbs: pendingToolCall.params.carbs || 0,
+                          fat: pendingToolCall.params.fat || 0,
+                          foods: [{
+                             name: pendingToolCall.params.description || "Quick log"
+                          }]
+                        });
+                        setIsLoggerOpen(true);
+                    }}
+                    onCancel={() => {
+                        setPendingToolCall(null);
+                        setOmniFeedback("Meal log cancelled.");
+                    }}
+                  />
               )}
 
               <div className="w-full h-px bg-[var(--color-glass-border)] my-2" />

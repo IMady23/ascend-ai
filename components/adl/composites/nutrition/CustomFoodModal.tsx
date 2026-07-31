@@ -73,18 +73,18 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="w-full max-w-lg"
       >
-        <GlassCard className="flex flex-col overflow-hidden border border-[var(--color-glass-border)] bg-[var(--color-bg-base)]/95 shadow-2xl">
+        <GlassCard className="flex flex-col overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
           
-          <div className="p-4 border-b border-[var(--color-glass-border)] flex items-center justify-between">
+          <div className="p-4 border-b border-border-subtle flex items-center justify-between">
             <Heading level="h3">Add Custom Food</Heading>
-            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-surface)] transition-colors">
+            <button onClick={onClose} className="p-2 text-[var(--color-text-muted)] hover:text-primary rounded-full hover:bg-surface transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -99,7 +99,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Chicken Curry"
-                className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
               />
             </div>
 
@@ -114,7 +114,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   placeholder="e.g. 100"
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
               <div>
@@ -125,7 +125,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   value={servingSize}
                   onChange={(e) => setServingSize(e.target.value)}
                   placeholder="e.g. g, cup, oz"
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   min="0"
                   value={calories}
                   onChange={(e) => setCalories(e.target.value)}
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
               <div>
@@ -151,7 +151,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   step="0.1"
                   value={protein}
                   onChange={(e) => setProtein(e.target.value)}
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
               <div>
@@ -163,7 +163,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   step="0.1"
                   value={carbs}
                   onChange={(e) => setCarbs(e.target.value)}
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
               <div>
@@ -175,7 +175,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                   step="0.1"
                   value={fat}
                   onChange={(e) => setFat(e.target.value)}
-                  className="w-full bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  className="w-full bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
                 step="0.1"
                 value={fiber}
                 onChange={(e) => setFiber(e.target.value)}
-                className="w-full sm:w-1/4 bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                className="w-full sm:w-1/4 bg-surface border border-border-subtle rounded-[var(--radius-md)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
               />
             </div>
 

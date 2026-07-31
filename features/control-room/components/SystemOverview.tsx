@@ -8,10 +8,10 @@ const getStatusColor = (status: SystemStatus) => {
   switch (status) {
     case "operational": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
     case "ready": return "text-indigo-400 bg-indigo-500/10 border-indigo-500/20";
-    case "offline": return "text-zinc-400 bg-zinc-500/10 border-zinc-500/20";
+    case "offline": return "text-secondary bg-zinc-500/10 border-zinc-500/20";
     case "warning": return "text-amber-400 bg-amber-500/10 border-amber-500/20";
     case "coming_soon": return "text-purple-400 bg-purple-500/10 border-purple-500/20";
-    default: return "text-zinc-400 bg-zinc-500/10 border-zinc-500/20";
+    default: return "text-secondary bg-zinc-500/10 border-zinc-500/20";
   }
 };
 
@@ -42,13 +42,13 @@ export function SystemOverview() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
-      <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 ml-1">System Overview</h2>
+      <h2 className="text-xs font-bold text-secondary uppercase tracking-widest mb-4 ml-1">System Overview</h2>
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {services.map((service) => (
-          <div key={service.id} className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 flex flex-col justify-between backdrop-blur-sm group hover:border-zinc-700/50 transition-colors">
+          <div key={service.id} className="bg-surface/50 border border-border-subtle/50 rounded-xl p-4 flex flex-col justify-between backdrop-blur-sm group hover:border-border-subtle/50 transition-colors">
             <div className="flex items-start justify-between mb-4">
-              <div className="p-2 bg-zinc-950 rounded-lg text-zinc-400 group-hover:text-purple-400 transition-colors">
+              <div className="p-2 bg-base rounded-lg text-secondary group-hover:text-purple-400 transition-colors">
                 <service.icon size={16} />
               </div>
               
@@ -59,8 +59,8 @@ export function SystemOverview() {
             </div>
             
             <div>
-              <h3 className="text-sm font-bold text-zinc-200 mb-0.5">{service.name}</h3>
-              <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">{service.description}</p>
+              <h3 className="text-sm font-bold text-primary mb-0.5">{service.name}</h3>
+              <p className="text-[10px] font-medium text-secondary uppercase tracking-wider">{service.description}</p>
             </div>
           </div>
         ))}

@@ -10,6 +10,7 @@ import { useIntelligenceStore } from "@/stores/intelligence.store";
 import { TimeFilter, TrendCategory, SufficiencyState } from "@/services/intelligence/intelligence.service";
 import { ActiveInsightModal } from "@/components/adl/composites/intel/ActiveInsightModal";
 import { ConsistencyModal } from "@/components/adl/composites/intel/ConsistencyModal";
+import { useAnalyticsStore } from "@/stores/analytics.store";
 import dynamic from "next/dynamic";
 import { cn } from "@/utils/cn";
 
@@ -51,19 +52,37 @@ export default function IntelDashboardPage() {
     chartData,
     sufficiency
   } = useIntelligenceStore();
+  const { aiSummary } = useAnalyticsStore();
 
   const [isInsightModalOpen, setInsightModalOpen] = useState(false);
   const [isConsistencyModalOpen, setConsistencyModalOpen] = useState(false);
+  const [lifecycle, setLifecycle] = useState<"LOADING" | "SYNCING" | "LIVE">("LOADING");
 
   useEffect(() => {
-    fetchIntelligence();
+    fetchIntelligence().then(() => {
+      setLifecycle("SYNCING");
+      setTimeout(() => {
+        setLifecycle("LIVE");
+      }, 800); // Artificial delay for visual effect
+    });
   }, [fetchIntelligence]);
 
-  if (isLoading || !sufficiency) {
+  if (isLoading || !sufficiency || lifecycle === "LOADING") {
     return (
       <div className="flex flex-col h-full items-center justify-center p-8 space-y-4 mt-20">
         <div className="w-8 h-8 border-4 border-[var(--color-accent-blue)] border-t-transparent rounded-full animate-spin"></div>
-        <span className="text-[var(--color-text-secondary)] font-medium">Initializing intelligence...</span>
+        <span className="text-secondary font-medium">Initializing intelligence...</span>
+      </div>
+    );
+  }
+
+  if (lifecycle === "SYNCING") {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-8 space-y-4 mt-20">
+        <div className="flex gap-2 items-center text-[var(--color-success)] animate-pulse">
+          <BrainCircuit size={24} />
+          <span className="font-bold text-lg tracking-wider">SYNCING DATA MODULES...</span>
+        </div>
       </div>
     );
   }
@@ -84,7 +103,7 @@ export default function IntelDashboardPage() {
         <div>
           <Heading level="h1" className="text-3xl flex items-center gap-3">
             Intelligence Center
-            <span className="text-xs font-bold px-2 py-1 bg-[var(--color-bg-surface)] border border-[var(--color-glass-border)] rounded-full text-[var(--color-accent-blue)] uppercase tracking-wider">
+            <span className="text-xs font-bold px-2 py-1 bg-surface border border-border-subtle rounded-full text-[var(--color-accent-blue)] uppercase tracking-wider">
               {sufficiency.level}
             </span>
           </Heading>
@@ -92,7 +111,7 @@ export default function IntelDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className={cn("flex p-1 bg-[var(--color-bg-surface)] rounded-xl border border-[var(--color-glass-border)]", isNoData && "opacity-50 pointer-events-none")}>
+          <div className={cn("flex p-1 bg-surface rounded-xl border border-border-subtle", isNoData && "opacity-50 pointer-events-none")}>
             {TIME_FILTERS.map(tf => (
               <button
                 key={tf.value}
@@ -100,8 +119,8 @@ export default function IntelDashboardPage() {
                 className={cn(
                   "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
                   timeFilter === tf.value 
-                    ? "bg-[var(--color-bg-base)] text-white shadow-sm border border-[var(--color-glass-border)]" 
-                    : "text-[var(--color-text-muted)] hover:text-white"
+                    ? "bg-base text-primary shadow-sm border border-border-subtle" 
+                    : "text-[var(--color-text-muted)] hover:text-primary"
                 )}
               >
                 {tf.label}
@@ -120,56 +139,103 @@ export default function IntelDashboardPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* Coach Insight Card */}
+            {/* AI Summary Grid */}
             <div className="md:col-span-2 space-y-4">
-              <Heading level="h4" className="text-[var(--color-text-secondary)] uppercase tracking-wider text-xs font-bold">
-                {isLimited ? "Early Insights" : "Active Coach Insight"}
+              <Heading level="h4" className="text-secondary uppercase tracking-wider text-xs font-bold">
+                Intelligence Dashboard
               </Heading>
               
-              <GlassCard 
-                className="p-6 relative overflow-hidden group border border-[var(--color-accent-indigo)]/50 hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer"
-                onClick={() => setInsightModalOpen(true)}
-              >
-                <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-accent-indigo)]"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
-                <div className="flex flex-col md:flex-row items-start gap-4 relative z-10">
-                  <div className="w-12 h-12 rounded-full bg-[var(--color-accent-indigo)]/20 flex items-center justify-center shrink-0">
-                    <BrainCircuit className="text-[var(--color-accent-indigo)]" size={24} />
+                {/* Performance */}
+                <GlassCard className="p-5 border-l-4 border-l-[var(--color-accent-blue)] hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="text-[var(--color-accent-blue)]" size={18} />
+                    <Heading level="h5" className="text-primary text-sm">Today's Performance</Heading>
                   </div>
-                  <div className="space-y-3 flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <Caption className="text-[var(--color-accent-indigo)] font-bold mb-1">{activeInsightData?.category}</Caption>
-                        <Heading level="h3" className="text-white">{activeInsightData?.title}</Heading>
-                      </div>
-                      <div className="text-right">
-                        <Caption className="text-[var(--color-text-muted)] text-[10px] uppercase font-bold tracking-widest">Confidence</Caption>
-                        <span className={cn("text-sm font-bold", isLimited ? "text-[var(--color-warning)]" : "text-[var(--color-success)]")}>
-                          {activeInsightData?.confidenceScore}%
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary">Calories</span>
+                      <span className="font-medium text-primary">{Math.round(aiSummary?.performance?.calories || 0)} kcal</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary">Protein</span>
+                      <span className="font-medium text-primary">{Math.round(aiSummary?.performance?.protein || 0)} g</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary">Water</span>
+                      <span className="font-medium text-primary">{Math.round(aiSummary?.performance?.water || 0)} ml</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary">Steps</span>
+                      <span className="font-medium text-primary">{Math.round(aiSummary?.performance?.steps || 0)}</span>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* Trend Shifts */}
+                <GlassCard className="p-5 border-l-4 border-l-[var(--color-accent-gold)] hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="text-[var(--color-accent-gold)]" size={18} />
+                    <Heading level="h5" className="text-primary text-sm">Weekly Trend Shifts</Heading>
+                  </div>
+                  <div className="space-y-3">
+                    {aiSummary?.weeklyTrends?.map((trend: any, idx: number) => (
+                      <div key={idx} className="flex justify-between items-center text-sm">
+                        <span className="text-secondary">{trend.label}</span>
+                        <span className={cn("font-bold", trend.trend > 0 ? "text-[var(--color-success)]" : trend.trend < 0 ? "text-[var(--color-error)]" : "text-secondary")}>
+                          {trend.trend > 0 ? '↑' : trend.trend < 0 ? '↓' : ''} {Math.abs(Math.round(trend.trend))}%
                         </span>
                       </div>
-                    </div>
-                    <BodyText className="text-[var(--color-text-secondary)] line-clamp-2">
-                      {activeInsightData?.description}
-                    </BodyText>
-                    
-                    <div className="flex items-center gap-2 pt-2 text-sm font-bold text-[var(--color-accent-indigo)]">
-                      Read Detailed Analysis &rarr;
-                    </div>
+                    ))}
                   </div>
-                </div>
-              </GlassCard>
+                </GlassCard>
+
+                {/* Coach Recommendation */}
+                <GlassCard className="p-5 border-l-4 border-l-[var(--color-accent-indigo)] sm:col-span-2 hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer" onClick={() => setInsightModalOpen(true)}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <BrainCircuit className="text-[var(--color-accent-indigo)]" size={18} />
+                    <Heading level="h5" className="text-primary text-sm">Active Coach Recommendation</Heading>
+                  </div>
+                  <BodyText className="text-secondary">
+                    {aiSummary?.recommendation || activeInsightData?.description || "Log more data to receive coaching."}
+                  </BodyText>
+                </GlassCard>
+
+                {/* Achievement */}
+                <GlassCard className="p-5 border-l-4 border-l-[var(--color-success)] hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle className="text-[var(--color-success)]" size={18} />
+                    <Heading level="h5" className="text-primary text-sm">Recent Achievement</Heading>
+                  </div>
+                  <BodyText className="text-secondary text-sm">
+                    {aiSummary?.achievement || "Keep training!"}
+                  </BodyText>
+                </GlassCard>
+
+                {/* Risk Detection */}
+                <GlassCard className="p-5 border-l-4 border-l-[var(--color-warning)] hover:bg-[var(--color-bg-surface-hover)] transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingDown className="text-[var(--color-warning)]" size={18} />
+                    <Heading level="h5" className="text-primary text-sm">Risk Detection</Heading>
+                  </div>
+                  <BodyText className="text-secondary text-sm">
+                    {aiSummary?.riskDetection || "All metrics are stable."}
+                  </BodyText>
+                </GlassCard>
+
+              </div>
             </div>
 
             {/* Consistency Score */}
             <div className="space-y-4">
-              <Heading level="h4" className="text-[var(--color-text-secondary)] uppercase tracking-wider text-xs font-bold">Consistency Score</Heading>
+              <Heading level="h4" className="text-secondary uppercase tracking-wider text-xs font-bold">Consistency Score</Heading>
               
               {isLimited ? (
-                <GlassCard className="p-6 flex flex-col items-center justify-center min-h-[220px] bg-[var(--color-bg-surface)] opacity-80 border-dashed">
+                <GlassCard className="p-6 flex flex-col items-center justify-center min-h-[220px] bg-surface opacity-80 border-dashed">
                   <Lock size={32} className="text-[var(--color-text-muted)] mb-3" />
-                  <Heading level="h4" className="text-white mb-1">Locked</Heading>
-                  <Caption className="text-center text-[var(--color-text-secondary)]">More tracking required to calculate consistency.</Caption>
+                  <Heading level="h4" className="text-primary mb-1">Locked</Heading>
+                  <Caption className="text-center text-secondary">More tracking required to calculate consistency.</Caption>
                 </GlassCard>
               ) : (
                 <GlassCard className="p-6 flex flex-col items-center justify-center min-h-[220px] hover:bg-[var(--color-bg-surface-hover)] transition-colors relative cursor-pointer" onClick={() => setConsistencyModalOpen(true)}>
@@ -185,11 +251,11 @@ export default function IntelDashboardPage() {
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-3xl font-bold text-white">{consistencyBreakdown!.currentScore}</span>
+                      <span className="text-3xl font-bold text-primary">{consistencyBreakdown!.currentScore}</span>
                       <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-widest">Score</span>
                     </div>
                   </div>
-                  <Caption className="mt-4 text-center text-[var(--color-text-secondary)] underline decoration-dashed underline-offset-4 decoration-[var(--color-text-muted)]">
+                  <Caption className="mt-4 text-center text-secondary underline decoration-dashed underline-offset-4 decoration-[var(--color-text-muted)]">
                     View Score Breakdown
                   </Caption>
                 </GlassCard>
@@ -200,8 +266,8 @@ export default function IntelDashboardPage() {
           {/* Interactive Trends Section */}
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <Heading level="h4" className="text-[var(--color-text-secondary)] uppercase tracking-wider text-xs font-bold">Interactive Trends</Heading>
-              <div className="flex space-x-2 bg-[var(--color-bg-surface)] p-1 rounded-xl border border-[var(--color-glass-border)] w-fit">
+              <Heading level="h4" className="text-secondary uppercase tracking-wider text-xs font-bold">Interactive Trends</Heading>
+              <div className="flex space-x-2 bg-surface p-1 rounded-xl border border-border-subtle w-fit">
                 {TREND_CATEGORIES.map(tc => {
                   const Icon = tc.icon;
                   return (
@@ -211,8 +277,8 @@ export default function IntelDashboardPage() {
                       className={cn(
                         "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
                         trendCategory === tc.value 
-                          ? "bg-[var(--color-bg-base)] text-white shadow-sm border border-[var(--color-glass-border)]" 
-                          : "text-[var(--color-text-muted)] hover:text-white"
+                          ? "bg-base text-primary shadow-sm border border-border-subtle" 
+                          : "text-[var(--color-text-muted)] hover:text-primary"
                       )}
                     >
                       <Icon size={14} />
@@ -226,14 +292,14 @@ export default function IntelDashboardPage() {
             <GlassCard className="p-6">
               {!hasChartData ? (
                 <div className="flex flex-col items-center justify-center h-[300px] text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-[var(--color-bg-surface)] flex items-center justify-center border border-[var(--color-glass-border)]">
+                  <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center border border-border-subtle">
                     {trendCategory === "workout" ? <Activity className="text-[var(--color-text-muted)]" size={24} /> : 
                      trendCategory === "nutrition" ? <Target className="text-[var(--color-text-muted)]" size={24} /> : 
                      <BrainCircuit className="text-[var(--color-text-muted)]" size={24} />}
                   </div>
                   <div>
-                    <Heading level="h4" className="text-white mb-1">No {trendCategory} history yet.</Heading>
-                    <Caption className="text-[var(--color-text-secondary)] max-w-sm">Complete your first log to begin tracking volume and discovering trends.</Caption>
+                    <Heading level="h4" className="text-primary mb-1">No {trendCategory} history yet.</Heading>
+                    <Caption className="text-secondary max-w-sm">Complete your first log to begin tracking volume and discovering trends.</Caption>
                   </div>
                 </div>
               ) : (
@@ -241,8 +307,8 @@ export default function IntelDashboardPage() {
                   <div className="h-[300px] w-full">
                     <IntelCharts trendCategory={trendCategory} chartData={chartData} />
                   </div>
-                  <div className="mt-4 flex items-center justify-center border-t border-[var(--color-glass-border)] pt-4">
-                    <Caption className="text-[var(--color-text-secondary)] text-center flex items-center gap-2">
+                  <div className="mt-4 flex items-center justify-center border-t border-border-subtle pt-4">
+                    <Caption className="text-secondary text-center flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[var(--color-accent-blue)]"></span>
                       Click any bar or point to navigate to its daily log.
                     </Caption>
@@ -254,11 +320,11 @@ export default function IntelDashboardPage() {
 
           {/* Insights Timeline */}
           <div className="space-y-6">
-            <Heading level="h4" className="text-[var(--color-text-secondary)] uppercase tracking-wider text-xs font-bold">Recent Insights Timeline</Heading>
+            <Heading level="h4" className="text-secondary uppercase tracking-wider text-xs font-bold">Recent Insights Timeline</Heading>
             
             {historicalInsights.length === 0 ? (
               <GlassCard className="p-8 text-center border-dashed">
-                <Caption className="text-[var(--color-text-secondary)]">No AI Insights Yet. Your personalized timeline will appear once you've logged enough activity.</Caption>
+                <Caption className="text-secondary">No AI Insights Yet. Your personalized timeline will appear once you've logged enough activity.</Caption>
               </GlassCard>
             ) : (
               <div className="space-y-3">
@@ -271,12 +337,12 @@ export default function IntelDashboardPage() {
                         (insight as any).priority === "warning" ? "bg-[var(--color-warning)]" : "bg-[var(--color-success)]"
                       )} />
                       <div>
-                        <Heading level="h5" className="text-white text-sm">{insight.title}</Heading>
-                        <BodyText size="sm" className="text-[var(--color-text-secondary)]">{insight.description}</BodyText>
+                        <Heading level="h5" className="text-primary text-sm">{insight.title}</Heading>
+                        <BodyText size="sm" className="text-secondary">{insight.description}</BodyText>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-xs font-bold text-[var(--color-text-muted)] bg-[var(--color-bg-base)] px-2 py-1 rounded-md border border-[var(--color-glass-border)]">{insight.category}</span>
+                      <span className="text-xs font-bold text-[var(--color-text-muted)] bg-base px-2 py-1 rounded-md border border-border-subtle">{insight.category}</span>
                       <div className="flex items-center gap-1 text-[var(--color-text-muted)] text-xs">
                         <Calendar size={12} />
                         {new Date((insight as any).date || (insight.timestamp as any)?.toDate?.() || new Date()).toLocaleDateString()}
@@ -314,17 +380,17 @@ function NoDataState({ sufficiency }: { sufficiency: SufficiencyState }) {
         <div className="w-20 h-20 bg-[var(--color-accent-indigo)]/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <BrainCircuit size={40} className="text-[var(--color-accent-indigo)]" />
         </div>
-        <Heading level="h2" className="text-white">Welcome to Ascend Intelligence</Heading>
-        <BodyText className="text-[var(--color-text-secondary)] text-lg">Your AI coach is ready to analyze your progress. Start tracking your activities to unlock personalized insights and macro trends.</BodyText>
+        <Heading level="h2" className="text-primary">Welcome to Ascend Intelligence</Heading>
+        <BodyText className="text-secondary text-lg">Your AI coach is ready to analyze your progress. Start tracking your activities to unlock personalized insights and macro trends.</BodyText>
       </div>
 
       <GlassCard className="p-6 md:p-8 space-y-6">
         <div className="flex items-center justify-between mb-2">
-          <Heading level="h4" className="text-white">Unlock Intelligence</Heading>
+          <Heading level="h4" className="text-primary">Unlock Intelligence</Heading>
           <span className="text-sm font-bold text-[var(--color-accent-blue)]">{completedCount} / {tasks.length} Complete</span>
         </div>
         
-        <div className="w-full h-2 bg-[var(--color-bg-base)] rounded-full overflow-hidden mb-6">
+        <div className="w-full h-2 bg-base rounded-full overflow-hidden mb-6">
           <div 
             className="h-full bg-[var(--color-accent-blue)] transition-all duration-1000" 
             style={{ width: `${(completedCount / tasks.length) * 100}%` }}
@@ -339,17 +405,17 @@ function NoDataState({ sufficiency }: { sufficiency: SufficiencyState }) {
               <button 
                 key={idx}
                 onClick={() => router.push(task.href)}
-                className="w-full flex items-center justify-between p-4 bg-[var(--color-bg-base)] border border-[var(--color-glass-border)] rounded-xl hover:bg-[var(--color-bg-surface)] transition-colors text-left"
+                className="w-full flex items-center justify-between p-4 bg-base border border-border-subtle rounded-xl hover:bg-surface transition-colors text-left"
               >
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "w-6 h-6 rounded flex items-center justify-center shrink-0 border",
-                    isCompleted ? "bg-[var(--color-success)] border-[var(--color-success)] text-black" : "border-[var(--color-text-muted)] text-transparent"
+                    isCompleted ? "bg-[var(--color-success)] border-[var(--color-success)] text-primary" : "border-[var(--color-text-muted)] text-transparent"
                   )}>
                     {isCompleted && <CheckCircle size={14} />}
                   </div>
                   <div>
-                    <span className={cn("font-medium", isCompleted ? "text-[var(--color-text-secondary)] line-through" : "text-white")}>{task.label}</span>
+                    <span className={cn("font-medium", isCompleted ? "text-secondary line-through" : "text-primary")}>{task.label}</span>
                   </div>
                 </div>
                 <Icon size={18} className="text-[var(--color-text-muted)]" />

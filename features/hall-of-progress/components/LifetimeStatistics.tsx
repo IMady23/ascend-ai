@@ -23,7 +23,7 @@ export function LifetimeStatistics() {
     { label: "Calories Burned", value: `${(totalCalories / 1000).toFixed(1)}k`, icon: Flame, color: "text-rose-400" },
     { label: "Water Consumed", value: `${totalWaterLiters.toFixed(1)}L`, icon: Droplets, color: "text-cyan-400" },
     { label: "Protein Consumed", value: `${totalProteinKg.toFixed(2)}kg`, icon: Leaf, color: "text-emerald-400" },
-    { label: "Days Active", value: totalWorkouts > 0 ? 1 : 0, icon: Hash, color: "text-zinc-400" },
+    { label: "Days Active", value: totalWorkouts > 0 ? 1 : 0, icon: Hash, color: "text-secondary" },
   ];
 
   return (
@@ -31,21 +31,21 @@ export function LifetimeStatistics() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.5 }}
-      className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6"
+      className="bg-surface/50 border border-border-subtle rounded-xl p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <Activity size={18} className="text-purple-400" />
-        <h2 className="text-lg font-semibold text-white">Lifetime Statistics</h2>
+        <h2 className="text-lg font-semibold text-primary">Lifetime Statistics</h2>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {data.map((stat, i) => (
-          <div key={i} className="flex flex-col gap-1 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+          <div key={i} className="flex flex-col gap-1 p-4 bg-base/50 rounded-xl border border-border-subtle/50">
             <div className={`mb-2 ${stat.color}`}>
               <stat.icon size={16} />
             </div>
-            <span className="text-2xl font-black text-white font-mono">{stat.value}</span>
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{stat.label}</span>
+            <span className="text-2xl font-black text-primary font-mono">{stat.value}</span>
+            <span className="text-[10px] font-bold text-secondary uppercase tracking-wider">{stat.label}</span>
           </div>
         ))}
       </div>

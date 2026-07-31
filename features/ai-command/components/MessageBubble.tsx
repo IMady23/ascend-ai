@@ -14,14 +14,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div className={`flex gap-4 max-w-[85%] ${isAi ? "self-start" : "self-end flex-row-reverse"}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border mt-1 ${
-        isAi ? "bg-violet-950 border-violet-900/50" : "bg-zinc-800 border-zinc-700"
+        isAi ? "bg-violet-950 border-violet-900/50" : "bg-surface-elevated border-border-subtle"
       }`}>
-        {isAi ? <Cpu size={14} className="text-violet-400" /> : <User size={14} className="text-zinc-400" />}
+        {isAi ? <Cpu size={14} className="text-violet-400" /> : <User size={14} className="text-secondary" />}
       </div>
       
       <div className={`flex flex-col gap-3 w-full`}>
         {!isAi ? (
-          <div className="p-4 rounded-2xl bg-violet-600 text-white rounded-tr-sm text-sm leading-relaxed inline-block">
+          <div className="p-4 rounded-2xl bg-violet-600 text-primary rounded-tr-sm text-sm leading-relaxed inline-block">
             {message.content}
           </div>
         ) : (
@@ -30,11 +30,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-zinc-950 border border-zinc-800 rounded-2xl rounded-tl-sm overflow-hidden"
+                className="bg-base border border-border-subtle rounded-2xl rounded-tl-sm overflow-hidden"
               >
                 {/* Summary */}
-                <div className="p-4 border-b border-zinc-800/50 bg-zinc-900/30">
-                  <p className="text-sm text-zinc-200 leading-relaxed">
+                <div className="p-4 border-b border-border-subtle/50 bg-surface/30">
+                  <p className="text-sm text-primary leading-relaxed">
                     {message.structuredContent.summary}
                   </p>
                 </div>
@@ -59,18 +59,18 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
                 {/* Recommendations */}
                 {message.structuredContent.recommendations && message.structuredContent.recommendations.length > 0 && (
-                  <div className="p-4 border-b border-zinc-800/50">
+                  <div className="p-4 border-b border-border-subtle/50">
                     <h4 className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                       <CheckCircle2 size={12} />
                       Action Plan
                     </h4>
                     <div className="space-y-2">
                       {message.structuredContent.recommendations.map((rec, i) => (
-                        <div key={i} className="flex gap-3 items-start bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50">
+                        <div key={i} className="flex gap-3 items-start bg-surface/50 p-3 rounded-xl border border-border-subtle/50">
                           <div className="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center shrink-0 mt-0.5">
                             <span className="text-[10px] font-bold text-violet-400">{i + 1}</span>
                           </div>
-                          <p className="text-sm text-zinc-300 leading-relaxed">{rec}</p>
+                          <p className="text-sm text-primary leading-relaxed">{rec}</p>
                         </div>
                       ))}
                     </div>
@@ -86,7 +86,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                 </div>
               </motion.div>
             ) : (
-              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 text-zinc-300 rounded-tl-sm text-sm leading-relaxed inline-block">
+              <div className="p-4 rounded-2xl bg-base border border-border-subtle text-primary rounded-tl-sm text-sm leading-relaxed inline-block">
                 {message.content}
               </div>
             )}

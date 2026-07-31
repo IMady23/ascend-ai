@@ -10,8 +10,11 @@ export const NutritionSync = {
     this.dispose();
 
     // 1. Meals
+    const currentDate = useNutritionStore.getState().currentDate;
+
     unsubscribeMeals = NutritionRepository.subscribeToNutritionLogs(
       userId,
+      currentDate,
       (logs) => {
         useNutritionStore.getState().setMeals(logs);
       },
@@ -21,6 +24,7 @@ export const NutritionSync = {
     // 2. Hydration
     unsubscribeHydration = NutritionRepository.subscribeToHydrationLogs(
       userId,
+      currentDate,
       (logs) => {
         useNutritionStore.getState().setHydrationLogs(logs);
       },
