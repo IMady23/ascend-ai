@@ -5,7 +5,8 @@ import { useNutritionStore } from "@/stores/nutrition.store";
 import { useRecoveryStore } from "@/stores/recovery.store";
 
 export type TrendCategory = "workout" | "nutrition" | "recovery" | "body" | "performance";
-export type TimeFilter = 7 | 30 | 90 | 365;
+export type TimeFilter = 7 | 14 | 30 | 180 | 365;
+
 export type IntelligenceStage = "NO_DATA" | "LIMITED_DATA" | "SUFFICIENT_DATA";
 export type IntelligenceLevel = "Initializing" | "Learning" | "Analyzing" | "Optimized";
 
@@ -35,8 +36,8 @@ export interface ConsistencyBreakdown {
 
 export interface ChartDataPoint {
   date: string;
-  label: string; // "Mon", "Tue"
-  [key: string]: any; // dynamic keys for volume, protein, etc.
+  label: string; // "Mon", "Tue", "Jan"
+  [key: string]: any;
 }
 
 export interface SufficiencyState {
@@ -109,9 +110,73 @@ export class IntelligenceService {
     const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
     const cache = AnalyticsService.getCache();
     
-    const data: ChartDataPoint[] = [];
     const today = new Date();
     
+    if (days === 180 || days === 365) {
+      const months = days === 180 ? 6 : 12;
+      const dataMap = new Map<string, ChartDataPoint>();
+      
+      for (let i = months - 1; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        const monthKey = format(d, "yyyy-MM");
+        dataMap.set(monthKey, {
+          date: monthKey,
+          label: format(d, "MMM"),
+          volume: 0, duration: 0, protein: 0, calories: 0, carbs: 0, fat: 0, sleep: 0, score: 0, count: 0
+        });
+      }
+      
+      if (category === "workout") {
+         const cutoff = new Date(today.getFullYear(), today.getMonth() - months + 1, 1).toISOString();
+         cache.activities.forEach(a => {
+           const d = a.date.toDate ? a.date.toDate() : new Date(a.date);
+           if (d.toISOString() >= cutoff) {
+             const key = format(d, "yyyy-MM");
+             if (dataMap.has(key)) {
+               const p = dataMap.get(key)!;
+               p.volume += (a.metrics?.totalVolume || 0);
+               p.duration += (a.durationMinutes || 0);
+             }
+           }
+         });
+      } else if (category === "nutrition") {
+         const cutoff = new Date(today.getFullYear(), today.getMonth() - months + 1, 1).toISOString().split('T')[0];
+         cache.nutritionLogs.forEach(m => {
+           if (m.date >= cutoff) {
+             const key = m.date.substring(0, 7);
+             if (dataMap.has(key)) {
+               const p = dataMap.get(key)!;
+               p.protein += (m.protein || 0);
+               p.calories += (m.calories || 0);
+               p.carbs += (m.carbs || 0);
+               p.fat += (m.fat || 0);
+             }
+           }
+         });
+      } else if (category === "recovery") {
+         const cutoff = new Date(today.getFullYear(), today.getMonth() - months + 1, 1).toISOString().split('T')[0];
+         cache.dailyLogs.forEach(dLog => {
+           if (dLog.date >= cutoff) {
+             const key = dLog.date.substring(0, 7);
+             if (dataMap.has(key)) {
+               const p = dataMap.get(key)!;
+               p.sleep += (dLog.sleepHours || 0);
+               p.score += ((dLog.energy || 0) * 20);
+               p.count += 1;
+             }
+           }
+         });
+         dataMap.forEach(p => {
+           if (p.count > 0) {
+             p.sleep = Number((p.sleep / p.count).toFixed(1));
+             p.score = Math.round(p.score / p.count);
+           }
+         });
+      }
+      return Array.from(dataMap.values());
+    }
+
+    const data: ChartDataPoint[] = [];
     for (let i = days - 1; i >= 0; i--) {
       const d = subDays(today, i);
       const dateStr = format(d, "yyyy-MM-dd");

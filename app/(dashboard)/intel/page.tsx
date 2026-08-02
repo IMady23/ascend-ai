@@ -26,8 +26,9 @@ const IntelCharts = dynamic(() => import("@/components/adl/composites/intel/Inte
 
 const TIME_FILTERS: { label: string; value: TimeFilter }[] = [
   { label: "7 Days", value: 7 },
+  { label: "14 Days", value: 14 },
   { label: "30 Days", value: 30 },
-  { label: "90 Days", value: 90 },
+  { label: "6 Months", value: 180 },
   { label: "1 Year", value: 365 },
 ];
 
