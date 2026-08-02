@@ -1,7 +1,10 @@
 import { useReminderStore } from "@/stores/reminder.store";
 import { useUserStore } from "@/stores/user.store";
+import { useNotificationStore } from "@/stores/notification.store";
+import { useToastStore } from "@/stores/toast.store";
 import { Reminder, NotificationChannel, AppEvent } from "@/types/reminder";
 import { BrowserNotificationService } from "./browser.service";
+import { Timestamp } from "firebase/firestore";
 import { doc, setDoc, writeBatch, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { MotivationalEngine } from "./motivational.engine";
@@ -248,8 +251,9 @@ export class ReminderEngine {
       }
     }
 
-    // 3. In-App Notification Center
+    // 3. In-App Notification Center and Toast Popup
     if (reminder.notificationChannels.includes("in-app") && userId) {
+      // 3.a. Store in Event Log (historical)
       const event: AppEvent = {
         id: crypto.randomUUID(),
         userId,
@@ -260,6 +264,31 @@ export class ReminderEngine {
         isRead: false
       };
       useReminderStore.getState().logEvent(event);
+
+      // 3.b. Push to Notification Center store so the bell icon shows it
+      const currentNotifications = useNotificationStore.getState().notifications;
+      useNotificationStore.getState().setNotifications([
+        {
+          id: crypto.randomUUID(),
+          title: notificationTitle,
+          body: notificationBody,
+          type: 'reminder',
+          priority: 'high',
+          read: false,
+          link: null,
+          createdAt: Timestamp.now(),
+        },
+        ...currentNotifications
+      ]);
+
+      // 3.c. Show an in-app Toast so the user actually sees a popup
+      useToastStore.getState().addToast({
+        title: notificationTitle,
+        message: notificationBody,
+        type: "info",
+        duration: 8000
+      });
+
       deliveredChannels.push("in-app");
     }
 
