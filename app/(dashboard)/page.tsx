@@ -43,6 +43,7 @@ import { AICoachDrawer } from "@/features/ai/components/AICoachDrawer";
 import { StepsLoggerModal } from "@/components/adl/composites/tracking/StepsLoggerModal";
 import { WaterLoggerModal } from "@/components/adl/composites/tracking/WaterLoggerModal";
 import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
+import { RecoveryLoggerSheet } from "@/components/recovery/RecoveryLoggerSheet";
 import { useNutritionStore } from "@/stores/nutrition.store";
 
 // Animated Number Hook
@@ -69,6 +70,7 @@ export default function MissionControl() {
   const [isWaterLoggerOpen, setIsWaterLoggerOpen] = React.useState(false);
   const [isStepsLoggerOpen, setIsStepsLoggerOpen] = React.useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = React.useState(false);
+  const [isRecoveryLoggerOpen, setIsRecoveryLoggerOpen] = React.useState(false);
   const [isActionLoading, setIsActionLoading] = React.useState<string | null>(null);
   const { dailySteps, workoutState } = useActivityStore();
   const { aiSummary, goalCompletion, fetchStats, inspectionMode, hoveredDate, selectedDate } = useAnalyticsStore();
@@ -247,11 +249,11 @@ export default function MissionControl() {
                 <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.workoutText}</p>
               </InteractiveCard>
             </div>
-            <div onClick={() => handleRoute('/recovery', 'recovery-card')} className="cursor-pointer">
+            <div onClick={() => setIsRecoveryLoggerOpen(true)} className="cursor-pointer">
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
                 <LivingHeartbeat progress={0.5} size={40} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Recovery</h4>
-                <p className="text-[10px] md:text-xs text-text-secondary">Pending</p>
+                <p className="text-[10px] md:text-xs text-text-secondary">Log Session</p>
               </InteractiveCard>
             </div>
           </div>
@@ -383,6 +385,11 @@ export default function MissionControl() {
       <ReminderScheduleModal 
         isOpen={isReminderModalOpen} 
         onClose={() => setIsReminderModalOpen(false)} 
+      />
+
+      <RecoveryLoggerSheet
+        isOpen={isRecoveryLoggerOpen}
+        onClose={() => setIsRecoveryLoggerOpen(false)}
       />
     </PageContainer>
   );

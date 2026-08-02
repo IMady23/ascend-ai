@@ -29,3 +29,17 @@ export interface RecoveryProfile {
   recommendations: RecoveryRecommendation[];
   timestamp: Timestamp;
 }
+
+export type RecoveryActivityType = 'sleep' | 'meditation' | 'active_recovery' | 'rest';
+
+export interface RecoverySession {
+  id: string;
+  userId: string;
+  type: RecoveryActivityType;
+  durationMinutes: number;
+  feelingBefore: number; // 1-10
+  feelingAfter: number;  // 1-10
+  notes?: string;
+  date: string;          // YYYY-MM-DD
+  timestamp: Timestamp;
+}

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { RecoveryProfile, RecoveryState, RecoveryRecommendation } from "@/types/recovery";
+import { RecoveryProfile, RecoveryState, RecoveryRecommendation, RecoverySession, RecoveryActivityType } from "@/types/recovery";
 import { RecoveryRepository } from "@/services/repositories/recovery.repository";
 import { useUserStore } from "@/stores/user.store";
 import { useNutritionStore } from "@/stores/nutrition.store";
@@ -24,11 +24,14 @@ export interface MuscleRecovery {
 interface EnhancedRecoveryState {
   currentProfile: RecoveryProfile | null;
   history: RecoveryProfile[];
+  sessions: RecoverySession[];
   muscleRecovery: MuscleRecovery;
   explanation: ExplanationPoint[];
   isLoading: boolean;
 
   fetchRecovery: () => Promise<void>;
+  fetchRecoverySessions: () => Promise<void>;
+  logRecoverySession: (session: Omit<RecoverySession, 'id' | 'userId' | 'timestamp' | 'date'>) => Promise<void>;
   calculateRecoveryScore: () => void;
 }
 
@@ -37,6 +40,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
     (set, get) => ({
       currentProfile: null,
       history: [],
+      sessions: [],
       muscleRecovery: {
         chest: 100,
         back: 100,
@@ -46,6 +50,45 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
       },
       explanation: [],
       isLoading: false,
+
+      fetchRecoverySessions: async () => {
+        const userId = useUserStore.getState().userId;
+        if (!userId) return;
+        try {
+          const sessions = await RecoveryRepository.getRecoverySessions(userId);
+          set({ sessions });
+        } catch (e) {
+          console.error("Failed to fetch recovery sessions", e);
+        }
+      },
+
+      logRecoverySession: async (sessionData) => {
+        const userId = useUserStore.getState().userId;
+        const id = crypto.randomUUID();
+        const now = new Date();
+        const session: RecoverySession = {
+          ...sessionData,
+          id,
+          userId: userId || "anonymous",
+          date: now.toISOString().split("T")[0],
+          timestamp: { seconds: Math.floor(now.getTime() / 1000), nanoseconds: 0 } as any,
+        };
+
+        // Optimistic update
+        set(state => ({ sessions: [session, ...state.sessions] }));
+
+        // Persist to Firestore
+        if (userId) {
+          try {
+            await RecoveryRepository.saveRecoverySession(userId, session);
+          } catch (e) {
+            console.error("Failed to save recovery session", e);
+          }
+        }
+
+        // Re-calculate the readiness score since feeling may have improved
+        get().calculateRecoveryScore();
+      },
 
       fetchRecovery: async () => {
         const userId = useUserStore.getState().userId;
@@ -225,6 +268,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
       partialize: (state) => ({
         currentProfile: state.currentProfile,
         history: state.history,
+        sessions: state.sessions,
         muscleRecovery: state.muscleRecovery,
         explanation: state.explanation
       })
