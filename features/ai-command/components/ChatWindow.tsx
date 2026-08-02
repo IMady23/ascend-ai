@@ -35,7 +35,7 @@ export function ChatWindow() {
   };
 
   return (
-    <section className="bg-surface border border-border-subtle rounded-2xl flex flex-col h-[600px] overflow-hidden">
+    <section className="bg-surface border border-border-subtle rounded-2xl flex flex-col overflow-hidden" style={{ height: 'min(600px, 70dvh)' }}>
       <div className="p-4 border-b border-border-subtle bg-base flex items-center gap-2">
         <Sparkles size={16} className="text-violet-400" />
         <h2 className="font-bold text-primary text-sm">Ascend Intelligence</h2>
@@ -71,9 +71,12 @@ export function ChatWindow() {
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(e as any); }}
             placeholder="Command Ascend AI..."
             disabled={isProcessing}
-            className="w-full bg-surface border border-border-subtle rounded-xl py-3 pl-4 pr-12 text-primary placeholder:text-disabled focus:outline-none focus:border-violet-500/50 transition-colors disabled:opacity-50"
+            inputMode="text"
+            enterKeyHint="send"
+            className="w-full bg-surface border border-border-subtle rounded-xl py-3 pl-4 pr-12 text-primary placeholder:text-disabled focus:outline-none focus:border-violet-500/50 transition-colors disabled:opacity-50 [overflow-wrap:break-word]"
           />
           <button 
             type="submit"

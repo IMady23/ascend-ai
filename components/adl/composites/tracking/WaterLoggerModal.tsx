@@ -120,6 +120,9 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
               placeholder="Custom (ml)"
               value={customAmount}
               onChange={e => setCustomAmount(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCustomAdd(); }}
+              inputMode="decimal"
+              enterKeyHint="done"
               className="flex-1 bg-base border border-border-subtle rounded-lg font-mono py-2.5 px-4 text-center focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
             />
             <Button 

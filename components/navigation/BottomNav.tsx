@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/utils/cn";
 import { LayoutDashboard, Dumbbell, Bot, TrendingUp, Menu } from "lucide-react";
 import { useUiStore } from "@/stores/ui.store";
+import { useNotificationStore } from "@/stores/notification.store";
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Home", href: "/", icon: LayoutDashboard },
@@ -17,6 +18,8 @@ const NAV_ITEMS = [
 export function BottomNav() {
   const pathname = usePathname();
   const { setMobileDrawerOpen } = useUiStore();
+  const { notifications } = useNotificationStore();
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] pb-[env(safe-area-inset-bottom)] px-4 mb-4 pointer-events-none">
@@ -53,8 +56,16 @@ export function BottomNav() {
             setMobileDrawerOpen(true);
           }}
           className="relative flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 space-y-1 text-text-secondary hover:text-text-primary transition-all duration-300 ease-spring active:scale-95 focus:outline-none"
+          aria-label="More options"
         >
-          <Menu size={22} strokeWidth={2} />
+          <div className="relative">
+            <Menu size={22} strokeWidth={2} />
+            {unreadCount > 0 && (
+              <div className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[9px] font-bold text-white shadow-sm ring-2 ring-bg-surface-elevated">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </div>
+            )}
+          </div>
           <span className="text-[10px] font-medium tracking-tight opacity-80">
             More
           </span>

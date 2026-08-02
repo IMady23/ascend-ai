@@ -38,7 +38,7 @@ export function HydrationBeakerWidget({ currentOunces, goalOunces, onClick }: Hy
 
   return (
     <div 
-      className="relative w-full h-48 sm:h-64 bg-black/60 border border-white/10 rounded-3xl overflow-hidden cursor-pointer group shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-transform hover:scale-[1.01] active:scale-[0.98]"
+      className="relative w-full h-48 sm:h-64 bg-bg-surface-elevated border border-border rounded-3xl overflow-hidden cursor-pointer group shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition-transform hover:scale-[1.01] active:scale-[0.98]"
       onClick={onClick}
     >
       {/* Container Background (Empty State) */}

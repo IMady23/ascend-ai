@@ -172,8 +172,6 @@ export default function MissionControl() {
   const calorieProgress = (targetCalories ?? 0) > 0 ? Math.min(1, displayMetrics.calories / (targetCalories ?? 1)) : 0;
   const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
-  // Haptic feedback on goal completion (only fires once per crossing)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useGoalHaptics([
     { value: displayMetrics.calories, target: targetCalories, label: "calories" },
     { value: displayMetrics.protein, target: targetProtein, label: "protein" },

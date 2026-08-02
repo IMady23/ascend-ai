@@ -393,7 +393,9 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     if (e.key === "Enter") handleSend(input);
                   }}
                   placeholder="Ask your coach..."
-                  className="w-full bg-surface border border-border-subtle rounded-xl py-3 pl-4 pr-12 text-sm text-primary placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors"
+                  inputMode="text"
+                  enterKeyHint="send"
+                  className="w-full bg-surface border border-border-subtle rounded-xl py-3 pl-4 pr-12 text-sm text-primary placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue)] transition-colors [overflow-wrap:break-word]"
                 />
                 <button
                   onClick={() => handleSend(input)}

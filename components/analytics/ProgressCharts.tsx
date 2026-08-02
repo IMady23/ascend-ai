@@ -90,7 +90,7 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart 
                   data={data?.steps || []} 
-                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 4, left: 0, bottom: 0 }}
                   onMouseMove={(e) => handleChartHover(e, 'steps')}
                   onMouseLeave={handleChartLeave}
                 >
@@ -101,11 +101,12 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
-                  <XAxis dataKey="date" stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)' }} axisLine={false} tickLine={false} />
-                  <YAxis width={60} stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="date" stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                  <YAxis width={40} stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', fontSize: 12 }}
                     itemStyle={{ color: 'var(--color-accent-blue)' }}
+                    wrapperStyle={{ zIndex: 100 }}
                   />
                   <Area 
                     type="monotone" 
@@ -139,17 +140,18 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={data?.hydration || []} 
-                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 4, left: 0, bottom: 0 }}
                   onMouseMove={(e) => handleChartHover(e, 'hydration')}
                   onMouseLeave={handleChartLeave}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
-                  <XAxis dataKey="date" stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)' }} axisLine={false} tickLine={false} />
-                  <YAxis width={60} stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="date" stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                  <YAxis width={40} stroke="var(--color-text-secondary)" tick={{ fill: 'var(--color-text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', cursor: 'default' }}
+                    contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', fontSize: 12, cursor: 'default' }}
                     itemStyle={{ color: 'var(--color-accent-hydration)' }}
                     cursor={{ fill: 'var(--color-bg-surface)' }}
+                    wrapperStyle={{ zIndex: 100 }}
                   />
                   <Bar 
                     dataKey="water" 
@@ -178,13 +180,13 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
           <div className="h-72">
             {renderContent(hasWorkoutSplit, () => (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                   <Pie
                     data={data?.workoutSplit || []}
                     cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
+                    cy="45%"
+                    innerRadius={50}
+                    outerRadius={75}
                     paddingAngle={5}
                     dataKey="value"
                     isAnimationActive={true}
@@ -195,8 +197,8 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px' }} />
-                  <Legend iconType="circle" verticalAlign="bottom" />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', fontSize: 12 }} wrapperStyle={{ zIndex: 100 }} />
+                  <Legend iconType="circle" verticalAlign="bottom" wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
             ), { title: "No Workouts Logged", message: "Complete a workout to see your muscular split.", icon: Dumbbell })}
@@ -228,8 +230,8 @@ export function ProgressCharts({ status, data }: ProgressChartsProps) {
                     animationDuration={1500}
                     animationEasing="ease-out"
                   />
-                  <Legend iconSize={10} layout="horizontal" verticalAlign="bottom" wrapperStyle={{ bottom: 0 }} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px' }} />
+                  <Legend iconSize={10} layout="horizontal" verticalAlign="bottom" wrapperStyle={{ bottom: 0, fontSize: 11 }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', fontSize: 12 }} wrapperStyle={{ zIndex: 100 }} />
                 </RadialBarChart>
               </ResponsiveContainer>
             ), { title: "Goals Pending", message: "Achieve daily goals to fill your rings.", icon: Flame })}

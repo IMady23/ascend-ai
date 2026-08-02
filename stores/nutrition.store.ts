@@ -60,13 +60,27 @@ export const useNutritionStore = create<NutritionState>()(
 
       setMeals: (newMeals) => {
         set((state) => {
-          // Merge meals to prevent overwriting other dates, and prevent sync race conditions
-          const otherDateMeals = state.meals.filter(m => newMeals.length > 0 && m.date !== newMeals[0].date);
-          const mergedMeals = [...newMeals, ...otherDateMeals];
+          // Merge meals by ID to prevent wiping local optimistic updates or other dates
+          const mealMap = new Map<string, NutritionLog>();
           
-          const calories = newMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
-          const protein = newMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
-          const sugar = newMeals.reduce((acc, m) => acc + (m.sugar || 0), 0);
+          // Add all existing meals first
+          state.meals.forEach(m => mealMap.set(m.id, m));
+          
+          // Overwrite/add with incoming newMeals
+          newMeals.forEach(m => mealMap.set(m.id, m));
+          
+          const mergedMeals = Array.from(mealMap.values());
+          // Keep sorted by createdAt descending
+          mergedMeals.sort((a, b) => {
+            const aTime = a.createdAt?.seconds || 0;
+            const bTime = b.createdAt?.seconds || 0;
+            return bTime - aTime;
+          });
+          
+          const todaysMeals = mergedMeals.filter(m => m.date === state.currentDate);
+          const calories = todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
+          const protein = todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+          const sugar = todaysMeals.reduce((acc, m) => acc + (m.sugar || 0), 0);
           
           return { 
             meals: mergedMeals, 
@@ -77,12 +91,58 @@ export const useNutritionStore = create<NutritionState>()(
         });
       },
       setHydrationLogs: (logs) => {
-        const water = logs.reduce((acc, l) => acc + (l.amountMl || 0), 0);
-        set({ hydrationLogs: logs, dailyWaterMl: water });
+        set((state) => {
+          const logMap = new Map<string, HydrationLog>();
+          state.hydrationLogs.forEach(l => logMap.set(l.id, l));
+          logs.forEach(l => logMap.set(l.id, l));
+          
+          const mergedLogs = Array.from(logMap.values());
+          mergedLogs.sort((a, b) => {
+            const aTime = a.timestamp?.seconds || 0;
+            const bTime = b.timestamp?.seconds || 0;
+            return bTime - aTime;
+          });
+          
+          const todaysLogs = mergedLogs.filter(l => l.date === state.currentDate);
+          const water = todaysLogs.reduce((acc, l) => acc + (l.amountMl || 0), 0);
+          
+          return { hydrationLogs: mergedLogs, dailyWaterMl: water };
+        });
       },
-      setMealPlans: (plans) => set({ mealPlans: plans }),
-      setCustomFoods: (foods) => set({ customFoods: foods }),
-      setCurrentDate: (date) => set({ currentDate: date }),
+      setMealPlans: (plans) => {
+        set((state) => {
+          const planMap = new Map<string, MealPlan>();
+          state.mealPlans.forEach(p => planMap.set(p.id, p));
+          plans.forEach(p => planMap.set(p.id, p));
+          const mergedPlans = Array.from(planMap.values());
+          mergedPlans.sort((a, b) => {
+            const aTime = a.updatedAt?.seconds || 0;
+            const bTime = b.updatedAt?.seconds || 0;
+            return bTime - aTime;
+          });
+          return { mealPlans: mergedPlans };
+        });
+      },
+      setCustomFoods: (foods) => {
+        set((state) => {
+          const foodMap = new Map<string, FoodItem>();
+          state.customFoods.forEach(f => foodMap.set(f.id, f));
+          foods.forEach(f => foodMap.set(f.id, f));
+          return { customFoods: Array.from(foodMap.values()) };
+        });
+      },
+      setCurrentDate: (date) => set((state) => {
+        const todaysMeals = state.meals.filter(m => m.date === date);
+        const todaysWater = state.hydrationLogs.filter(l => l.date === date);
+        
+        return { 
+          currentDate: date,
+          dailyCalories: todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
+          dailyProtein: todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+          dailySugar: todaysMeals.reduce((acc, m) => acc + (m.sugar || 0), 0),
+          dailyWaterMl: todaysWater.reduce((acc, l) => acc + (l.amountMl || 0), 0)
+        };
+      }),
       setDailyWater: (waterMl) => set({ dailyWaterMl: waterMl }), // Legacy support
 
       addMeal: async (mealData) => {

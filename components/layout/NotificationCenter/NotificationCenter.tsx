@@ -51,7 +51,7 @@ export function NotificationCenter() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[9px] font-bold text-white shadow-sm ring-2 ring-black"
+              className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[9px] font-bold text-white shadow-sm ring-2 ring-bg-base"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </motion.div>
