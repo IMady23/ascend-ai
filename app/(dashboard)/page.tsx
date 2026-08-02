@@ -195,11 +195,12 @@ export default function MissionControl() {
 
   return (
     <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-3 md:px-8 max-w-7xl mx-auto">
-      <DashboardLayout>
-        
-        {/* 1. DAILY BRIEFING HERO */}
-        <motion.div variants={HeroMotion.reveal} initial="initial" animate="animate">
-          <HeroSection className="mt-2 md:mt-8 mb-6 md:mb-12 glass-premium p-4 md:p-8">
+      <motion.div variants={PageMotion.staggerContainer} initial="initial" animate="animate">
+        <DashboardLayout>
+          
+          {/* 1. DAILY BRIEFING HERO */}
+          <motion.div variants={PageMotion.staggerItem}>
+            <HeroSection className="mt-2 md:mt-8 mb-6 md:mb-12 glass-premium p-4 md:p-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
               
               <div className="space-y-2 md:space-y-4 text-center md:text-left w-full md:w-auto">
@@ -235,14 +236,14 @@ export default function MissionControl() {
           </HeroSection>
         </motion.div>
 
-        {/* 2. INSIGHTS */}
-        <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
-          <InsightCards userId={userId || ""} />
+          {/* 2. INSIGHTS */}
+          <motion.div variants={PageMotion.staggerItem}>
+            <InsightCards userId={userId || ""} />
         </motion.div>
 
-        {/* 3. DAILY SNAPSHOT */}
-        <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
-          {inspectionMode !== 'live' && (
+          {/* 3. DAILY SNAPSHOT */}
+          <motion.div variants={PageMotion.staggerItem}>
+            {inspectionMode !== 'live' && (
              <div className="mb-2 flex items-center justify-center bg-accent-blue/10 text-accent-blue py-1 px-3 rounded-full text-xs font-bold animate-pulse w-max mx-auto">
                 <Clock size={12} className="mr-1" /> Inspecting: {hoveredDate || selectedDate}
              </div>
@@ -286,9 +287,9 @@ export default function MissionControl() {
           </div>
         </motion.div>
 
-        {/* NEW: HOW AM I DOING + ACTIVITY RINGS + STREAK + WEIGHT */}
-        <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-10">
+          {/* NEW: HOW AM I DOING + ACTIVITY RINGS + STREAK + WEIGHT */}
+          <motion.div variants={PageMotion.staggerItem}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-10">
             
             {/* 1. How Am I Doing Today? */}
             <GlassCard className={`p-4 md:p-5 col-span-1 md:col-span-2 flex flex-col gap-3 border-l-4 ${allGoalsMet ? 'border-l-[var(--color-success)]' : 'border-l-[var(--color-accent-blue)]'}`}>
@@ -441,7 +442,7 @@ export default function MissionControl() {
         </div>
 
         {/* 4. OVERVIEW & REPORTS */}
-        <div className="mb-6 md:mb-12">
+        <motion.div variants={PageMotion.staggerItem}>
           <WidgetSection title="Overview & Reports">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <InteractiveCard onClick={() => handleRoute('/progress', 'progress-streak')} className="flex flex-col justify-between min-h-[120px] md:min-h-[140px] p-4 md:p-5">
@@ -494,9 +495,10 @@ export default function MissionControl() {
               </InteractiveCard>
             </div>
           </WidgetSection>
-        </div>
+        </motion.div>
 
-      </DashboardLayout>
+        </DashboardLayout>
+      </motion.div>
 
       <MealLoggerModal 
         isOpen={isMealLoggerOpen} 

@@ -34,12 +34,32 @@ export interface GlassCardProps extends CardProps {
 }
 
 export function GlassCard({ className, padding = "md", intensity = "standard", children, ...props }: GlassCardProps) {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   return (
     <div 
-      className={cn("glass-premium", paddingStyles[padding], className)} 
+      className={cn("glass-premium relative overflow-hidden group", paddingStyles[padding], className)} 
+      onMouseMove={handleMouseMove}
       {...props}
     >
-      {children}
+      {/* Glow Effect */}
+      <div 
+        className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), var(--color-border) 0%, transparent 40%)`
+        }}
+      />
+      
+      {/* Content wrapper to stay above glow */}
+      <div className="relative z-10 w-full h-full">
+        {children}
+      </div>
     </div>
   );
 }

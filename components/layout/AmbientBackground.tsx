@@ -5,12 +5,43 @@ import { motion, useAnimation } from 'framer-motion';
 
 export function AmbientBackground() {
   const [mounted, setMounted] = useState(false);
+  const [colors, setColors] = useState({
+    orb1: 'var(--color-accent-gold)',
+    orb2: 'var(--color-accent-blue)',
+    orb3: 'var(--color-accent-purple)'
+  });
+
   const controls1 = useAnimation();
   const controls2 = useAnimation();
   const controls3 = useAnimation();
 
   useEffect(() => {
     setMounted(true);
+    
+    // Set time-responsive colors
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      // Morning (Sunrise vibe)
+      setColors({
+        orb1: 'var(--color-accent-gold)',
+        orb2: 'var(--color-accent-blue)',
+        orb3: 'var(--color-accent-dashboard)'
+      });
+    } else if (hour >= 12 && hour < 18) {
+      // Afternoon (Vibrant vibe)
+      setColors({
+        orb1: 'var(--color-accent-blue)',
+        orb2: 'var(--color-accent-green)',
+        orb3: 'var(--color-accent-purple)'
+      });
+    } else {
+      // Evening/Night (Deep, calm vibe)
+      setColors({
+        orb1: 'var(--color-accent-indigo)',
+        orb2: 'var(--color-accent-purple)',
+        orb3: 'var(--color-accent-blue)'
+      });
+    }
     
     // Slow, subtle, breathing mesh gradients
     controls1.start({
@@ -47,18 +78,18 @@ export function AmbientBackground() {
       {/* Mesh Orbs */}
       <motion.div
         animate={controls1}
-        className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full mix-blend-screen blur-[120px]"
-        style={{ background: 'radial-gradient(circle, var(--color-accent-gold) 0%, transparent 70%)' }}
+        className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full mix-blend-screen blur-[120px] transition-colors duration-1000"
+        style={{ background: `radial-gradient(circle, ${colors.orb1} 0%, transparent 70%)` }}
       />
       <motion.div
         animate={controls2}
-        className="absolute top-[40%] -right-[20%] w-[60%] h-[60%] rounded-full mix-blend-screen blur-[140px]"
-        style={{ background: 'radial-gradient(circle, var(--color-accent-blue) 0%, transparent 70%)' }}
+        className="absolute top-[40%] -right-[20%] w-[60%] h-[60%] rounded-full mix-blend-screen blur-[140px] transition-colors duration-1000"
+        style={{ background: `radial-gradient(circle, ${colors.orb2} 0%, transparent 70%)` }}
       />
       <motion.div
         animate={controls3}
-        className="absolute -bottom-[20%] left-[20%] w-[40%] h-[40%] rounded-full mix-blend-screen blur-[100px]"
-        style={{ background: 'radial-gradient(circle, var(--color-accent-purple) 0%, transparent 70%)' }}
+        className="absolute -bottom-[20%] left-[20%] w-[40%] h-[40%] rounded-full mix-blend-screen blur-[100px] transition-colors duration-1000"
+        style={{ background: `radial-gradient(circle, ${colors.orb3} 0%, transparent 70%)` }}
       />
 
       {/* Subtle Noise Texture Overlay for Premium Feel */}
