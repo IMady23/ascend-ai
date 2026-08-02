@@ -171,6 +171,7 @@ export const ContextBuilder = {
       },
       personalTimeline: timelineState.events.slice(0, 10).map(e => ({ title: e.title, description: e.description, date: e.timestamp })),
       coachMemory: CoachMemoryLayer.summarizeTimeline(),
+      contextualInsight: CoachMemoryLayer.generateContextualInsight(),
       timestamp: new Date().toISOString(),
     };
   },

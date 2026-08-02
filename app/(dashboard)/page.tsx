@@ -52,8 +52,12 @@ import { ReminderScheduleModal } from "@/components/adl/composites/settings/Remi
 import { RecoveryLoggerSheet } from "@/components/recovery/RecoveryLoggerSheet";
 import { useNutritionStore } from "@/stores/nutrition.store";
 import { useDynamicGreeting } from "@/hooks/useDynamicGreeting";
+import { WelcomeBackCard } from "@/components/dashboard/WelcomeBackCard";
+import { WeeklyAchievementCard } from "@/components/dashboard/WeeklyAchievementCard";
+import { JourneyMemoryCard } from "@/components/dashboard/JourneyMemoryCard";
 
 import { AnimatedNumber } from "@/components/ui/motion/AnimatedNumber";
+import { useDashboardPersonalization } from "@/stores/dashboard-personalization.store";
 
 export default function MissionControl() {
 
@@ -70,6 +74,7 @@ export default function MissionControl() {
   const [isActionLoading, setIsActionLoading] = React.useState<string | null>(null);
   const { dailySteps, workoutState } = useActivityStore();
   const { aiSummary, goalCompletion, fetchStats, inspectionMode, hoveredDate, selectedDate } = useAnalyticsStore();
+  const { tapWidget } = useDashboardPersonalization();
   
   const [displayMetrics, setDisplayMetrics] = React.useState({
     calories: 0,
@@ -236,6 +241,23 @@ export default function MissionControl() {
           </HeroSection>
         </motion.div>
 
+          {/* WELCOME BACK CARD */}
+          <motion.div variants={PageMotion.staggerItem}>
+            <WelcomeBackCard userName={userName} dailyScore={dailyScore} />
+          </motion.div>
+
+          {/* JOURNEY MEMORY */}
+          <motion.div variants={PageMotion.staggerItem}>
+            <JourneyMemoryCard profile={profile} />
+          </motion.div>
+
+          {/* WEEKLY ACHIEVEMENT (Sundays only) */}
+          {new Date().getDay() === 0 && (
+            <motion.div variants={PageMotion.staggerItem}>
+              <WeeklyAchievementCard userId={userId || ''} />
+            </motion.div>
+          )}
+
           {/* 2. INSIGHTS */}
           <motion.div variants={PageMotion.staggerItem}>
             <InsightCards userId={userId || ""} />
@@ -249,14 +271,14 @@ export default function MissionControl() {
              </div>
           )}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-12">
-            <div onClick={() => handleRoute('/nutrition', 'calories-card')} className="cursor-pointer">
+            <div onClick={() => { handleRoute('/nutrition', 'calories-card'); tapWidget('calories'); }} className="cursor-pointer">
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
                 <LivingFlameWidget progress={calorieProgress} size={40} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Calories</h4>
                 <p className="text-[10px] md:text-xs text-text-secondary"><AnimatedNumber value={displayMetrics.calories} /> / {targetCalories}</p>
               </InteractiveCard>
             </div>
-            <div onClick={() => setIsWaterLoggerOpen(true)} className="cursor-pointer">
+            <div onClick={() => { setIsWaterLoggerOpen(true); tapWidget('water'); }} className="cursor-pointer">
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
                 <LivingHydrationWidget progress={waterProgress} width={40} height={48} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Hydration</h4>
@@ -360,17 +382,15 @@ export default function MissionControl() {
             {hasWeightGoal ? (
               <GlassCard className="p-4 md:p-5 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">⚖️</span>
-                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Weight Goal</span>
+                  <Weight size={16} className="text-[var(--color-accent-purple)]" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">Goal Countdown</span>
                 </div>
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-2xl font-black" style={{ color: "var(--color-text-primary)" }}>{currentWeight}<span className="text-sm font-medium ml-1" style={{ color: "var(--color-text-muted)" }}>kg</span></p>
-                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Target: {targetWeightKg} kg</p>
-                  </div>
-                  <p className="text-sm font-bold" style={{ color: currentWeight <= targetWeightKg ? "var(--color-success)" : "var(--color-accent-gold)" }}>
-                    {Math.abs(currentWeight - targetWeightKg).toFixed(1)} kg to go
-                  </p>
+                <span className="font-mono text-sm md:text-base font-bold">
+                  {Math.abs(currentWeight - targetWeightKg).toFixed(1)}kg left
+                </span>
+                <div>
+                  <p className="text-2xl font-black" style={{ color: "var(--color-text-primary)" }}>{currentWeight}<span className="text-sm font-medium ml-1" style={{ color: "var(--color-text-muted)" }}>kg</span></p>
+                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Target: {targetWeightKg} kg</p>
                 </div>
                 <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "var(--color-bg-surface)" }}>
                   <motion.div

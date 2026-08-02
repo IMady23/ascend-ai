@@ -56,6 +56,15 @@ export class XPEngine {
       await store.addXP(xpEarned);
       await this.logToTimeline(event, title, xpEarned);
 
+      eventBus.dispatch({
+        id: crypto.randomUUID(),
+        userId: event.userId,
+        type: 'XP_GAINED',
+        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any,
+        metadata: { amount: xpEarned, reason: title },
+        processed: false
+      });
+
       const newLevel = useProgressionStore.getState().profile?.xp.currentLevel || 1;
       if (newLevel > oldLevel) {
         eventBus.dispatch({

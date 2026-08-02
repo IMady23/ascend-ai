@@ -26,7 +26,8 @@ export type EventType =
   | 'RECOVERY_UPDATED'
   | 'SLEEP_LOGGED'
   | 'PROFILE_UPDATED'
-  | 'DAY_RESET';
+  | 'DAY_RESET'
+  | 'XP_GAINED';
 
 export interface BaseEvent {
   id: string;
@@ -123,6 +124,14 @@ export interface DayResetEvent extends BaseEvent {
   };
 }
 
+export interface XPGainedEvent extends BaseEvent {
+  type: 'XP_GAINED';
+  metadata: {
+    amount: number;
+    reason: string;
+  };
+}
+
 export type AscendEvent = 
   | WorkoutCompletedEvent 
   | MealLoggedEvent 
@@ -134,4 +143,5 @@ export type AscendEvent =
   | WeightUpdatedEvent
   | StepsUpdatedEvent
   | DayResetEvent
+  | XPGainedEvent
   | BaseEvent;

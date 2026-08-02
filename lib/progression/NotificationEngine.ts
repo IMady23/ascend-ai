@@ -39,22 +39,24 @@ export class NotificationEngine {
 
     // Bundling Logic Example
     if (meals.length > 0 && meals.some(m => (m.metadata as any)?.isGoalMet)) {
+      const metadata = meals[0].metadata as any;
       this.dispatchNotification(
         events[0].userId,
         'NOTIFICATION',
         'NORMAL',
-        'Protein Goal Reached',
-        `You logged your meal and hit your daily protein goal! +40 XP`,
+        'Protein Goal Reached 🎯',
+        `You hit your daily protein goal! (+${metadata.protein}g) +40 XP`,
         '🍽️',
         { label: 'View Progress', route: '/progress' }
       );
     } else if (meals.length > 0) {
+      const metadata = meals[0].metadata as any;
       this.dispatchNotification(
         events[0].userId,
         'NOTIFICATION',
         'NORMAL',
-        'Meal Logged',
-        `Successfully logged your meal.`,
+        'Meal Logged 🍽️',
+        `Protein +${metadata.protein}g • ${metadata.calories} kcal`,
         '🍽️',
         { label: 'View Nutrition', route: '/nutrition' }
       );
