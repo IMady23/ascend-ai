@@ -197,7 +197,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                   <Sparkles size={16} className="text-[var(--color-accent-blue)]" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-sm text-primary">Ascend AI</h2>
+                  <h2 className="font-bold text-sm" style={{ color: "var(--color-text-primary)" }}>Ascend AI</h2>
                   <div className="flex items-center gap-1.5 text-xs text-[var(--color-success)]">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-75"></span>
@@ -210,13 +210,15 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => createNewConversation()}
-                  className="p-2 text-secondary hover:text-primary transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg text-xs font-medium flex items-center gap-1 border border-border-subtle"
+                  className="p-2 hover:bg-[var(--color-bg-surface-hover)] rounded-lg text-xs font-medium flex items-center gap-1 border border-border-subtle transition-colors"
+                  style={{ color: "var(--color-text-secondary)" }}
                 >
                   <Plus size={14} /> New
                 </button>
                 <button
                   onClick={onClose}
-                  className="p-2 text-secondary hover:text-primary transition-colors hover:bg-[var(--color-bg-surface-hover)] rounded-lg"
+                  className="p-2 hover:bg-[var(--color-bg-surface-hover)] rounded-lg transition-colors"
+                  style={{ color: "var(--color-text-secondary)" }}
                 >
                   <X size={20} />
                 </button>
@@ -231,9 +233,10 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     onClick={() => loadConversation(c.id)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border max-w-[120px] truncate ${
                       activeConversationId === c.id
-                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
-                        : "bg-surface border-border-subtle text-secondary hover:text-primary"
+                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50"
+                        : "bg-surface border-border-subtle hover:bg-[var(--color-bg-surface-hover)]"
                     }`}
+                    style={{ color: activeConversationId === c.id ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
                   >
                     {c.title}
                   </button>
@@ -248,9 +251,10 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                   onClick={() => setActiveMode(null)}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                     activeMode === null
-                      ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
-                      : "bg-surface border-border-subtle text-secondary hover:text-primary"
+                      ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50"
+                      : "bg-surface border-border-subtle hover:bg-[var(--color-bg-surface-hover)]"
                   }`}
+                  style={{ color: activeMode === null ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
                 >
                   General
                 </button>
@@ -260,9 +264,10 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     onClick={() => setActiveMode(mode.id)}
                     className={`flex items-center gap-1.5 flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                       activeMode === mode.id
-                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50 text-primary"
-                        : "bg-surface border-border-subtle text-secondary hover:text-primary"
+                        ? "bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)]/50"
+                        : "bg-surface border-border-subtle hover:bg-[var(--color-bg-surface-hover)]"
                     }`}
+                    style={{ color: activeMode === mode.id ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
                   >
                     {mode.icon} {mode.label}
                   </button>
@@ -275,23 +280,22 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               
               {connectionState !== "ready" ? (
                  <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-6">
-                    {connectionState === "connecting" && (
-                       <>
+                    {connectionState === "connecting" &&                        <>
                          <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
-                         <p className="text-secondary text-sm">Connecting to AI Services...</p>
+                         <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Connecting to AI Services...</p>
                        </>
                     )}
                     {connectionState === "authenticating" && (
                        <>
                          <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
-                         <p className="text-secondary text-sm">Authenticating Profile...</p>
+                         <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Authenticating Profile...</p>
                        </>
                     )}
                     {connectionState === "loading_context" && (
                        <>
                          <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
-                         <p className="text-secondary text-sm">Loading Coach Context...</p>
-                       </>
+                         <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading Coach Context...</p>
+                       </> </>
                     )}
                     {connectionState === "offline_error" && (
                        <div className="flex flex-col items-center gap-4">

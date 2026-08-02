@@ -31,7 +31,8 @@ export function Omnibar({ onSend, className, placeholder = "Ask your coach anyth
         type="button"
         variant="ghost" 
         size="icon" 
-        className="shrink-0 text-[var(--color-text-muted)] hover:text-primary rounded-xl"
+        className="shrink-0 rounded-xl"
+        style={{ color: "var(--color-text-secondary)" }}
       >
         <Paperclip size={20} />
       </Button>
@@ -46,7 +47,8 @@ export function Omnibar({ onSend, className, placeholder = "Ask your coach anyth
           }
         }}
         placeholder={placeholder}
-        className="w-full bg-transparent text-primary placeholder-[var(--color-text-muted)] resize-none outline-none py-3 max-h-32 min-h-[44px]"
+        className="w-full bg-transparent resize-none outline-none py-3 max-h-32 min-h-[44px]"
+        style={{ color: "var(--color-text-primary)" }}
         rows={1}
       />
 
