@@ -87,7 +87,7 @@ export function AIConfiguration() {
           </div>
           <button 
             onClick={() => handleToggle("dailyBriefing")}
-            className={`w-10 h-5 rounded-full relative transition-colors ${ai.dailyBriefing ? 'bg-rose-500' : 'bg-surface-elevated'}`}
+            className={`w-10 h-5 rounded-full relative transition-colors ${ai.dailyBriefing ? 'bg-[var(--color-accent-blue)]' : 'bg-surface-elevated'}`}
           >
             <div className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${ai.dailyBriefing ? 'left-6' : 'left-1'}`} />
           </button>
@@ -100,7 +100,7 @@ export function AIConfiguration() {
           </div>
           <button 
             onClick={() => handleToggle("weeklyReview")}
-            className={`w-10 h-5 rounded-full relative transition-colors ${ai.weeklyReview ? 'bg-rose-500' : 'bg-surface-elevated'}`}
+            className={`w-10 h-5 rounded-full relative transition-colors ${ai.weeklyReview ? 'bg-[var(--color-accent-blue)]' : 'bg-surface-elevated'}`}
           >
             <div className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${ai.weeklyReview ? 'left-6' : 'left-1'}`} />
           </button>
