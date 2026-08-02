@@ -10,7 +10,8 @@ export interface AIResponse {
   reasoning?: string;
   tool_calls: ToolCall[];
   widgets: WidgetData[];
-  rawText?: string; 
+  rawText?: string;
+  summary?: string; // Human-readable summary of the AI response, displayed in the UI
 }
 
 export interface WidgetData {

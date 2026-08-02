@@ -19,6 +19,7 @@ import { UpdateWorkoutTool } from './tools/actions/UpdateWorkout';
 import { UpdateGoalTool } from './tools/actions/UpdateGoal';
 import { SavePreferenceTool } from './tools/actions/SavePreference';
 import { GenerateMealPlanTool } from './tools/actions/GenerateMealPlan';
+import { SuggestMealTool } from './tools/actions/SuggestMeal';
 import { StreamingEngine } from './streaming/StreamingEngine';
 
 /**
@@ -45,6 +46,7 @@ export class AIOrchestrator {
         this.toolRegistry.register(new UpdateGoalTool());
         this.toolRegistry.register(new SavePreferenceTool());
         this.toolRegistry.register(new GenerateMealPlanTool());
+        this.toolRegistry.register(new SuggestMealTool());
     }
 
     /**
@@ -102,6 +104,13 @@ export class AIOrchestrator {
                 // If the tool failed validation or permission, we can safely log it.
                 if (toolResult.status === 'error') {
                     console.warn(`[Orchestrator] Tool ${call.tool} failed: ${toolResult.message}`);
+                } else if (toolResult.status === 'success' && call.tool === 'Suggest_Meal') {
+                    // Map the suggest meal result directly to a widget payload for the frontend
+                    validResponse.widgets = validResponse.widgets || [];
+                    validResponse.widgets.push({
+                        component: 'Suggest_Meal',
+                        data: toolResult.result as Record<string, unknown>
+                    });
                 }
             }
         }

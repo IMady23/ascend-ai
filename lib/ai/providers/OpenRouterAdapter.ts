@@ -77,7 +77,8 @@ export class OpenRouterAdapter implements AIProvider {
             reasoning: parsedContent.reasoning,
             tool_calls: parsedContent.tool_calls || [],
             widgets: parsedContent.widgets || [],
-            rawText: data.choices[0].message.content
+            rawText: data.choices[0].message.content,
+            summary: parsedContent.summary
         };
     }
 

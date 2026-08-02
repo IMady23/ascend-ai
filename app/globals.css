@@ -82,6 +82,18 @@
   --color-text-secondary: var(--color-text-secondary);
   --color-text-disabled: var(--color-text-disabled);
 
+  /* bg-bg-* and text-text-* shorthand classes (Tailwind V4 color tokens) */
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-surface-elevated: var(--color-bg-surface-elevated);
+  --color-border: var(--color-border);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-disabled: var(--color-text-disabled);
+
+  /* AI accent for chat/AI coach */
+  --color-accent-ai: var(--color-accent-workout);
+
   /* Component Semantic Colors */
   --color-success: #10B981; /* emerald-500 */
   --color-warning: #F59E0B; /* amber-500 */

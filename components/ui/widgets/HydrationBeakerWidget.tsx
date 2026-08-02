@@ -89,19 +89,19 @@ export function HydrationBeakerWidget({ currentOunces, goalOunces, onClick }: Hy
       {/* Typography Overlay */}
       <div className="absolute inset-0 z-30 p-6 flex flex-col justify-between pointer-events-none">
         <div className="flex justify-between items-start">
-          <h3 className="text-xl font-bold text-white drop-shadow-md">Hydration</h3>
+          <h3 className="text-xl font-bold text-text-primary drop-shadow-md">Hydration</h3>
           <div className="text-right">
-            <span className="text-2xl font-black text-white drop-shadow-md">
+            <span className="text-2xl font-black text-text-primary drop-shadow-md">
               {currentOunces}
             </span>
-            <span className="text-sm font-semibold text-white/80 drop-shadow-md ml-1">
+            <span className="text-sm font-semibold text-text-secondary drop-shadow-md ml-1">
               / {goalOunces} ml
             </span>
           </div>
         </div>
         
         <div className="self-end pointer-events-auto">
-          <button className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold backdrop-blur-md transition-colors border border-white/20 shadow-lg flex items-center gap-2">
+          <button className="px-6 py-2 rounded-xl bg-bg-surface-elevated/80 hover:bg-bg-surface-elevated text-text-primary font-semibold backdrop-blur-md transition-colors border border-border shadow-lg flex items-center gap-2">
             <span className="text-lg">+</span> 250 ml
           </button>
         </div>

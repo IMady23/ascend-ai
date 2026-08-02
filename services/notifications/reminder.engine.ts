@@ -4,6 +4,7 @@ import { Reminder, NotificationChannel, AppEvent } from "@/types/reminder";
 import { BrowserNotificationService } from "./browser.service";
 import { doc, setDoc, writeBatch, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { MotivationalEngine } from "./motivational.engine";
 
 export class ReminderEngine {
   private static timeoutId: NodeJS.Timeout | null = null;
@@ -166,7 +167,6 @@ export class ReminderEngine {
     const userId = userStoreState.userId;
     const profile = userStoreState.profile;
     
-    const { MotivationalEngine } = require("./motivational.engine");
     const category = MotivationalEngine.getCategoryForType(reminder.type);
     
     const messageContent = MotivationalEngine.generateMessage(category, {

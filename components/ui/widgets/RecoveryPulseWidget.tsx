@@ -44,7 +44,7 @@ export function RecoveryPulseWidget({ recoveryScore, sleepHours, onClick }: Reco
 
       <div className="relative z-10 flex flex-col h-full min-h-[160px] justify-between">
         <div className="flex justify-between items-start">
-          <h3 className="text-sm font-semibold text-white/80">Recovery</h3>
+          <h3 className="text-sm font-semibold text-text-secondary">Recovery</h3>
           <span className={`text-xs font-medium ${pulseColor}`}>
             {recoveryScore}%
           </span>
@@ -86,7 +86,7 @@ export function RecoveryPulseWidget({ recoveryScore, sleepHours, onClick }: Reco
             )}
           </div>
           
-          <p className="text-[11px] text-white/50 mt-2">
+          <p className="text-[11px] text-text-disabled mt-2">
             {sleepHours} hrs sleep
           </p>
         </div>

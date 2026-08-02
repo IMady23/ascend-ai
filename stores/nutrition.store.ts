@@ -12,6 +12,7 @@ interface NutritionState {
   dailyCalories: number;
   dailyProtein: number;
   dailyWaterMl: number;
+  dailySugar: number;
 
   meals: NutritionLog[];
   hydrationLogs: HydrationLog[];
@@ -48,6 +49,7 @@ export const useNutritionStore = create<NutritionState>()(
       dailyCalories: 0,
       dailyProtein: 0,
       dailyWaterMl: 0,
+      dailySugar: 0,
       
       meals: [],
       hydrationLogs: [],
@@ -56,10 +58,23 @@ export const useNutritionStore = create<NutritionState>()(
       recentFoods: [],
       customFoods: [],
 
-      setMeals: (meals) => {
-        const calories = meals.reduce((acc, m) => acc + (m.calories || 0), 0);
-        const protein = meals.reduce((acc, m) => acc + (m.protein || 0), 0);
-        set({ meals, dailyCalories: calories, dailyProtein: protein });
+      setMeals: (newMeals) => {
+        set((state) => {
+          // Merge meals to prevent overwriting other dates, and prevent sync race conditions
+          const otherDateMeals = state.meals.filter(m => newMeals.length > 0 && m.date !== newMeals[0].date);
+          const mergedMeals = [...newMeals, ...otherDateMeals];
+          
+          const calories = newMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
+          const protein = newMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+          const sugar = newMeals.reduce((acc, m) => acc + (m.sugar || 0), 0);
+          
+          return { 
+            meals: mergedMeals, 
+            dailyCalories: calories, 
+            dailyProtein: protein,
+            dailySugar: sugar
+          };
+        });
       },
       setHydrationLogs: (logs) => {
         const water = logs.reduce((acc, l) => acc + (l.amountMl || 0), 0);
@@ -93,8 +108,9 @@ export const useNutritionStore = create<NutritionState>()(
           const updatedMeals = [newMeal, ...state.meals];
           return { 
             meals: updatedMeals,
-            dailyCalories: updatedMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
-            dailyProtein: updatedMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailyCalories: updatedMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.calories || 0), 0),
+            dailyProtein: updatedMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailySugar: updatedMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.sugar || 0), 0),
             recentFoods: newRecentFoods.slice(0, 20) // Keep last 20
           };
         });
@@ -145,8 +161,9 @@ export const useNutritionStore = create<NutritionState>()(
           const newMeals = state.meals.map(m => m.id === id ? { ...m, ...updates } : m);
           return {
             meals: newMeals,
-            dailyCalories: newMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
-            dailyProtein: newMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailyCalories: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.calories || 0), 0),
+            dailyProtein: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailySugar: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.sugar || 0), 0),
           };
         });
 
@@ -168,8 +185,9 @@ export const useNutritionStore = create<NutritionState>()(
           const newMeals = state.meals.filter(m => m.id !== id);
           return {
             meals: newMeals,
-            dailyCalories: newMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
-            dailyProtein: newMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailyCalories: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.calories || 0), 0),
+            dailyProtein: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailySugar: newMeals.filter(m => m.date === get().currentDate).reduce((acc, m) => acc + (m.sugar || 0), 0),
           };
         });
 
@@ -315,6 +333,7 @@ export const useNutritionStore = create<NutritionState>()(
         dailyCalories: state.dailyCalories,
         dailyProtein: state.dailyProtein,
         dailyWaterMl: state.dailyWaterMl,
+        dailySugar: state.dailySugar,
         currentDate: state.currentDate
       })
     }

@@ -39,7 +39,7 @@ import { MealConfirmationWidget } from "@/features/ai/components/MealConfirmatio
 
 export default function NutritionModule() {
   const { profile, isLoading: isUserLoading } = useUserStore();
-  const { meals = [], dailyCalories, dailyProtein, dailyWaterMl, setDailyWater, currentDate } = useNutritionStore();
+  const { meals = [], dailyCalories, dailyProtein, dailyWaterMl, dailySugar, setDailyWater, currentDate } = useNutritionStore();
   
   const readiness = useDataReadiness();
   const isLoading = isUserLoading || readiness.nutrition.status === "loading";
@@ -63,9 +63,9 @@ export default function NutritionModule() {
         text,
         []
       );
-      if (response) {
-        setOmniFeedback(response.summary);
-        const logMealTool = response.tool_calls?.find((t: any) => t.tool === 'Log_Meal');
+      if (response && response.response) {
+        setOmniFeedback(response.response.summary);
+        const logMealTool = response.response.tool_calls?.find((t: any) => t.tool === 'Log_Meal');
         if (logMealTool) {
             setPendingToolCall(logMealTool);
         } else {
@@ -334,9 +334,9 @@ export default function NutritionModule() {
                   />
                   <MacroRing 
                     label="Sugar"
-                    current={0}
+                    current={dailySugar || 0}
                     target={40}
-                    color="var(--color-danger)]"
+                    color="var(--color-danger)"
                     size={64}
                   />
                 </div>

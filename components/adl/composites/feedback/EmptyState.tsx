@@ -35,7 +35,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <GlassCard className={`p-8 md:p-12 flex flex-col items-center justify-center text-center border-dashed border-border-subtle bg-base/20 group relative overflow-hidden ${className}`}>
       {/* Soft Ambient Glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-br from-bg-surface-elevated/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
       
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -44,14 +44,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         className="flex flex-col items-center max-w-sm mx-auto relative z-10"
       >
         <motion.div 
-          className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center mb-6 shadow-sm border border-white/10 backdrop-blur-md"
+          className="w-16 h-16 rounded-[24px] bg-bg-surface-elevated flex items-center justify-center mb-6 shadow-sm border border-border backdrop-blur-md"
           whileHover={{ scale: 1.05, rotate: [-2, 2, 0] }}
           transition={{ type: 'spring' }}
         >
           {emoji ? (
             <span className="text-3xl filter drop-shadow-md">{emoji}</span>
           ) : icon ? (
-            <div className="text-[var(--color-text-muted)] w-8 h-8 flex items-center justify-center">
+            <div className="text-text-disabled w-8 h-8 flex items-center justify-center">
               {icon}
             </div>
           ) : (
@@ -59,10 +59,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           )}
         </motion.div>
         
-        <Heading level="h4" className="mb-2 text-[var(--color-text-primary)]">{title}</Heading>
+        <Heading level="h4" className="mb-2 text-text-primary">{title}</Heading>
         
         {description && (
-          <BodyText size="sm" className="text-[var(--color-text-secondary)] mb-6 leading-relaxed">
+          <BodyText size="sm" className="text-text-secondary mb-6 leading-relaxed">
             {description}
           </BodyText>
         )}
@@ -109,10 +109,10 @@ export const WorkoutEmptyState = ({ onAction }: { onAction: () => void }) => (
 // 3. Animated Premium Skeleton (Shimmer)
 export const Skeleton = ({ className = "" }: { className?: string }) => {
   return (
-    <div className={`relative overflow-hidden bg-white/5 rounded-[24px] ${className}`}>
+    <div className={`relative overflow-hidden bg-bg-surface-elevated rounded-[24px] ${className}`}>
       {/* Animated Shimmer */}
       <motion.div
-        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent"
+        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-bg-surface/80 to-transparent"
         animate={{ translateX: ['-100%', '200%'] }}
         transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
       />

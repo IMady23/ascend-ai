@@ -17,7 +17,7 @@ export function CalorieFlameWidget({ currentCalories, goalCalories, onClick }: C
     <LivingWidget onClick={onClick} theme="dark" className="group">
       <div className="flex flex-col h-full min-h-[160px] justify-between">
         <div className="flex justify-between items-start z-10">
-          <h3 className="text-sm font-semibold text-white/80">Burned</h3>
+          <h3 className="text-sm font-semibold text-text-secondary">Burned</h3>
           <span className="text-xs font-medium text-orange-400">
             {currentCalories} / {goalCalories} kcal
           </span>

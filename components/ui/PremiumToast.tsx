@@ -42,14 +42,14 @@ export function PremiumToast({ toast, onDismiss }: PremiumToastProps) {
           {icons[toast.type]}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white">{toast.title}</p>
+          <p className="text-sm font-medium text-text-primary">{toast.title}</p>
           {toast.message && (
-            <p className="mt-1 text-sm text-white/70 line-clamp-2">{toast.message}</p>
+            <p className="mt-1 text-sm text-text-secondary line-clamp-2">{toast.message}</p>
           )}
         </div>
         <button
           onClick={() => onDismiss(toast.id)}
-          className="flex-shrink-0 ml-4 rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
+          className="flex-shrink-0 ml-4 rounded-full p-1 text-text-disabled hover:bg-bg-surface-elevated hover:text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-blue)]"
         >
           <X className="w-4 h-4" />
         </button>

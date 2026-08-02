@@ -25,8 +25,8 @@ export function LivingWidget({
       onClick={onClick}
       className={`relative overflow-hidden rounded-2xl border transition-colors ${
         theme === 'dark'
-          ? 'bg-black border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
-          : 'bg-white/80 border-black/10 backdrop-blur-md shadow-sm'
+          ? 'bg-bg-base border-border/50 shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
+          : 'bg-bg-surface border-border/50 backdrop-blur-md shadow-sm'
       } ${className}`}
       animate={
         prefersReducedMotion ? {} : {
@@ -44,7 +44,7 @@ export function LivingWidget({
         <motion.div
           animate={{ opacity: [0.1, 0.15, 0.1] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/5 to-transparent"
+          className="absolute inset-0 pointer-events-none bg-gradient-to-br from-bg-surface-elevated/30 to-transparent"
         />
       )}
 

@@ -3,7 +3,7 @@ import { PromptValidator, PromptComposer } from './PromptComposer';
 import { GlobalSystemIdentity } from './templates/system/SystemIdentity';
 import { GlobalSafetyInvariants } from './templates/safety/SafetyInvariants';
 import { OutputSchemaInjector } from './templates/schemas/OutputSchemaInjector';
-import { WorkoutCoachPersona, IntelAnalystPersona } from './templates/personas/Personas';
+import { WorkoutCoachPersona, IntelAnalystPersona, NutritionCoachPersona } from './templates/personas/Personas';
 
 /**
  * The Central Registry for pre-approved templates
@@ -17,6 +17,9 @@ export class PromptRegistry {
         if (module.toLowerCase().includes('training')) {
             persona = WorkoutCoachPersona;
             expectedSchema = 'workout.v1';
+        } else if (module.toLowerCase().includes('nutrition') || module.toLowerCase().includes('diet')) {
+            persona = NutritionCoachPersona;
+            expectedSchema = 'suggest_meal.v1';
         }
 
         return {

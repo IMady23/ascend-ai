@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { InteractiveCard } from "@/components/adl/composites/cards/Cards";
 import { Heading, BodyText, Caption } from "@/components/adl/typography";
@@ -11,13 +11,17 @@ export interface MealItem {
   name: string;
   amount: string;
   calories: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fiber?: number;
 }
 
 export interface MealCardProps {
   type: "Breakfast" | "Lunch" | "Dinner" | "Snack";
   time: string;
   totalCalories: number;
-  macros: { protein: number; carbs: number; fat: number };
+  macros: { protein: number; carbs: number; fat: number; fiber?: number };
   items: MealItem[];
   isAiVerified?: boolean;
   className?: string;
@@ -93,31 +97,45 @@ export function MealCard({
             className="overflow-hidden"
           >
             <div className="pt-2 flex flex-col gap-2 border-t border-border-subtle mt-2">
+              {/* Per-Item Breakdown */}
               {items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between py-1">
+                <div key={idx} className="flex items-center justify-between py-1.5">
                   <div>
                     <BodyText size="sm" className="text-secondary">{item.name}</BodyText>
                     <Caption className="text-[var(--color-text-muted)]">{item.amount}</Caption>
                   </div>
-                  <span className="font-mono text-sm text-secondary">{item.calories}</span>
+                  <div className="text-right">
+                    <span className="font-mono text-sm text-secondary">{item.calories} kcal</span>
+                    {(item.protein || item.carbs || item.fat) && (
+                      <Caption className="text-[var(--color-text-muted)] block">
+                        P:{item.protein?.toFixed(0)}g C:{item.carbs?.toFixed(0)}g F:{item.fat?.toFixed(0)}g
+                      </Caption>
+                    )}
+                  </div>
                 </div>
               ))}
+              {/* Summary Row */}
+              {macros.fiber !== undefined && macros.fiber > 0 && (
+                <div className="flex items-center gap-3 mt-1 pt-2 border-t border-border-subtle">
+                  <Caption className="text-[var(--color-text-muted)]">Fiber: {macros.fiber.toFixed(1)}g</Caption>
+                </div>
+              )}
               {(onEdit || onDelete) && (
                 <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-border-subtle">
                   {onEdit && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                      className="px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-secondary hover:text-primary hover:bg-surface transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/10 transition-colors"
                     >
-                      Edit
+                      <Pencil size={12} /> Edit
                     </button>
                   )}
                   {onDelete && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                      className="px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
                     >
-                      Delete
+                      <Trash2 size={12} /> Delete
                     </button>
                   )}
                 </div>

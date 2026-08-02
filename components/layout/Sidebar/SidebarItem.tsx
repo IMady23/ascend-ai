@@ -24,14 +24,14 @@ export function SidebarItem({ id, label, icon: Icon, route, accentColor, isSideb
       href={route}
       className={cn(
         "group relative flex items-center h-11 px-3 rounded-md transition-colors duration-fast ease-ui outline-none",
-        isActive ? "text-text-primary" : "text-text-secondary hover:text-text-primary hover:bg-white/5"
+        isActive ? "text-text-primary" : "text-text-secondary hover:text-text-primary hover:bg-bg-surface-elevated"
       )}
     >
       {/* Active Indicator Background */}
       {isActive && (
         <motion.div
           layoutId="sidebar-active-indicator"
-          className="absolute inset-0 rounded-md bg-white/10 glass-highlight border border-white/10 -z-10"
+          className="absolute inset-0 rounded-md bg-bg-surface-elevated glass-highlight border border-border -z-10"
           initial={false}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
         />

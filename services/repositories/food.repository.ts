@@ -62,54 +62,67 @@ export const FoodRepository = {
     searchQuery: string,
     customFoods: FoodItem[],
     recentFoods: FoodItem[]
-  ): FoodItem[] {
+  ): any[] {
     const q = searchQuery.toLowerCase().trim();
+    
+    // Map database items so they have a consistent interface for the UI, 
+    // but preserve their predefinedServings and base properties
+    const dbPool = FOOD_DATABASE.map(dbf => ({
+      ...dbf,
+      quantity: dbf.baseServingQuantity,
+      servingSize: dbf.baseServingUnit,
+      source: "database"
+    }));
+
     if (!q) {
-      // Default ranking: Custom -> Recent -> Common
-      const combined = [...customFoods, ...recentFoods, ...FOOD_DATABASE];
+      // Default ranking: Custom -> Recent -> Common DB
+      const combined = [...customFoods, ...recentFoods, ...dbPool];
       const seen = new Set();
-      return (combined as any[]).filter((f: any) => {
+      return combined.filter((f: any) => {
         const normalized = f.name.toLowerCase().trim();
         if (seen.has(normalized)) return false;
         seen.add(normalized);
         return true;
-      }).slice(0, 15);
+      }).slice(0, 20);
     }
 
-    // Merged pool
-    const pool = [...customFoods, ...recentFoods, ...FOOD_DATABASE];
+    const pool = [...customFoods, ...recentFoods, ...dbPool];
+    const uniquePool = new Map<string, any>();
     
-    // Deduplicate by normalized name
-    const uniquePool = new Map<string, FoodItem>();
     for (const f of pool) {
       const normalized = f.name.toLowerCase().trim();
       if (!uniquePool.has(normalized)) {
-        uniquePool.set(normalized, f as any);
-      } else {
-        // If it's already there, prefer Custom > Recent > DB by not overwriting since we inserted in that order
+        uniquePool.set(normalized, f);
       }
     }
 
     const results = Array.from(uniquePool.values());
+    const exactMatches: any[] = [];
+    const partialMatches: any[] = [];
+    const similarMatches: any[] = [];
 
-    const exactMatches: FoodItem[] = [];
-    const partialMatches: FoodItem[] = [];
-    const similarMatches: FoodItem[] = [];
+    // Fuzzy matcher helper
+    const isFuzzyMatch = (target: string, query: string) => {
+      // simple substring or subsequence
+      return target.includes(query) || target.replace(/[^a-z0-9]/g, '').includes(query.replace(/[^a-z0-9]/g, ''));
+    };
 
     results.forEach(f => {
       const name = f.name.toLowerCase().trim();
-      if (name === q) {
+      const aliases = f.aliases ? f.aliases.map((a: string) => a.toLowerCase().trim()) : [];
+      const keywords = f.searchKeywords ? f.searchKeywords.map((k: string) => k.toLowerCase().trim()) : [];
+      
+      const allText = [name, ...aliases, ...keywords].join(" ");
+      
+      if (name === q || aliases.includes(q)) {
         exactMatches.push(f);
-      } else if (name.startsWith(q) || name.includes(` ${q}`)) {
-        // Starts with or distinct word match
+      } else if (name.startsWith(q) || name.includes(` ${q}`) || aliases.some((a:string) => a.startsWith(q))) {
         partialMatches.push(f);
-      } else if (name.includes(q)) {
-        // General partial match
+      } else if (isFuzzyMatch(allText, q)) {
         similarMatches.push(f);
       }
     });
 
-    // Custom foods boost is naturally handled if we inserted them first in the pool and didn't deduplicate-overwrite
-    return [...exactMatches, ...partialMatches, ...similarMatches];
+    return [...exactMatches, ...partialMatches, ...similarMatches].slice(0, 30);
   }
 };

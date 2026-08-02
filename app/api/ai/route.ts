@@ -93,7 +93,8 @@ export async function POST(req: Request) {
       meta: {
         provider: structuredResponse.provider,
         model: structuredResponse.model,
-        responseTime
+        responseTime,
+        contextSize: Object.keys(enrichedSnapshot).length
       }
     });
 

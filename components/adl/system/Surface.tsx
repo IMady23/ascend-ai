@@ -9,9 +9,9 @@ export const elevationVariants = cva("transition-all duration-300 ease-ui", {
       1: "shadow-sm border border-border bg-bg-surface-elevated",
       2: "shadow-md border border-border bg-bg-surface-elevated hover:shadow-lg",
       3: "shadow-lg border border-border bg-bg-surface-elevated",
-      floating: "shadow-modal border border-white/10 bg-white/5 backdrop-blur-md",
-      modal: "shadow-modal border border-white/10 bg-white/10 backdrop-blur-xl",
-      hero: "shadow-modal border border-white/10 bg-white/10 backdrop-blur-2xl",
+      floating: "shadow-modal border border-border/50 bg-bg-surface-elevated/80 backdrop-blur-md",
+      modal: "shadow-modal border border-border/50 bg-bg-surface-elevated/90 backdrop-blur-xl",
+      hero: "shadow-modal border border-border/50 bg-bg-surface-elevated/90 backdrop-blur-2xl",
     },
     interactive: {
       true: "hover:-translate-y-1 hover:shadow-lg cursor-pointer",
@@ -44,7 +44,7 @@ Surface.displayName = "Surface";
 // GlassSurface
 // ----------------------------------------------------------------------
 
-const glassVariants = cva("glass-highlight border border-white/10 transition-all duration-300 ease-ui", {
+const glassVariants = cva("glass-highlight border border-border/50 transition-all duration-300 ease-ui", {
   variants: {
     blur: {
       sm: "backdrop-blur-sm",
@@ -55,8 +55,8 @@ const glassVariants = cva("glass-highlight border border-white/10 transition-all
     },
     intensity: {
       low: "bg-bg-base/30",
-      standard: "bg-white/5",
-      high: "bg-white/10",
+      standard: "bg-bg-surface-elevated/50",
+      high: "bg-bg-surface-elevated/80",
     }
   },
   defaultVariants: {

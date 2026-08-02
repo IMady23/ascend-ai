@@ -7,11 +7,12 @@ import { Heading, BodyText, Caption } from "@/components/adl/typography";
 import { Button } from "@/components/adl/primitives/Button";
 import { Badge } from "@/components/adl/primitives/Badge";
 import { useNutritionStore } from "@/stores/nutrition.store";
-import { FOOD_DATABASE } from "@/lib/data/foods";
+
 import type { FoodItem, MealType } from "@/types/nutrition";
 import { motion, AnimatePresence } from "framer-motion";
 import { FoodRepository } from "@/services/repositories/food.repository";
 import { CustomFoodModal } from "./CustomFoodModal";
+import { calculateMacrosForServing } from "@/lib/nutrition/calculator";
 
 interface MealLoggerModalProps {
   isOpen: boolean;
@@ -78,23 +79,29 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
     setSelectedFoods(prev => prev.filter(f => f.localId !== localId));
   };
 
-  const handleUpdateQuantity = (localId: string, quantity: number) => {
+  const handleUpdateServing = (localId: string, quantity: number, unit: string) => {
     setSelectedFoods(prev => prev.map(f => {
       if (f.localId === localId) {
-        const baseItem = FOOD_DATABASE.find(dbF => dbF.name === f.name);
-        
-        if (baseItem) {
-          const ratio = quantity / (baseItem.quantity || 1);
-          return {
-            ...f,
-            quantity,
-            calories: Math.round(baseItem.calories * ratio),
-            protein: Number((baseItem.protein * ratio).toFixed(1)),
-            carbs: Number((baseItem.carbs * ratio).toFixed(1)),
-            fat: Number((baseItem.fat * ratio).toFixed(1)),
-          };
+        if (f.source === "database" && (f as any).predefinedServings) {
+           const calc = calculateMacrosForServing(f as any, quantity, unit);
+           return {
+             ...f,
+             ...calc,
+             localId
+           };
         }
-        return { ...f, quantity };
+        
+        // Fallback for custom foods without predefined servings
+        const ratio = quantity / ((f as any).baseServingQuantity || 1);
+        return {
+          ...f,
+          quantity,
+          servingSize: unit,
+          calories: Math.round((f.calories / f.quantity) * quantity),
+          protein: Number(((f.protein / f.quantity) * quantity).toFixed(1)),
+          carbs: Number(((f.carbs / f.quantity) * quantity).toFixed(1)),
+          fat: Number(((f.fat / f.quantity) * quantity).toFixed(1)),
+        };
       }
       return f;
     }));
@@ -108,6 +115,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
     const totalProtein = selectedFoods.reduce((sum, f) => sum + f.protein, 0);
     const totalCarbs = selectedFoods.reduce((sum, f) => sum + f.carbs, 0);
     const totalFat = selectedFoods.reduce((sum, f) => sum + f.fat, 0);
+    const totalSugar = selectedFoods.reduce((sum, f) => sum + (f.sugar || 0), 0);
 
     if (mealToEdit) {
       await updateMeal(mealToEdit.id, {
@@ -118,6 +126,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
         protein: totalProtein,
         carbs: totalCarbs,
         fat: totalFat,
+        sugar: totalSugar || undefined,
         notes: notes || undefined,
         updatedAt: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any
       } as any);
@@ -132,6 +141,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
         protein: totalProtein,
         carbs: totalCarbs,
         fat: totalFat,
+        sugar: totalSugar || undefined,
         notes: notes || undefined,
         date: nowStr,
         timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any
@@ -262,15 +272,29 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
                           <Caption className="text-[var(--color-text-muted)]">F: {food.fat}g</Caption>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-2 sm:mt-0">
                         <input 
                           type="number"
                           value={food.quantity}
-                          onChange={(e) => handleUpdateQuantity(food.localId, Number(e.target.value))}
+                          onChange={(e) => handleUpdateServing(food.localId, Number(e.target.value), food.servingSize)}
                           className="w-16 bg-base border border-border-subtle rounded px-2 py-1 text-sm text-center"
-                          min="1"
+                          min="0.1"
+                          step="0.1"
                         />
-                        <Caption className="text-[var(--color-text-muted)] w-10">{food.servingSize.split(" ")[0]}</Caption>
+                        {(food as any).predefinedServings ? (
+                          <select
+                            value={food.servingSize}
+                            onChange={(e) => handleUpdateServing(food.localId, food.quantity, e.target.value)}
+                            className="bg-base border border-border-subtle rounded px-2 py-1 text-sm text-[var(--color-text-muted)] focus:outline-none"
+                          >
+                            {(food as any).predefinedServings.map((s: any) => (
+                              <option key={s.unit} value={s.unit}>{s.label}</option>
+                            ))}
+                            <option value="Custom">Custom</option>
+                          </select>
+                        ) : (
+                          <Caption className="text-[var(--color-text-muted)] w-10">{food.servingSize.split(" ")[0]}</Caption>
+                        )}
                         <button onClick={() => handleRemoveFood(food.localId)} className="p-1.5 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded-full transition-colors ml-1">
                           <X size={16} />
                         </button>

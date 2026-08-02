@@ -5,13 +5,17 @@ import { ConversationRepository } from "@/services/repositories/conversation.rep
 import { aiService } from "@/services/ai/ai.service";
 import { ContextBuilder } from "@/services/ai/context.builder";
 import { formatCoachMessage } from "@/services/ai/format-coach-response";
-import { buildFallbackCoachResponse } from "@/lib/ai/coach-state";
+
+export type ConnectionState = "connecting" | "authenticating" | "loading_context" | "ready" | "offline_error";
 
 interface AiState {
   conversations: Conversation[];
   activeConversationId: string | null;
   isLoading: boolean;
   insightsCache: Record<string, string>;
+  connectionState: ConnectionState;
+  connectionError: string | null;
+  lastAiMeta: { provider: string; model: string; responseTime: number; contextSize?: number } | null;
   
   setConversations: (conversations: Conversation[]) => void;
   loadConversation: (id: string) => void;
@@ -19,6 +23,7 @@ interface AiState {
   sendMessage: (content: string, role?: "user" | "assistant" | "system", coachingMode?: string | null) => Promise<void>;
   setIsLoading: (isLoading: boolean) => void;
   cacheInsight: (key: string, insight: string) => void;
+  initializeConnection: () => Promise<void>;
 }
 
 export const useAiStore = create<AiState>((set, get) => ({
@@ -26,10 +31,39 @@ export const useAiStore = create<AiState>((set, get) => ({
   activeConversationId: null,
   isLoading: false,
   insightsCache: {},
+  connectionState: "connecting",
+  connectionError: null,
+  lastAiMeta: null,
   
+  initializeConnection: async () => {
+    try {
+      set({ connectionState: "connecting", connectionError: null });
+      
+      // Simulate connection lifecycle checks for AI Coach resilience
+      if (!navigator.onLine) {
+        set({ connectionState: "offline_error", connectionError: "You are currently offline. Please check your network connection." });
+        return;
+      }
+
+      set({ connectionState: "authenticating" });
+      const userId = useUserStore.getState().userId;
+      if (!userId) {
+        set({ connectionState: "offline_error", connectionError: "Authentication failed. Please log in again." });
+        return;
+      }
+      
+      set({ connectionState: "loading_context" });
+      // Verify context builder can run
+      ContextBuilder.build();
+
+      set({ connectionState: "ready" });
+    } catch (err: any) {
+      set({ connectionState: "offline_error", connectionError: err.message || "Failed to initialize AI Coach." });
+    }
+  },
+
   setConversations: (conversations) => {
     set({ conversations });
-    // Auto-load most recent if none is active and there are conversations
     const state = get();
     if (!state.activeConversationId && conversations.length > 0) {
       set({ activeConversationId: conversations[0].id });
@@ -56,13 +90,11 @@ export const useAiStore = create<AiState>((set, get) => ({
       messages: []
     };
     
-    // We update local state first for immediate UI response
     set(state => ({
       conversations: [newConv, ...state.conversations],
       activeConversationId: newConv.id
     }));
     
-    // Fire and forget repo call
     ConversationRepository.createConversation(userId, newConv).catch(console.error);
     
     return newConv.id;
@@ -85,7 +117,6 @@ export const useAiStore = create<AiState>((set, get) => ({
       timestamp: new Date().toISOString()
     };
     
-    // Optimistic local update
     set(state => {
       const updatedConversations = state.conversations.map(c => {
         if (c.id === convId) {
@@ -102,13 +133,11 @@ export const useAiStore = create<AiState>((set, get) => ({
       return { conversations: updatedConversations };
     });
     
-    // Persist user message to firestore
     const updatedConv = get().conversations.find(c => c.id === convId);
     if (updatedConv) {
       await ConversationRepository.updateConversation(userId, convId, updatedConv);
     }
     
-    // Generate Title if it's the first message
     const isFirstMessage = updatedConv?.messageCount === 1;
     if (isFirstMessage) {
       aiService.generateTitle(content).then(title => {
@@ -116,37 +145,71 @@ export const useAiStore = create<AiState>((set, get) => ({
           const conversations = state.conversations.map(c => 
             c.id === convId ? { ...c, title } : c
           );
-          // Persist the title change
           ConversationRepository.updateConversation(userId, convId, { title }).catch(console.error);
           return { conversations };
         });
       });
     }
 
-    // Call AI if the message is from user
     if (role === "user") {
+      if (!navigator.onLine) {
+         const offlineMsg: Message = {
+           id: crypto.randomUUID(),
+           role: "assistant",
+           content: "You are offline. Your message was saved locally and will be preserved. Please restore your connection to receive a response.",
+           timestamp: new Date().toISOString()
+         };
+         set(state => {
+           const updated = state.conversations.map(c => {
+             if (c.id === convId) {
+               return { ...c, messages: [...c.messages, offlineMsg] };
+             }
+             return c;
+           });
+           return { conversations: updated };
+         });
+         return;
+      }
+
       const contextSnapshot = ContextBuilder.build(coachingMode);
-      
-      // Pass chat history up to (but not including) this new message
       const currentMessages = updatedConv?.messages || [];
       const chatHistory = currentMessages.slice(0, -1);
       
-      let response = null;
+      let apiResult = null;
       try {
-        response = await aiService.getCoachingResponse(contextSnapshot, content, chatHistory);
+        apiResult = await aiService.getCoachingResponse(contextSnapshot, content, chatHistory);
       } catch (error) {
-        console.error("AI coaching request failed, using fallback response:", error);
+        console.error("AI coaching request failed:", error);
       }
 
-      const coachResponse = response || buildFallbackCoachResponse(contextSnapshot, content);
-      const aiResponseContent = response ? formatCoachMessage(response) : coachResponse.summary;
+      if (!apiResult || !apiResult.response) {
+         // Network or AI Failure
+         const failMsg: Message = {
+           id: crypto.randomUUID(),
+           role: "assistant",
+           content: "The AI service is temporarily unavailable due to a network or server issue. Your message history has been preserved. Please try again in a few moments.",
+           timestamp: new Date().toISOString()
+         };
+         set(state => {
+           const updated = state.conversations.map(c => {
+             if (c.id === convId) {
+               return { ...c, messages: [...c.messages, failMsg] };
+             }
+             return c;
+           });
+           return { conversations: updated };
+         });
+         return;
+      }
+
+      const aiResponseContent = formatCoachMessage(apiResult.response);
       
       const aiMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
         content: aiResponseContent,
         timestamp: new Date().toISOString(),
-        toolExecutions: response ? [response] : [],
+        toolExecutions: [apiResult.response],
       };
       
       set(state => {
@@ -162,7 +225,7 @@ export const useAiStore = create<AiState>((set, get) => ({
           }
           return c;
         });
-        return { conversations: updatedConversations };
+        return { conversations: updatedConversations, lastAiMeta: apiResult.meta };
       });
       
       const finalConv = get().conversations.find(c => c.id === convId);

@@ -5,7 +5,7 @@ import { AiStructuredResponse } from "@/types/ai";
 import { useUserStore } from "@/stores/user.store";
 
 class AiService {
-  async getCoachingResponse(contextSnapshot: any, messageText: string, chatHistory: any[] = []): Promise<AiStructuredResponse | null> {
+  async getCoachingResponse(contextSnapshot: any, messageText: string, chatHistory: any[] = []): Promise<{ response: AiStructuredResponse, meta: any } | null> {
     try {
       const userId = useUserStore.getState().userId;
       const response = await fetch('/api/ai', {
@@ -20,7 +20,7 @@ class AiService {
         return null;
       }
 
-      return result.data;
+      return { response: result.data, meta: result.meta };
     } catch (error) {
       console.error("AI Service Network Error:", error);
       return null;

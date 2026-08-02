@@ -22,6 +22,7 @@ import { UserChatBubble } from "@/components/adl/composites/ai/UserChatBubble";
 import { Omnibar } from "@/components/adl/composites/ai/Omnibar";
 import { MemoryChip } from "@/components/adl/composites/ai/MemoryChip";
 import { InteractiveWidgetWrapper } from "@/components/adl/composites/ai/InteractiveWidgetWrapper";
+import { NutritionSuggestionCard } from "@/components/adl/composites/ai/NutritionSuggestionCard";
 
 import { WorkoutSessionCard } from "@/components/adl/composites/training/WorkoutSessionCard";
 import { buildCoachState } from "@/lib/ai/coach-state";
@@ -62,16 +63,16 @@ export default function AICommandModule() {
     // Generate contextual response based on user message using the real AiService
     const response = await aiService.getCoachingResponse(coachState, msg, messages);
     
-    const aiResponse = response 
-      ? formatCoachMessage(response) 
+    const aiResponse = response && response.response
+      ? formatCoachMessage(response.response) 
       : "I'm having trouble connecting to my database right now. Give me a second.";
     
     setMessages(prev => [...prev, { 
       type: "ai", 
       content: aiResponse,
-      confidence: response?.confidence || coachState.confidence,
-      widget: response?.widgets?.[0]?.component || undefined,
-      insight: response?.widgets?.[0]?.data || undefined,
+      confidence: response?.response?.confidence || coachState.confidence,
+      widget: response?.response?.widgets?.[0]?.component || undefined,
+      insight: response?.response?.widgets?.[0]?.data || undefined,
     }]);
   };
 
@@ -193,6 +194,16 @@ export default function AICommandModule() {
                           ))}
                         </div>
                       </InteractiveWidgetWrapper>
+                    )}
+                    {msg.widget === "Suggest_Meal" && msg.insight && (
+                      <NutritionSuggestionCard 
+                        data={msg.insight}
+                        onLogMeal={(mealType) => {
+                           handleSend(`Please log this meal as ${mealType}.`);
+                        }}
+                        onEdit={() => handleSend("I want to adjust the portions for this meal.")}
+                        onRegenerate={() => handleSend("Can you suggest another meal instead?")}
+                      />
                     )}
                   </>
                 )}

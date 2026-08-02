@@ -39,7 +39,7 @@ export default function RecoveryDashboardPage() {
             Ascend AI calculates your readiness based on Sleep, Hydration, Nutrition, and Training Volume. Log your first sleep, hydration, and workout to calculate your readiness score.
           </BodyText>
           <div className="flex justify-center gap-4">
-            <button className="px-6 py-3 bg-accent-blue text-white font-bold rounded-lg hover:bg-accent-blue-light transition">
+            <button className="px-6 py-3 bg-accent-blue text-text-primary font-bold rounded-lg hover:bg-accent-blue-light transition">
               Log Hydration
             </button>
             <button className="px-6 py-3 bg-surface border border-border-subtle font-bold rounded-lg hover:bg-surface-elevated transition">

@@ -9,7 +9,7 @@ export function LivingHydrationWidget({ progress, width = 60, height = 80 }: { p
   const color = isGoal ? 'var(--color-accent-gold)' : 'var(--color-accent-hydration)';
 
   return (
-    <div className="relative overflow-hidden rounded-b-[20px] rounded-t-sm border-2 border-t-0 border-white/20 shadow-inner group" style={{ width, height, background: 'rgba(255,255,255,0.02)' }}>
+    <div className="relative overflow-hidden rounded-b-[20px] rounded-t-sm border-2 border-t-0 border-border/60 shadow-inner group" style={{ width, height, background: 'var(--color-bg-surface-elevated)' }}>
       {/* Water Fill Layer */}
       <motion.div
         className="absolute bottom-0 left-0 right-0 w-[200%]"
@@ -150,7 +150,8 @@ export function LivingTrailWidget({ progress, width = 100 }: { progress: number,
       {progress > 0 && Array.from({ length: 4 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute top-1/2 w-1 h-1 bg-white/50 rounded-full"
+          className="absolute top-1/2 w-1 h-1 rounded-full opacity-60"
+          style={{ background: color }}
           initial={{ left: `calc(${fillPercentage}% - 20px)`, opacity: 0, scale: 0, y: 0 }}
           animate={{ 
             left: `calc(${fillPercentage}% - ${20 + Math.random() * 20}px)`, 

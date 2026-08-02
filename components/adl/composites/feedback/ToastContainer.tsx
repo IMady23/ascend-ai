@@ -55,7 +55,7 @@ const ToastItem = ({ toast, removeToast }: { toast: any, removeToast: (id: strin
           removeToast(toast.id);
         }
       }}
-      className={`relative pointer-events-auto flex gap-4 p-4 bg-white/10 dark:bg-black/40 backdrop-blur-2xl border ${border} rounded-[24px] shadow-2xl overflow-hidden group hover:bg-white/20 dark:hover:bg-black/50 transition-colors`}
+      className={`relative pointer-events-auto flex gap-4 p-4 bg-bg-surface backdrop-blur-2xl border ${border} rounded-[24px] shadow-2xl overflow-hidden group hover:bg-bg-surface-elevated transition-colors`}
     >
       <div className={`flex items-center justify-center shrink-0 w-10 h-10 rounded-full ${bgIcon}`}>
         <Icon size={20} className={iconColor} />
@@ -74,7 +74,7 @@ const ToastItem = ({ toast, removeToast }: { toast: any, removeToast: (id: strin
 
       <button
         onClick={() => removeToast(toast.id)}
-        className="absolute top-4 right-4 text-[var(--color-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity hover:text-[var(--color-text-primary)] rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-blue)]"
+        className="absolute top-4 right-4 text-text-disabled opacity-0 group-hover:opacity-100 transition-opacity hover:text-text-primary rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-blue)]"
       >
         <X size={16} />
       </button>

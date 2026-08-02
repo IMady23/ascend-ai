@@ -65,7 +65,7 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
       if (currentPlans.length > prevPlansCount) {
         // A new plan was generated!
         setCurrentPlan(currentPlans[0]); // assuming prepended or we can sort by date
-      } else if (response?.tool_calls?.some(t => t.tool === 'Generate_Meal_Plan')) {
+      } else if (response?.response?.tool_calls?.some(t => t.tool === 'Generate_Meal_Plan')) {
         // Fallback in case store update was delayed but tool was called
         setTimeout(() => {
            const latestPlans = useNutritionStore.getState().mealPlans;
@@ -73,8 +73,8 @@ export function MealPlanGenerator({ isOpen, onClose }: MealPlanGeneratorProps) {
         }, 500);
       }
       
-      if (response) {
-        setMessages(prev => [...prev, { role: "assistant", content: response.summary }]);
+      if (response && response.response) {
+        setMessages(prev => [...prev, { role: "assistant", content: response.response.summary }]);
       }
     } catch (e) {
       console.error(e);

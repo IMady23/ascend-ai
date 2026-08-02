@@ -20,7 +20,7 @@ export function StepTrailWidget({ currentSteps, goalSteps, onClick }: StepTrailW
     <LivingWidget onClick={onClick} theme="dark" className="group">
       <div className="flex flex-col h-full min-h-[160px] justify-between">
         <div className="flex justify-between items-start z-10">
-          <h3 className="text-sm font-semibold text-white/80">Steps</h3>
+          <h3 className="text-sm font-semibold text-text-secondary">Steps</h3>
           <span className="text-xs font-medium text-emerald-400">
             {currentSteps.toLocaleString()} / {goalSteps.toLocaleString()}
           </span>
@@ -28,7 +28,7 @@ export function StepTrailWidget({ currentSteps, goalSteps, onClick }: StepTrailW
 
         <div className="relative flex-1 flex flex-col justify-center">
           {/* Background Path Line */}
-          <div className="absolute w-full h-1 bg-white/10 rounded-full top-1/2 -translate-y-1/2 overflow-hidden">
+          <div className="absolute w-full h-1 bg-bg-surface-elevated rounded-full top-1/2 -translate-y-1/2 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
@@ -53,7 +53,7 @@ export function StepTrailWidget({ currentSteps, goalSteps, onClick }: StepTrailW
                         : { opacity: 0.2, scale: 0.8 }
                     }
                     transition={{ duration: 0.5 }}
-                    className={`text-[10px] ${isActive ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]' : 'text-white/20'}`}
+                    className={`text-[10px] ${isActive ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]' : 'text-text-disabled'}`}
                     style={{
                       transform: `translateY(${isLeftFoot ? '-8px' : '8px'}) rotate(${isLeftFoot ? '-15deg' : '15deg'})`,
                     }}

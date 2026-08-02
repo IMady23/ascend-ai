@@ -11,6 +11,7 @@ import { ThinkingIndicator } from "@/components/adl/composites/ai/AI";
 import { CoachMessage } from "@/features/ai/components/CoachMessage";
 import { Message } from "@/types/conversation";
 import { AiStructuredResponse } from "@/types/ai";
+import { ConnectionState } from "@/stores/ai.store";
 
 interface AICoachDrawerProps {
   isOpen: boolean;
@@ -87,6 +88,10 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
     sendMessage,
     createNewConversation,
     loadConversation,
+    connectionState,
+    connectionError,
+    initializeConnection,
+    lastAiMeta
   } = useAiStore();
 
   const activeConversation = conversations.find((c) => c.id === activeConversationId);
@@ -135,6 +140,12 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen && connectionState !== "ready") {
+      initializeConnection();
+    }
+  }, [isOpen, connectionState, initializeConnection]);
 
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
@@ -259,9 +270,48 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               </div>
             </div>
 
-            {/* Chat Area */}
+            {/* Chat Area or Connection State */}
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {messages.length === 0 && (
+              
+              {connectionState !== "ready" ? (
+                 <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-6">
+                    {connectionState === "connecting" && (
+                       <>
+                         <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
+                         <p className="text-secondary text-sm">Connecting to AI Services...</p>
+                       </>
+                    )}
+                    {connectionState === "authenticating" && (
+                       <>
+                         <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
+                         <p className="text-secondary text-sm">Authenticating Profile...</p>
+                       </>
+                    )}
+                    {connectionState === "loading_context" && (
+                       <>
+                         <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
+                         <p className="text-secondary text-sm">Loading Coach Context...</p>
+                       </>
+                    )}
+                    {connectionState === "offline_error" && (
+                       <div className="flex flex-col items-center gap-4">
+                         <div className="w-12 h-12 rounded-full bg-[var(--color-danger)]/10 flex items-center justify-center">
+                           <Activity size={24} className="text-[var(--color-danger)]" />
+                         </div>
+                         <h3 className="text-primary font-bold text-lg">Connection Failed</h3>
+                         <p className="text-secondary text-sm leading-relaxed max-w-[250px]">{connectionError}</p>
+                         <button 
+                           onClick={() => initializeConnection()}
+                           className="mt-4 px-6 py-2 bg-[var(--color-accent-blue)] text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+                         >
+                           Retry Connection
+                         </button>
+                       </div>
+                    )}
+                 </div>
+              ) : (
+                <>
+                  {messages.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-accent-blue)]/20 to-[var(--color-accent-indigo)]/20 border border-[var(--color-accent-blue)]/30 flex items-center justify-center">
                     <Sparkles size={32} className="text-[var(--color-accent-blue)]" />
@@ -323,6 +373,8 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               )}
 
               <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Input Area */}
@@ -349,6 +401,23 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               <div className="text-[10px] text-center mt-2 text-[var(--color-text-muted)]">
                 Ascend AI coaches from your real data. It never invents metrics.
               </div>
+              
+              {process.env.NODE_ENV === 'development' && lastAiMeta && (
+                <div className="mt-4 p-3 bg-black/5 border border-[var(--color-accent-blue)]/30 rounded-lg font-mono text-xs text-secondary">
+                  <div className="font-bold text-primary mb-2 flex items-center justify-between">
+                    <span>AI Status</span>
+                    <span className="text-[10px] bg-[var(--color-success)] text-white px-2 py-0.5 rounded-full">LIVE</span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between"><span>Provider:</span> <span className="text-primary">{lastAiMeta.provider || "Gemini"}</span></div>
+                    <div className="flex justify-between"><span>Latency:</span> <span className="text-primary">{lastAiMeta.responseTime}ms</span></div>
+                    <div className="flex justify-between"><span>Context Size:</span> <span className="text-primary">{lastAiMeta.contextSize || 11} Modules</span></div>
+                  </div>
+                  <div className="text-[10px] text-[var(--color-text-muted)] mt-2 italic">
+                    Not for normal users. Just useful for debugging.
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </>
