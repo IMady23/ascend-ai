@@ -57,14 +57,28 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-base/60 backdrop-blur-sm">
+      <div className="absolute inset-0" onClick={onClose} />
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-sm"
+        initial={{ opacity: 0, y: "100%" }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(e, { offset, velocity }) => {
+          if (offset.y > 100 || velocity.y > 400) {
+            onClose();
+          }
+        }}
+        className="relative w-full max-w-sm mt-auto md:mt-0"
       >
-        <GlassCard intensity="high" className="flex flex-col overflow-hidden shadow-2xl p-6">
+        <GlassCard intensity="high" className="flex flex-col overflow-hidden shadow-2xl p-6 rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
+          {/* Drag Handle (Mobile Only) */}
+          <div className="md:hidden w-full flex justify-center pb-4 -mt-2 cursor-grab active:cursor-grabbing">
+            <div className="w-12 h-1.5 bg-border rounded-full" />
+          </div>
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-[var(--color-accent-blue)]/10 flex items-center justify-center">

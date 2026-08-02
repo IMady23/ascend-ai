@@ -114,46 +114,58 @@
 - `[x]` Create email API route
 - `[x]` Create email templates
 
-# Phase 3: Premium UI/UX, Theme Consistency & Mobile Polish
+# Phase 3: Premium UI/UX & Native Mobile Feel
 
-## Complete Responsive Audit
-- `[ ]` Verify on 320px (small Android)
-- `[ ]` Verify on 375px (iPhone)
-- `[ ]` Verify on 390px
-- `[ ]` Verify on 414px
-- `[ ]` Verify on Tablets
-- `[ ]` Verify on Desktop
-- `[ ]` Verify on Ultra-wide monitors
-- `[ ]` Ensure: No horizontal scrolling, no overflowing cards, no clipped charts, no clipped text, no broken grids
+- [x] **1. Mobile-First Audit (Highest Priority)**
+  - Ensure all cards stack naturally on mobile (Dashboard, AI Coach, Nutrition, Training, Recovery, Intelligence, Hall of Progress).
+  - Verify every page layout across device widths (320px up to Desktop).
 
-## Native App Feel
-- `[ ]` Verify: Momentum scrolling, sticky headers, bottom navigation spacing, keyboard avoiding inputs, touch feedback, safe-area handling, smooth drawer animations
+- [x] **2. Compact Dashboard**
+  - Reduce vertical padding and unnecessary gaps.
+  - Show more information above the fold.
+  - Combine related widgets/metrics to improve information density.
 
-## Chart Responsiveness
-- `[ ]` Verify: Charts resize correctly, tooltips stay inside viewport, labels don't overlap, touch gestures work properly
+- [x] **3. Bottom Navigation Polish**
+  - Increase touch targets (at least 44x44px).
+  - Ensure floating pill appearance with backdrop blur.
+  - Add active state indicators (dot/background).
+  - Apply `env(safe-area-inset-bottom)` to respect iOS home indicators.
 
-## AI Chat Polish
-- `[ ]` Verify: Message bubbles, widget cards, nutrition cards, loading animations, thinking indicators, scroll behavior, keyboard handling, streaming text (if implemented)
+- [x] **4. Drawer & Modal Behavior**
+  - Replace centered popups with bottom sheets on mobile devices.
+  - Support drag/swipe to close where possible using `framer-motion`.
 
-## Loading States
-- `[ ]` Verify every async page has: Skeleton loaders, progress indicators, smooth transitions
+- [x] **5. AI Chat Mobile Experience**
+  - Avoid layout shifts where the keyboard covers input.
+  - Improve chat bubble formatting (wrap correctly) and auto-scrolling logic on mobile.
 
-## Animation Performance
-- `[ ]` Audit: GPU acceleration, layout shifts, animation jank, excessive repainting
+- [x] **6. Gesture Polish**
+  - Enable momentum scrolling (`-webkit-overflow-scrolling: touch` or modern equivalent).
+  - Disable elastic bounce on `body` using `overscroll-behavior-y: none`.
+  - Remove Android tap highlights (`-webkit-tap-highlight-color: transparent`).
 
-## Consistent Iconography
-- `[ ]` Verify: Same icon sizes, same stroke width, same spacing, same alignment
+- [x] **7. Remove Top Nav on Mobile**
+  - Hide the `TopBar` on mobile layouts.
+  - Relocate profile/notification access to the `BottomNav` "More" drawer.
 
-## Touch Targets
-- `[ ]` Verify every interactive element is at least 44 × 44 px (Buttons, Tabs, Cards, Chips, Quick Actions)
+- [x] **8. Clean Typography & Weights**
+  - Use `tracking-tight` for headings.
+  - Apply proper font weights to differentiate text hierarchy visually, avoiding unstyled defaults.
 
-## Scroll Experience
-- `[ ]` Check: Long pages, AI Chat, Nutrition, Analytics, Recovery (scrolling should remain smooth with no jumps)
+- [x] **9. Haptic Feedback**
+  - Integrate subtle `navigator.vibrate([10])` calls for standard button interactions.
 
-## Final UI Consistency Audit
-- `[ ]` Verify: Identical spacing system, consistent border radius, consistent shadows, consistent blur effects, consistent typography, consistent animations, consistent color tokens
+- [x] **10. Glassmorphism Audit**
+  - Standardize backdrop blur values and opacities in CSS variables (e.g., `globals.css`).
+
+- [x] **11. Button Tap States**
+  - Ensure all primary interactive elements use `active:scale-95` to mimic native press states.
+
+- [x] **12. Reduce Vertical Gaps**
+  - Audit containers like `PageContainer` and `DashboardLayout` for excessive padding.
 
 # Release Candidate (RC-1)
 - `[ ]` Final Verification: npm run lint
 - `[ ]` Final Verification: npx tsc --noEmit
 - `[ ]` Final Verification: npm run build
+- `[ ]` Manual Breakpoint Checks (320px to Ultrawide)

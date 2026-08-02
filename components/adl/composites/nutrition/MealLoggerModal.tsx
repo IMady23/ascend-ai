@@ -155,7 +155,9 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-base/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-base/60 backdrop-blur-sm">
+      {/* Click outside to close (desktop) / Tap background (mobile) */}
+      <div className="absolute inset-0" onClick={onClose} />
       <AnimatePresence>
         {isCustomFoodModalOpen && (
           <CustomFoodModal 
@@ -170,15 +172,28 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
       </AnimatePresence>
 
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-2xl max-h-[90vh] flex flex-col"
+        initial={{ opacity: 0, y: "100%" }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(e, { offset, velocity }) => {
+          if (offset.y > 150 || velocity.y > 500) {
+            onClose();
+          }
+        }}
+        className="relative w-full max-w-2xl h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col mt-auto md:mt-0"
       >
-        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
+        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
+          {/* Drag Handle (Mobile Only) */}
+          <div className="md:hidden w-full flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing">
+            <div className="w-12 h-1.5 bg-border rounded-full" />
+          </div>
           
           {/* Header */}
-          <div className="p-4 border-b border-border-subtle flex items-center justify-between">
+          <div className="p-4 border-b border-border-subtle flex items-center justify-between z-10">
             <div className="flex items-center gap-4">
               <Heading level="h3">Log Meal</Heading>
               <div className="flex bg-surface rounded-[var(--radius-full)] p-1">

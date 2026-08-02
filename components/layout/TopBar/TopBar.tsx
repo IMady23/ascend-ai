@@ -33,7 +33,7 @@ export function TopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-base/80 backdrop-blur-xl border-b border-border-subtle pt-[env(safe-area-inset-top)]">
+      <header className="hidden md:block sticky top-0 z-40 w-full bg-base/80 backdrop-blur-xl border-b border-border-subtle pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
           
           <div className="flex items-center gap-4">

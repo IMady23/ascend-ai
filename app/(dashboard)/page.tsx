@@ -165,12 +165,12 @@ export default function MissionControl() {
   const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
   return (
-    <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-4 md:px-8 max-w-7xl mx-auto">
+    <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-3 md:px-8 max-w-7xl mx-auto">
       <DashboardLayout>
         
         {/* 1. DAILY BRIEFING HERO */}
         <motion.div variants={HeroMotion.reveal} initial="initial" animate="animate">
-          <HeroSection className="mt-4 md:mt-8 mb-8 md:mb-12 glass-premium p-5 md:p-8">
+          <HeroSection className="mt-2 md:mt-8 mb-6 md:mb-12 glass-premium p-4 md:p-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
               
               <div className="space-y-2 md:space-y-4 text-center md:text-left w-full md:w-auto">
@@ -218,47 +218,47 @@ export default function MissionControl() {
                 <Clock size={12} className="mr-1" /> Inspecting: {hoveredDate || selectedDate}
              </div>
           )}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-12">
             <div onClick={() => handleRoute('/nutrition', 'calories-card')} className="cursor-pointer">
-              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
-                <LivingFlameWidget progress={calorieProgress} size={50} />
-                <h4 className="mt-4 font-semibold text-text-primary text-sm">Calories</h4>
-                <p className="text-xs text-text-secondary">{displayMetrics.calories} / {targetCalories}</p>
+              <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
+                <LivingFlameWidget progress={calorieProgress} size={40} />
+                <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Calories</h4>
+                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.calories} / {targetCalories}</p>
               </InteractiveCard>
             </div>
             <div onClick={() => setIsWaterLoggerOpen(true)} className="cursor-pointer">
-              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
-                <LivingHydrationWidget progress={waterProgress} width={50} height={60} />
-                <h4 className="mt-4 font-semibold text-text-primary text-sm">Hydration</h4>
-                <p className="text-xs text-text-secondary">{displayMetrics.waterMl} / {targetWater * 1000}ml</p>
+              <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
+                <LivingHydrationWidget progress={waterProgress} width={40} height={48} />
+                <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Hydration</h4>
+                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.waterMl} / {targetWater * 1000}ml</p>
               </InteractiveCard>
             </div>
             <div onClick={() => setIsStepsLoggerOpen(true)} className="cursor-pointer">
-              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
-                <LivingTrailWidget progress={stepsProgress} width={80} />
-                <h4 className="mt-4 font-semibold text-text-primary text-sm">Steps</h4>
-                <p className="text-xs text-text-secondary">{displayMetrics.steps} / {targetSteps}</p>
+              <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px] col-span-2 md:col-span-1">
+                <LivingTrailWidget progress={stepsProgress} width={60} />
+                <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Steps</h4>
+                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.steps} / {targetSteps}</p>
               </InteractiveCard>
             </div>
             <div onClick={() => handleRoute('/training', 'workout-card')} className="cursor-pointer">
-              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
-                <LivingEnergyCore progress={workoutState === 'completed' ? 1 : 0} size={50} />
-                <h4 className="mt-4 font-semibold text-text-primary text-sm">Workout</h4>
-                <p className="text-xs text-text-secondary">{displayMetrics.workoutText}</p>
+              <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
+                <LivingEnergyCore progress={workoutState === 'completed' ? 1 : 0} size={40} />
+                <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Workout</h4>
+                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.workoutText}</p>
               </InteractiveCard>
             </div>
             <div onClick={() => handleRoute('/recovery', 'recovery-card')} className="cursor-pointer">
-              <InteractiveCard className="flex flex-col items-center justify-center p-6 h-full text-center">
-                <LivingHeartbeat progress={0.5} size={50} />
-                <h4 className="mt-4 font-semibold text-text-primary text-sm">Recovery</h4>
-                <p className="text-xs text-text-secondary">Pending</p>
+              <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
+                <LivingHeartbeat progress={0.5} size={40} />
+                <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Recovery</h4>
+                <p className="text-[10px] md:text-xs text-text-secondary">Pending</p>
               </InteractiveCard>
             </div>
           </div>
         </motion.div>
 
         {/* 3. COACH & QUICK ACTIONS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-6 md:mb-12">
           
           <div className="md:col-span-2 space-y-6">
             <WidgetSection title="Today's AI Coach">
@@ -303,55 +303,55 @@ export default function MissionControl() {
         </div>
 
         {/* 4. OVERVIEW & REPORTS */}
-        <div className="mb-12">
+        <div className="mb-6 md:mb-12">
           <WidgetSection title="Overview & Reports">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-streak')} className="flex flex-col justify-between min-h-[140px]">
-                <span className="text-base font-semibold text-text-primary">Current Streak</span>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-text-secondary">Days Active</span>
-                  <span className="font-semibold text-accent-dashboard">{aiSummary?.currentStreak || 0} Days</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-streak')} className="flex flex-col justify-between min-h-[120px] md:min-h-[140px] p-4 md:p-5">
+                <span className="text-sm md:text-base font-semibold text-text-primary">Current Streak</span>
+                <div className="flex justify-between items-center mt-1 md:mt-2">
+                  <span className="text-xs md:text-sm text-text-secondary">Days Active</span>
+                  <span className="text-sm md:text-base font-semibold text-accent-dashboard">{aiSummary?.currentStreak || 0} Days</span>
                 </div>
-                <div className="flex gap-1 mt-3">
+                <div className="flex gap-1 mt-2 md:mt-3">
                   {[1, 2, 3, 4, 5, 6, 7].map((day, idx) => (
                     <div 
                       key={day} 
-                      className={`h-2 flex-1 rounded-full ${idx < (aiSummary?.currentStreak || 0) % 7 ? 'bg-accent-dashboard' : 'bg-border'}`} 
+                      className={`h-1.5 md:h-2 flex-1 rounded-full ${idx < (aiSummary?.currentStreak || 0) % 7 ? 'bg-accent-dashboard' : 'bg-border'}`} 
                     />
                   ))}
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard onClick={() => setIsReminderModalOpen(true)} className="flex flex-col justify-between min-h-[140px]">
-                <span className="text-base font-semibold text-text-primary">Active Reminder</span>
-                <div className="flex flex-col gap-1 mt-2">
+              <InteractiveCard onClick={() => setIsReminderModalOpen(true)} className="flex flex-col justify-between min-h-[120px] md:min-h-[140px] p-4 md:p-5">
+                <span className="text-sm md:text-base font-semibold text-text-primary">Active Reminder</span>
+                <div className="flex flex-col gap-1 mt-1 md:mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-text-secondary">Next Alert</span>
-                    <span className="font-semibold text-accent-dashboard">2:00 PM</span>
+                    <span className="text-xs md:text-sm text-text-secondary">Next Alert</span>
+                    <span className="text-sm md:text-base font-semibold text-accent-dashboard">2:00 PM</span>
                   </div>
-                  <span className="text-base font-medium mt-1 text-text-primary">Hydration Check</span>
+                  <span className="text-sm md:text-base font-medium mt-1 text-text-primary">Hydration Check</span>
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard onClick={() => handleRoute('/progress', 'latest-report')} className="flex flex-col justify-between min-h-[140px]">
-                <span className="text-base font-semibold text-text-primary">Latest Report</span>
-                <div className="flex flex-col gap-1 mt-2">
+              <InteractiveCard onClick={() => handleRoute('/progress', 'latest-report')} className="flex flex-col justify-between min-h-[120px] md:min-h-[140px] p-4 md:p-5">
+                <span className="text-sm md:text-base font-semibold text-text-primary">Latest Report</span>
+                <div className="flex flex-col gap-1 mt-1 md:mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-text-secondary">Weekly Summary</span>
-                    <span className="font-semibold text-success">Available</span>
+                    <span className="text-xs md:text-sm text-text-secondary">Weekly Summary</span>
+                    <span className="text-sm md:text-base font-semibold text-success">Available</span>
                   </div>
-                  <span className="text-sm mt-1 text-text-secondary">View your progress from last week.</span>
+                  <span className="text-xs md:text-sm mt-1 text-text-secondary">View your progress from last week.</span>
                 </div>
               </InteractiveCard>
 
-              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-card')} className="flex flex-col justify-between min-h-[140px]">
-                <span className="text-base font-semibold text-text-primary">Workout Consistency</span>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-text-secondary">Weekly Goal</span>
-                  <span className="font-semibold text-success">{goalCompletion?.workouts || 0}%</span>
+              <InteractiveCard onClick={() => handleRoute('/progress', 'progress-card')} className="flex flex-col justify-between min-h-[120px] md:min-h-[140px] p-4 md:p-5">
+                <span className="text-sm md:text-base font-semibold text-text-primary">Workout Consistency</span>
+                <div className="flex justify-between items-center mt-1 md:mt-2">
+                  <span className="text-xs md:text-sm text-text-secondary">Weekly Goal</span>
+                  <span className="text-sm md:text-base font-semibold text-success">{goalCompletion?.workouts || 0}%</span>
                 </div>
-                <div className="w-full bg-border rounded-full h-2 mt-2">
-                  <div className="bg-success h-2 rounded-full" style={{ width: `${goalCompletion?.workouts || 0}%` }} />
+                <div className="w-full bg-border rounded-full h-1.5 md:h-2 mt-2">
+                  <div className="bg-success h-1.5 md:h-2 rounded-full" style={{ width: `${goalCompletion?.workouts || 0}%` }} />
                 </div>
               </InteractiveCard>
             </div>

@@ -71,6 +71,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, fullWidth, className }))}
         disabled={disabled || loading}
         {...props}
+        onClick={(e) => {
+          if (!disabled && !loading) {
+            import("@/utils/haptics").then(({ vibrate }) => vibrate(15));
+          }
+          props.onClick?.(e);
+        }}
       >
         {loading && (
           <span className="mr-2">

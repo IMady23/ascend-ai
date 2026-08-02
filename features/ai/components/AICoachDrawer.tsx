@@ -188,7 +188,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full md:w-[400px] lg:w-[450px] bg-surface border-l border-border-subtle shadow-2xl z-50 flex flex-col"
+            className="fixed top-0 right-0 h-[100dvh] w-full md:w-[400px] lg:w-[450px] bg-surface border-l border-border-subtle shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-gradient-to-br from-[var(--color-bg-glass-standard)] to-[var(--color-bg-base)]">
@@ -378,7 +378,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-border-subtle bg-base">
+            <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-border-subtle bg-base mt-auto">
               <div className="relative flex items-center">
                 <input
                   type="text"
