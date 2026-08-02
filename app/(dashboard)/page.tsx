@@ -51,19 +51,9 @@ import { WaterLoggerModal } from "@/components/adl/composites/tracking/WaterLogg
 import { ReminderScheduleModal } from "@/components/adl/composites/settings/ReminderScheduleModal";
 import { RecoveryLoggerSheet } from "@/components/recovery/RecoveryLoggerSheet";
 import { useNutritionStore } from "@/stores/nutrition.store";
+import { useDynamicGreeting } from "@/hooks/useDynamicGreeting";
 
-// Animated Number Hook
-const AnimatedNumber = ({ value }: { value: number }) => {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => Math.round(latest));
-
-  useEffect(() => {
-    const controls = animate(count, value, { duration: 0.5 });
-    return controls.stop;
-  }, [count, value]);
-
-  return <motion.span>{rounded}</motion.span>;
-};
+import { AnimatedNumber } from "@/components/ui/motion/AnimatedNumber";
 
 export default function MissionControl() {
 
@@ -179,6 +169,12 @@ export default function MissionControl() {
     { value: displayMetrics.waterMl, target: targetWater * 1000, label: "water" },
   ]);
 
+  // "How am I doing today?" summary
+  const caloriesRemaining = Math.max(0, targetCalories - displayMetrics.calories);
+  const proteinRemaining = Math.max(0, targetProtein - displayMetrics.protein);
+  const stepsRemaining = Math.max(0, targetSteps - displayMetrics.steps);
+  const allGoalsMet = caloriesRemaining === 0 && proteinRemaining === 0 && stepsRemaining === 0;
+
   // Weight progress
   const currentWeight = identity?.weight || 0;
   const targetWeightKg = (profile.preferences?.goals as any)?.weightKg || 0;
@@ -188,11 +184,14 @@ export default function MissionControl() {
     : 0;
 
   // "How am I doing today?" summary
-  const caloriesRemaining = Math.max(0, targetCalories - displayMetrics.calories);
-  const proteinRemaining = Math.max(0, targetProtein - displayMetrics.protein);
-  const stepsRemaining = Math.max(0, targetSteps - displayMetrics.steps);
-  const allGoalsMet = caloriesRemaining === 0 && proteinRemaining === 0 && stepsRemaining === 0;
   const currentStreak = aiSummary?.currentStreak || 0;
+
+  const greeting = useDynamicGreeting({
+    userName,
+    allGoalsMet,
+    dailyScore,
+    currentStreak,
+  });
 
   return (
     <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-3 md:px-8 max-w-7xl mx-auto">
@@ -205,9 +204,9 @@ export default function MissionControl() {
               
               <div className="space-y-2 md:space-y-4 text-center md:text-left w-full md:w-auto">
                 <Heading level="h2" className="text-3xl md:text-5xl lg:text-6xl">
-                  Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'} <span className="hidden md:inline">, {userName}</span> 👋
+                  {greeting.title.split(',')[0]} <span className="hidden md:inline">, {greeting.title.split(',')[1]}</span> 👋
                 </Heading>
-                <Subheading size="md" className="hidden md:block text-base text-text-secondary">Welcome back!</Subheading>
+                <Subheading size="md" className="hidden md:block text-base text-text-secondary">{greeting.subtitle}</Subheading>
                 
                 <div className="mt-3 md:mt-6">
                   <Caption className="uppercase tracking-widest text-accent-dashboard mb-2 md:mb-3 font-semibold text-xs md:text-sm">Active Mission</Caption>
@@ -253,21 +252,21 @@ export default function MissionControl() {
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
                 <LivingFlameWidget progress={calorieProgress} size={40} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Calories</h4>
-                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.calories} / {targetCalories}</p>
+                <p className="text-[10px] md:text-xs text-text-secondary"><AnimatedNumber value={displayMetrics.calories} /> / {targetCalories}</p>
               </InteractiveCard>
             </div>
             <div onClick={() => setIsWaterLoggerOpen(true)} className="cursor-pointer">
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px]">
                 <LivingHydrationWidget progress={waterProgress} width={40} height={48} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Hydration</h4>
-                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.waterMl} / {targetWater * 1000}ml</p>
+                <p className="text-[10px] md:text-xs text-text-secondary"><AnimatedNumber value={displayMetrics.waterMl} /> / {targetWater * 1000}ml</p>
               </InteractiveCard>
             </div>
             <div onClick={() => setIsStepsLoggerOpen(true)} className="cursor-pointer">
               <InteractiveCard className="flex flex-col items-center justify-center p-3 md:p-6 h-full text-center min-h-[110px] col-span-2 md:col-span-1">
                 <LivingTrailWidget progress={stepsProgress} width={60} />
                 <h4 className="mt-2 md:mt-4 font-semibold text-text-primary text-xs md:text-sm">Steps</h4>
-                <p className="text-[10px] md:text-xs text-text-secondary">{displayMetrics.steps} / {targetSteps}</p>
+                <p className="text-[10px] md:text-xs text-text-secondary"><AnimatedNumber value={displayMetrics.steps} /> / {targetSteps}</p>
               </InteractiveCard>
             </div>
             <div onClick={() => handleRoute('/training', 'workout-card')} className="cursor-pointer">
