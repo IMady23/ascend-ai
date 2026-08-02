@@ -301,6 +301,43 @@ export default function NutritionModule() {
             </WidgetSection>
           )}
 
+          {/* QUICK-LOG SHORTCUTS: Recent Foods Chip Bar */}
+          {(() => {
+            const recentFoods = useNutritionStore.getState().recentFoods.slice(0, 6);
+            if (recentFoods.length === 0) return null;
+            return (
+              <WidgetSection title="Quick Log">
+                <div className="flex flex-wrap gap-2">
+                  {recentFoods.map((food, idx) => (
+                    <button
+                      key={food.id || idx}
+                      onClick={async () => {
+                        const now = Date.now();
+                        const dateStr = new Date(now).toISOString().split("T")[0];
+                        await useNutritionStore.getState().addMeal({
+                          date: dateStr,
+                          timestamp: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any,
+                          mealType: "snack",
+                          calories: food.calories,
+                          protein: food.protein || 0,
+                          carbs: food.carbs || 0,
+                          fat: food.fat || 0,
+                          foods: [{ ...food, id: crypto.randomUUID(), source: "manual" as const }],
+                        });
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-border-subtle bg-surface hover:bg-[var(--color-bg-surface-hover)] hover:border-[var(--color-accent-green)]/50 transition-all active:scale-95"
+                      style={{ color: "var(--color-text-primary)" }}
+                    >
+                      <Plus size={10} style={{ color: "var(--color-accent-green)" }} />
+                      {food.name}
+                      <span style={{ color: "var(--color-text-muted)" }} className="font-normal">{food.calories}kcal</span>
+                    </button>
+                  ))}
+                </div>
+              </WidgetSection>
+            );
+          })()}
+
         </div>
 
         {/* RIGHT COLUMN: Telemetry & Actions */}
@@ -394,9 +431,7 @@ export default function NutritionModule() {
                            carbs: params.carbs || 0,
                            fat: params.fat || 0,
                            source: "ai" as const
-                         }],
-                         source: "ai" as const,
-                         updatedAt: { seconds: Math.floor(now / 1000), nanoseconds: 0 } as any
+                         }]
                        };
                        useNutritionStore.getState().addMeal(newMeal);
                        setPendingToolCall(null);

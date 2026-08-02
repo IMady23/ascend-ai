@@ -129,7 +129,7 @@ export class IntelligenceService {
       if (category === "workout") {
          const cutoff = new Date(today.getFullYear(), today.getMonth() - months + 1, 1).toISOString();
          cache.activities.forEach(a => {
-           const d = a.date.toDate ? a.date.toDate() : new Date(a.date);
+           const d = (a.date as any).toDate ? (a.date as any).toDate() : new Date(a.date as any);
            if (d.toISOString() >= cutoff) {
              const key = format(d, "yyyy-MM");
              if (dataMap.has(key)) {
@@ -213,7 +213,7 @@ export class IntelligenceService {
     const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
     const { useUserStore } = await import('@/stores/user.store');
     const profile = useUserStore.getState().profile;
-    const goals = AnalyticsService.getGoalCompletion(days, profile);
+    const goals = AnalyticsService.getGoalCompletion(days as any, profile);
 
     const currentScore = Math.round((goals.workouts + goals.protein + goals.sleep + goals.water) / 4);
 
@@ -252,9 +252,9 @@ export class IntelligenceService {
     const { AnalyticsService } = await import('@/services/analytics/AnalyticsService');
     const { useUserStore } = await import('@/stores/user.store');
     const profile = useUserStore.getState().profile;
-    const summary = AnalyticsService.getAISummary(days, profile);
+    const summary = AnalyticsService.getAISummary(days as any, profile);
     const cache = AnalyticsService.getCache();
-    const workoutsCompleted = cache.activities.filter((a: any) => new Date(a.date.toDate ? a.date.toDate() : a.date) >= subDays(new Date(), days)).length;
+    const workoutsCompleted = cache.activities.filter((a: any) => new Date((a.date as any).toDate ? (a.date as any).toDate() : (a.date as any)) >= subDays(new Date(), days)).length;
     const avgProtein = Math.round(summary.performance.protein);
 
     return {

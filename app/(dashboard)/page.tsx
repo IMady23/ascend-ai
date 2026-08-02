@@ -23,6 +23,8 @@ import {
   LivingHeartbeat,
   LivingEnergyCore
 } from "@/components/dashboard/LivingWidgets";
+import { ActivityRings } from "@/components/dashboard/ActivityRings";
+import { useGoalHaptics } from "@/hooks/useGoalHaptics";
 import { 
   Dumbbell, 
   Flame, 
@@ -33,7 +35,11 @@ import {
   Sparkles,
   TrendingUp,
   Apple,
-  Clock
+  Clock,
+  Target,
+  Weight,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMotionValue, useTransform, animate } from "framer-motion";
@@ -166,6 +172,30 @@ export default function MissionControl() {
   const calorieProgress = (targetCalories ?? 0) > 0 ? Math.min(1, displayMetrics.calories / (targetCalories ?? 1)) : 0;
   const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
+  // Haptic feedback on goal completion (only fires once per crossing)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useGoalHaptics([
+    { value: displayMetrics.calories, target: targetCalories, label: "calories" },
+    { value: displayMetrics.protein, target: targetProtein, label: "protein" },
+    { value: displayMetrics.steps, target: targetSteps, label: "steps" },
+    { value: displayMetrics.waterMl, target: targetWater * 1000, label: "water" },
+  ]);
+
+  // Weight progress
+  const currentWeight = identity?.weight || 0;
+  const targetWeightKg = (profile.preferences?.goals as any)?.weightKg || 0;
+  const hasWeightGoal = targetWeightKg > 0 && currentWeight > 0;
+  const weightProgressPct = hasWeightGoal
+    ? Math.min(100, Math.max(0, Math.round(100 - ((Math.abs(currentWeight - targetWeightKg) / Math.abs((profile.identity?.weight ?? currentWeight) - targetWeightKg + 0.001)) * 100))))
+    : 0;
+
+  // "How am I doing today?" summary
+  const caloriesRemaining = Math.max(0, targetCalories - displayMetrics.calories);
+  const proteinRemaining = Math.max(0, targetProtein - displayMetrics.protein);
+  const stepsRemaining = Math.max(0, targetSteps - displayMetrics.steps);
+  const allGoalsMet = caloriesRemaining === 0 && proteinRemaining === 0 && stepsRemaining === 0;
+  const currentStreak = aiSummary?.currentStreak || 0;
+
   return (
     <PageContainer className="pb-[calc(8rem+env(safe-area-inset-bottom))] px-3 md:px-8 max-w-7xl mx-auto">
       <DashboardLayout>
@@ -256,6 +286,115 @@ export default function MissionControl() {
                 <p className="text-[10px] md:text-xs text-text-secondary">Log Session</p>
               </InteractiveCard>
             </div>
+          </div>
+        </motion.div>
+
+        {/* NEW: HOW AM I DOING + ACTIVITY RINGS + STREAK + WEIGHT */}
+        <motion.div variants={PageMotion.staggerItem} initial="initial" animate="animate">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-10">
+            
+            {/* 1. How Am I Doing Today? */}
+            <GlassCard className={`p-4 md:p-5 col-span-1 md:col-span-2 flex flex-col gap-3 border-l-4 ${allGoalsMet ? 'border-l-[var(--color-success)]' : 'border-l-[var(--color-accent-blue)]'}`}>
+              <div className="flex items-center gap-2">
+                {allGoalsMet
+                  ? <CheckCircle2 size={16} className="text-[var(--color-success)]" />
+                  : <Target size={16} className="text-[var(--color-accent-blue)]" />
+                }
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>
+                  How Am I Doing Today?
+                </span>
+              </div>
+              {allGoalsMet ? (
+                <p className="text-sm font-semibold" style={{ color: "var(--color-success)" }}>
+                  🎉 All goals smashed! Incredible work today, {userName}.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {caloriesRemaining > 0 && (
+                    <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                      🔥 <span className="font-semibold">{Math.round(caloriesRemaining)} kcal</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}> remaining to hit your calorie goal</span>
+                    </p>
+                  )}
+                  {proteinRemaining > 0 && (
+                    <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                      💪 <span className="font-semibold">{Math.round(proteinRemaining)}g protein</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}> left — try chicken, eggs, or a shake</span>
+                    </p>
+                  )}
+                  {stepsRemaining > 0 && (
+                    <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                      🚶 <span className="font-semibold">{stepsRemaining.toLocaleString()} steps</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}> to reach your step goal</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </GlassCard>
+
+            {/* 2. Streak Flame Badge */}
+            <InteractiveCard onClick={() => handleRoute('/progress', 'streak-flame')} className="p-4 md:p-5 flex flex-col items-center justify-center text-center gap-2 cursor-pointer">
+              <div className="relative">
+                <span className="text-4xl md:text-5xl">🔥</span>
+                {currentStreak >= 7 && (
+                  <span className="absolute -top-1 -right-3 text-[10px] font-black bg-[var(--color-accent-gold)] text-white rounded-full px-1.5 py-0.5">
+                    HOT
+                  </span>
+                )}
+              </div>
+              <div>
+                <p className="text-2xl font-black" style={{ color: "var(--color-text-primary)" }}>
+                  {currentStreak}
+                  <span className="text-sm font-medium ml-1" style={{ color: "var(--color-text-muted)" }}>days</span>
+                </p>
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>
+                  {currentStreak === 0 ? "Start your streak!" : currentStreak >= 30 ? "Legendary 🏆" : currentStreak >= 7 ? "On Fire!" : "Active Streak"}
+                </p>
+              </div>
+              <div className="flex gap-1 w-full mt-1">
+                {[0,1,2,3,4,5,6].map((_, i) => (
+                  <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < (currentStreak % 7 || (currentStreak > 0 && currentStreak % 7 === 0 ? 7 : 0)) ? 'bg-[var(--color-accent-gold)]' : 'bg-border'}`} />
+                ))}
+              </div>
+            </InteractiveCard>
+
+            {/* 3. Weight Progress (shows if user has a weight goal, otherwise show Activity Rings) */}
+            {hasWeightGoal ? (
+              <GlassCard className="p-4 md:p-5 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">⚖️</span>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-text-muted)" }}>Weight Goal</span>
+                </div>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-2xl font-black" style={{ color: "var(--color-text-primary)" }}>{currentWeight}<span className="text-sm font-medium ml-1" style={{ color: "var(--color-text-muted)" }}>kg</span></p>
+                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Target: {targetWeightKg} kg</p>
+                  </div>
+                  <p className="text-sm font-bold" style={{ color: currentWeight <= targetWeightKg ? "var(--color-success)" : "var(--color-accent-gold)" }}>
+                    {Math.abs(currentWeight - targetWeightKg).toFixed(1)} kg to go
+                  </p>
+                </div>
+                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "var(--color-bg-surface)" }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: "var(--color-success)" }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${weightProgressPct}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  />
+                </div>
+                <p className="text-xs text-right" style={{ color: "var(--color-text-muted)" }}>{weightProgressPct}% complete</p>
+              </GlassCard>
+            ) : (
+              <GlassCard className="p-4 md:p-5 flex flex-col items-center justify-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "var(--color-text-muted)" }}>Daily Rings</span>
+                <ActivityRings rings={[
+                  { label: "Calories", value: Math.round(displayMetrics.calories), target: targetCalories, color: "var(--color-accent-orange)", unit: "" },
+                  { label: "Protein", value: Math.round(displayMetrics.protein), target: targetProtein, color: "var(--color-accent-blue)", unit: "g" },
+                  { label: "Steps", value: displayMetrics.steps, target: targetSteps, color: "var(--color-success)", unit: "" },
+                ]} className="scale-[0.7] origin-top" />
+              </GlassCard>
+            )}
           </div>
         </motion.div>
 
