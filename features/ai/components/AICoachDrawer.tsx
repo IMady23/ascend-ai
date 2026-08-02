@@ -280,7 +280,8 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
               
               {connectionState !== "ready" ? (
                  <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-6">
-                    {connectionState === "connecting" &&                        <>
+                    {connectionState === "connecting" && (
+                       <>
                          <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
                          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Connecting to AI Services...</p>
                        </>
@@ -295,7 +296,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                        <>
                          <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-[var(--color-accent-blue)] animate-spin" />
                          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading Coach Context...</p>
-                       </> </>
+                       </>
                     )}
                     {connectionState === "offline_error" && (
                        <div className="flex flex-col items-center gap-4">

@@ -14,7 +14,7 @@ export class LogMealTool implements AITool {
         timeoutMs: 5000,
         idempotent: false,
         supportsStreaming: false,
-        requiresConfirmation: true 
+        requiresConfirmation: false
     };
 
     validate(input: Record<string, unknown>): ValidationResult {
@@ -31,14 +31,7 @@ export class LogMealTool implements AITool {
             throw new Error("User not authenticated");
         }
         
-        if (!isConfirmed) {
-            return {
-                status: "pending_confirmation",
-                summary: "Meal log requires user confirmation.",
-                toolData: input
-            };
-        }
-
+        // Automatically execute since it is now agentic
         const mealId = crypto.randomUUID();
         
         const now = Date.now();
@@ -54,6 +47,8 @@ export class LogMealTool implements AITool {
             protein: (input.protein as number) || 0,
             carbs: (input.carbs as number) || 0,
             fat: (input.fat as number) || 0,
+            fiber: (input.fiber as number) || 0,
+            sugar: (input.sugar as number) || 0,
             foods: [
                 {
                     id: crypto.randomUUID(),
@@ -64,6 +59,8 @@ export class LogMealTool implements AITool {
                     protein: (input.protein as number) || 0,
                     carbs: (input.carbs as number) || 0,
                     fat: (input.fat as number) || 0,
+                    fiber: (input.fiber as number) || 0,
+                    sugar: (input.sugar as number) || 0,
                     source: "ai" as const
                 }
             ],
