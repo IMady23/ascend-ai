@@ -46,7 +46,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <motion.div 
           className="w-16 h-16 rounded-[24px] bg-bg-surface-elevated flex items-center justify-center mb-6 shadow-sm border border-border backdrop-blur-md"
           whileHover={{ scale: 1.05, rotate: [-2, 2, 0] }}
-          transition={{ type: 'spring' }}
+          transition={{ type: 'tween', duration: 0.3 }}
         >
           {emoji ? (
             <span className="text-3xl filter drop-shadow-md">{emoji}</span>
