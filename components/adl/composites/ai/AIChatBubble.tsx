@@ -26,8 +26,8 @@ export function AIChatBubble({ content, confidence, className }: AIChatBubblePro
         </div>
         
         <div className="flex flex-col gap-2">
-          <div className="bg-surface border border-border-subtle rounded-2xl rounded-tl-sm p-4 text-primary shadow-sm">
-            <BodyText size="md" className="leading-relaxed whitespace-pre-wrap">
+          <div className="bg-[var(--color-accent-blue)]/[0.08] border border-[var(--color-accent-blue)]/20 rounded-2xl rounded-tl-sm p-4 shadow-sm">
+            <BodyText size="md" className="leading-relaxed whitespace-pre-wrap text-[var(--color-text-primary)]">
               {content}
             </BodyText>
           </div>

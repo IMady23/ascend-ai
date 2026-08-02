@@ -353,7 +353,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                     className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                       msg.role === "user"
                         ? "bg-[var(--color-accent-blue)] text-white"
-                        : "bg-surface border border-border-subtle text-primary"
+                        : "bg-[var(--color-accent-blue)]/[0.08] border border-[var(--color-accent-blue)]/20 text-[var(--color-text-primary)]"
                     }`}
                   >
                     {msg.role === "assistant" ? renderAssistantMessage(msg) : msg.content}
@@ -366,7 +366,7 @@ export function AICoachDrawer({ isOpen, onClose }: AICoachDrawerProps) {
                   <div className="w-8 h-8 flex-shrink-0 rounded-full bg-[var(--color-accent-blue)]/20 flex items-center justify-center mt-1">
                     <Sparkles size={14} className="text-[var(--color-accent-blue)]" />
                   </div>
-                  <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-surface border border-border-subtle flex items-center">
+                  <div className="max-w-[80%] rounded-2xl px-4 py-4 bg-[var(--color-accent-blue)]/[0.08] border border-[var(--color-accent-blue)]/20 flex items-center">
                     <ThinkingIndicator size="sm" />
                   </div>
                 </div>
