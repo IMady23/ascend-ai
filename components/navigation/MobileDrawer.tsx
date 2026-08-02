@@ -13,7 +13,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, Moon, Sun, Monitor, Bell, Settings, LogOut, Trash2, 
-  User, Shield, Activity, Target, Database
+  Shield, Target
 } from "lucide-react";
 import { Avatar } from "@/components/adl/primitives/Avatar";
 import { MODULE_CONFIG } from "@/constants/modules.config";
@@ -225,11 +225,11 @@ export function MobileDrawer() {
                       <Settings size={18} className="text-text-secondary" />
                       <span className="text-sm font-semibold">General Settings</span>
                     </Link>
-                    <Link href="/settings/goals" onClick={handleClose} className="flex items-center gap-3 p-4 hover:bg-bg-base transition-colors text-text-primary">
+                    <Link href="/settings/notifications" onClick={handleClose} className="flex items-center gap-3 p-4 hover:bg-bg-base transition-colors text-text-primary">
                       <Target size={18} className="text-text-secondary" />
-                      <span className="text-sm font-semibold">Daily Goals & Units</span>
+                      <span className="text-sm font-semibold">Notification Preferences</span>
                     </Link>
-                    <Link href="/settings/privacy" onClick={handleClose} className="flex items-center gap-3 p-4 hover:bg-bg-base transition-colors text-text-primary">
+                    <Link href="/settings" onClick={handleClose} className="flex items-center gap-3 p-4 hover:bg-bg-base transition-colors text-text-primary">
                       <Shield size={18} className="text-text-secondary" />
                       <span className="text-sm font-semibold">Privacy & About</span>
                     </Link>
