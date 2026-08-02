@@ -7,6 +7,7 @@ import { useRecoveryStore } from "@/stores/recovery.store";
 import { useToastStore } from "@/stores/toast.store";
 import { RecoveryActivityType } from "@/types/recovery";
 import { cn } from "@/utils/cn";
+import { useScrollIntoViewIfNeeded } from "@/hooks/useScrollIntoViewIfNeeded";
 
 interface RecoveryLoggerSheetProps {
   isOpen: boolean;
@@ -76,6 +77,12 @@ export function RecoveryLoggerSheet({ isOpen, onClose }: RecoveryLoggerSheetProp
 
   const [step, setStep] = useState<Step>("pick");
   const [selectedType, setSelectedType] = useState<RecoveryActivityType | null>(null);
+  const [activityTime, setActivityTime] = useState(30);
+  const scrollRef = useScrollIntoViewIfNeeded<HTMLDivElement>(isOpen, {
+    alignment: "nearest",
+    offset: 64,
+    focusFirstInput: false,
+  });
   const [feelingBefore, setFeelingBefore] = useState(5);
   const [feelingAfter, setFeelingAfter] = useState(7);
   const [notes, setNotes] = useState("");
@@ -177,6 +184,7 @@ export function RecoveryLoggerSheet({ isOpen, onClose }: RecoveryLoggerSheetProp
           if (offset.y > 120 || velocity.y > 400) onClose();
         }}
         className="relative w-full max-w-lg mt-auto md:mt-0 z-10"
+        ref={scrollRef}
       >
         <div
           className="flex flex-col overflow-hidden shadow-2xl rounded-t-[32px] md:rounded-[24px] rounded-b-none md:rounded-b-[24px] border border-[var(--color-border-subtle)]"

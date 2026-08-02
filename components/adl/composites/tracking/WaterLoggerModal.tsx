@@ -8,6 +8,7 @@ import { ProgressRing } from "@/components/adl/composites/progress/Progress";
 import { useNutritionStore } from "@/stores/nutrition.store";
 import { useUserStore } from "@/stores/user.store";
 import { useToastStore } from "@/stores/toast.store";
+import { useScrollIntoViewIfNeeded } from "@/hooks/useScrollIntoViewIfNeeded";
 
 interface WaterLoggerModalProps {
   isOpen: boolean;
@@ -21,6 +22,11 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
   
   const [customAmount, setCustomAmount] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const scrollRef = useScrollIntoViewIfNeeded<HTMLDivElement>(isOpen, {
+    alignment: "nearest",
+    offset: 64,
+    focusFirstInput: false,
+  });
 
   const targetWater = profile?.preferences?.goals?.waterMl || profile?.targets?.water || 3000;
   const progress = targetWater > 0 ? Math.min((dailyWaterMl / targetWater) * 100, 100) : 0;
@@ -73,6 +79,7 @@ export function WaterLoggerModal({ isOpen, onClose }: WaterLoggerModalProps) {
           }
         }}
         className="relative w-full max-w-sm mt-auto md:mt-0"
+        ref={scrollRef}
       >
         <GlassCard intensity="high" className="flex flex-col overflow-hidden shadow-2xl p-6 rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
           {/* Drag Handle (Mobile Only) */}

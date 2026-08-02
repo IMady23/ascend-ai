@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FoodRepository } from "@/services/repositories/food.repository";
 import { CustomFoodModal } from "./CustomFoodModal";
 import { calculateMacrosForServing } from "@/lib/nutrition/calculator";
+import { useScrollIntoViewIfNeeded } from "@/hooks/useScrollIntoViewIfNeeded";
 
 interface MealLoggerModalProps {
   isOpen: boolean;
@@ -31,6 +32,11 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
   const [notes, setNotes] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isCustomFoodModalOpen, setIsCustomFoodModalOpen] = React.useState(false);
+  const scrollRef = useScrollIntoViewIfNeeded<HTMLDivElement>(isOpen, {
+    alignment: "nearest",
+    offset: 64,
+    focusFirstInput: false,
+  });
 
   // Reset state when opened
   React.useEffect(() => {
@@ -185,6 +191,7 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
           }
         }}
         className="relative w-full max-w-2xl h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col mt-auto md:mt-0"
+        ref={scrollRef}
       >
         <GlassCard className="flex flex-col flex-1 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
           {/* Drag Handle (Mobile Only) */}

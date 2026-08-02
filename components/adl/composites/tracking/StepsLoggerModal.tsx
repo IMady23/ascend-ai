@@ -5,6 +5,7 @@ import { Heading, BodyText, Caption } from "@/components/adl/typography";
 import { Button } from "@/components/adl/primitives/Button";
 import { GlassCard } from "@/components/adl/composites/cards/Cards";
 import { useActivityStore } from "@/stores/activity.store";
+import { useScrollIntoViewIfNeeded } from "@/hooks/useScrollIntoViewIfNeeded";
 
 interface StepsLoggerModalProps {
   isOpen: boolean;
@@ -14,6 +15,11 @@ interface StepsLoggerModalProps {
 export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
   const { dailySteps, setDailySteps } = useActivityStore();
   const [stepsInput, setStepsInput] = React.useState(dailySteps.toString());
+  const scrollRef = useScrollIntoViewIfNeeded<HTMLDivElement>(isOpen, {
+    alignment: "nearest",
+    offset: 64,
+    focusFirstInput: false,
+  });
 
   React.useEffect(() => {
     if (isOpen) {
@@ -54,6 +60,7 @@ export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
           }
         }}
         className="relative w-full max-w-sm mt-auto md:mt-0"
+        ref={scrollRef}
       >
         <GlassCard intensity="high" className="flex flex-col overflow-hidden shadow-2xl p-6 rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
           {/* Drag Handle (Mobile Only) */}

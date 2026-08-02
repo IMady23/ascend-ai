@@ -8,6 +8,7 @@ import { Button } from "@/components/adl/primitives/Button";
 import { useNutritionStore } from "@/stores/nutrition.store";
 import type { FoodItem } from "@/types/nutrition";
 import { motion } from "framer-motion";
+import { useScrollIntoViewIfNeeded } from "@/hooks/useScrollIntoViewIfNeeded";
 
 interface CustomFoodModalProps {
   isOpen: boolean;
@@ -28,6 +29,11 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
   const [fat, setFat] = React.useState("");
   const [fiber, setFiber] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const scrollRef = useScrollIntoViewIfNeeded<HTMLDivElement>(isOpen, {
+    alignment: "nearest",
+    offset: 64,
+    focusFirstInput: false,
+  });
 
   React.useEffect(() => {
     if (isOpen) {
@@ -79,6 +85,7 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="w-full max-w-lg"
+        ref={scrollRef}
       >
         <GlassCard className="flex flex-col overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
           
