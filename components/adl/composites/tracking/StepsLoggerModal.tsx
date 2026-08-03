@@ -59,10 +59,10 @@ export function StepsLoggerModal({ isOpen, onClose }: StepsLoggerModalProps) {
             onClose();
           }
         }}
-        className="relative w-full max-w-sm mt-auto md:mt-0"
+        className="relative w-full max-w-sm max-h-[95vh] md:max-h-[90vh] flex flex-col min-h-0 mt-auto md:mt-0"
         ref={scrollRef}
       >
-        <GlassCard intensity="high" className="flex flex-col overflow-hidden shadow-2xl p-6 rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
+        <GlassCard intensity="high" className="flex flex-col flex-1 min-h-0 overflow-y-auto shadow-2xl p-6 rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
           {/* Drag Handle (Mobile Only) */}
           <div className="md:hidden w-full flex justify-center pb-4 -mt-2 cursor-grab active:cursor-grabbing">
             <div className="w-12 h-1.5 bg-border rounded-full" />

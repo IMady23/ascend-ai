@@ -190,10 +190,10 @@ export function MealLoggerModal({ isOpen, onClose, defaultMealType = "lunch", me
             onClose();
           }
         }}
-        className="relative w-full max-w-2xl h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col mt-auto md:mt-0"
+        className="relative w-full max-w-2xl h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col min-h-0 mt-auto md:mt-0"
         ref={scrollRef}
       >
-        <GlassCard className="flex flex-col flex-1 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
+        <GlassCard className="flex flex-col flex-1 min-h-0 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl rounded-t-[32px] md:rounded-[var(--radius-2xl)] rounded-b-none md:rounded-b-[var(--radius-2xl)]">
           {/* Drag Handle (Mobile Only) */}
           <div className="md:hidden w-full flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing">
             <div className="w-12 h-1.5 bg-border rounded-full" />
