@@ -82,7 +82,7 @@ export function SplashScreen({ onFinish, onRevealApp }: SplashScreenProps) {
         onEnded={handleVideoEnded}
         onError={handleVideoError}
         className={cn(
-          "w-full h-full object-cover transform scale-[1.10] transition-opacity duration-300",
+          "w-full h-full object-contain md:object-cover transition-opacity duration-300",
           phase === "fading" ? "opacity-0" : "opacity-100"
         )}
       >

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { HallEnvironment } from "@/components/hall/HallEnvironment";
 
 export function AuthLayout({ children, title, subtitle }: { children: React.ReactNode, title: string, subtitle: string }) {
@@ -23,14 +24,20 @@ export function AuthLayout({ children, title, subtitle }: { children: React.Reac
         className="w-full max-w-md relative z-10 flex flex-col gap-8"
       >
         <div className="flex flex-col items-center text-center">
-          <motion.img 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 1.5, ease: "easeOut" }}
-            src="/ascend-logo.svg" 
-            alt="Ascend" 
-            className="w-16 h-16 mb-6 opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" 
-          />
+            className="relative w-16 h-16 mb-6 opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+          >
+            <Image
+              src="/ascend-logo.svg"
+              alt="Ascend AI"
+              fill
+              className="object-contain"
+              priority
+            />
+          </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

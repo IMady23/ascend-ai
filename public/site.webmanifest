@@ -1,6 +1,7 @@
 {
   "name": "Ascend AI",
   "short_name": "Ascend",
+  "description": "Your personal AI-powered fitness and wellness command center.",
   "icons": [
     {
       "src": "/favicon-16x16.png",
@@ -20,12 +21,14 @@
     {
       "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     },
     {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ],
   "start_url": "/",
