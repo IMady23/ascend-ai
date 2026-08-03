@@ -183,11 +183,11 @@ export function RecoveryLoggerSheet({ isOpen, onClose }: RecoveryLoggerSheetProp
         onDragEnd={(_, { offset, velocity }) => {
           if (offset.y > 120 || velocity.y > 400) onClose();
         }}
-        className="relative w-full max-w-lg max-h-[95vh] md:max-h-[90vh] flex flex-col min-h-0 mt-auto md:mt-0 z-10"
+        className="relative w-full max-w-lg h-[90vh] md:h-auto md:max-h-[90vh] flex flex-col min-h-0 mt-auto md:mt-0 z-10"
         ref={scrollRef}
       >
         <div
-          className="flex flex-col flex-1 min-h-0 overflow-y-auto shadow-2xl rounded-t-[32px] md:rounded-[24px] rounded-b-none md:rounded-b-[24px] border border-[var(--color-border-subtle)]"
+          className="flex flex-col h-full min-h-0 overflow-y-auto shadow-2xl rounded-t-[32px] md:rounded-[24px] rounded-b-none md:rounded-b-[24px] border border-[var(--color-border-subtle)]"
           style={{ background: "var(--color-bg-surface-elevated)" }}
         >
           {/* Drag handle */}

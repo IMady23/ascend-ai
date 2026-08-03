@@ -84,10 +84,10 @@ export function CustomFoodModal({ isOpen, onClose, initialQuery = "", onFoodCrea
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-lg max-h-[95vh] md:max-h-[90vh] flex flex-col min-h-0"
+        className="w-full max-w-lg h-auto max-h-[90vh] flex flex-col min-h-0"
         ref={scrollRef}
       >
-        <GlassCard className="flex flex-col flex-1 min-h-0 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
+        <GlassCard className="flex flex-col h-full min-h-0 overflow-hidden border border-border-subtle bg-base/95 shadow-2xl">
           
           <div className="p-4 border-b border-border-subtle flex items-center justify-between">
             <Heading level="h3">Add Custom Food</Heading>
