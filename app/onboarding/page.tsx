@@ -58,7 +58,7 @@ export default function Onboarding() {
 
   // Redirect users who already completed onboarding
   useEffect(() => {
-    if (profile?.onboardingCompleted) {
+    if (profile?.onboardingCompleted || localStorage.getItem("ascend-onboarding-completed") === "true") {
       router.replace("/");
     }
   }, [profile, router]);
@@ -176,7 +176,7 @@ export default function Onboarding() {
   };
 
   const handleComplete = async () => {
-    if (!userId) return;
+    if (!userId || isSubmitting) return;
     setIsSubmitting(true);
     setStep(5); // Show Welcome Interstitial
 
@@ -213,8 +213,10 @@ export default function Onboarding() {
       // Clean up draft
       localStorage.removeItem("ascend-onboarding-draft");
 
-      setTimeout(() => {
-        router.push("/");
+      localStorage.setItem("ascend-onboarding-completed", "true");
+
+      window.setTimeout(() => {
+        router.replace("/");
       }, 3000);
 
     } catch (error) {

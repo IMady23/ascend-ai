@@ -77,10 +77,10 @@ export default function MissionControl() {
   const { tapWidget } = useDashboardPersonalization();
   
   const [displayMetrics, setDisplayMetrics] = React.useState({
-    calories: 0,
-    waterMl: 0,
-    steps: 0,
-    protein: 0,
+    calories: dailyCalories || 0,
+    waterMl: dailyWaterMl || 0,
+    steps: dailySteps || 0,
+    protein: dailyProtein || 0,
     workoutStatus: "neutral" as "neutral" | "warning" | "achieved",
     workoutText: "Not Started"
   });
@@ -94,14 +94,15 @@ export default function MissionControl() {
   // Sync metrics with interaction state
   useEffect(() => {
     if (inspectionMode === 'live') {
-      setDisplayMetrics({
-        calories: dailyCalories,
-        waterMl: dailyWaterMl,
-        steps: dailySteps,
-        protein: dailyProtein,
+      setDisplayMetrics((previous) => ({
+        ...previous,
+        calories: dailyCalories ?? previous.calories,
+        waterMl: dailyWaterMl ?? previous.waterMl,
+        steps: dailySteps ?? previous.steps,
+        protein: dailyProtein ?? previous.protein,
         workoutStatus: workoutState === "completed" ? "achieved" : workoutState === "in_progress" ? "warning" : "neutral",
         workoutText: workoutState === "completed" ? "Completed" : workoutState === "in_progress" ? "In Progress" : "Not Started"
-      });
+      }));
     } else {
       const dateToInspect = hoveredDate || selectedDate;
       if (dateToInspect) {
@@ -116,14 +117,15 @@ export default function MissionControl() {
           let totalCalories = 0; nutritionLogs.forEach(n => totalCalories += (n.calories || 0));
           let totalProtein = 0; nutritionLogs.forEach(n => totalProtein += (n.protein || 0));
           
-          setDisplayMetrics({
-            calories: totalCalories,
-            waterMl: totalWater,
-            steps: dailyLog?.steps || 0,
-            protein: totalProtein,
+          setDisplayMetrics((previous) => ({
+            ...previous,
+            calories: totalCalories ?? previous.calories,
+            waterMl: totalWater ?? previous.waterMl,
+            steps: dailyLog?.steps ?? previous.steps,
+            protein: totalProtein ?? previous.protein,
             workoutStatus: activities.length > 0 ? "achieved" : "neutral",
             workoutText: activities.length > 0 ? "Completed" : "No Workout"
-          });
+          }));
         });
       }
     }

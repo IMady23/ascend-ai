@@ -36,7 +36,6 @@ export const SyncManager = {
 
     this.currentUserId = userId;
     this.isSyncing = true;
-    console.log(`[SyncManager] Real-time sync started for user: ${userId}`);
   },
 
   /**
@@ -58,6 +57,5 @@ export const SyncManager = {
 
     this.currentUserId = null;
     this.isSyncing = false;
-    console.log(`[SyncManager] Real-time sync stopped.`);
   }
 };

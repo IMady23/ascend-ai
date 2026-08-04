@@ -23,33 +23,61 @@ import { Omnibar } from "@/components/adl/composites/ai/Omnibar";
 import { MemoryChip } from "@/components/adl/composites/ai/MemoryChip";
 import { InteractiveWidgetWrapper } from "@/components/adl/composites/ai/InteractiveWidgetWrapper";
 import { NutritionSuggestionCard } from "@/components/adl/composites/ai/NutritionSuggestionCard";
+import AIHistoryModal from "@/components/adl/composites/ai/AIHistoryModal";
+import AISettingsDrawer from "@/components/adl/composites/ai/AISettingsDrawer";
 
 import { WorkoutSessionCard } from "@/components/adl/composites/training/WorkoutSessionCard";
 import { buildCoachState } from "@/lib/ai/coach-state";
+import { appendChatMessage } from "@/lib/ai/chat-history";
 import { aiService } from "@/services/ai/ai.service";
 import { formatCoachMessage } from "@/services/ai/format-coach-response";
 
 import { useUserStore } from "@/stores/user.store";
 import { useTimelineStore } from "@/stores/timeline.store";
 import { useIntelligenceStore } from "@/stores/intelligence.store";
+import { useActivityStore } from "@/stores/activity.store";
+import { useNutritionStore } from "@/stores/nutrition.store";
 
 export default function AICommandModule() {
   const [messages, setMessages] = React.useState<any[]>([]);
+  const [isSending, setIsSending] = React.useState(false);
+  const messagesRef = React.useRef<any[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const { profile } = useUserStore();
   const { events, fetchInitialEvents } = useTimelineStore();
   const { latestInsights } = useIntelligenceStore();
+  const { activities, workoutState } = useActivityStore();
+  const { meals, mealPlans } = useNutritionStore();
 
   React.useEffect(() => {
     fetchInitialEvents();
   }, [fetchInitialEvents]);
+
+  React.useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
   
+  const todayStr = React.useMemo(() => new Date().toISOString().split("T")[0], []);
+  const workoutCount = activities.length;
+  const mealCount = meals.length;
+  const hasActiveMealPlan = mealPlans.some((plan: any) => plan.status === "active");
+  const completedWorkoutToday = React.useMemo(() => {
+    const completedToday = activities.some((activity: any) => {
+      const activityDate = activity.date?.toDate ? activity.date.toDate() : new Date(activity.date as any);
+      return activityDate.toISOString().split("T")[0] === todayStr;
+    });
+
+    return completedToday || workoutState === "completed";
+  }, [activities, todayStr, workoutState]);
+
   const coachState = React.useMemo(() => buildCoachState({
     profile: profile || { nickname: "Guest", name: "Guest User" },
-    workoutCount: 0,
-    mealCount: 0,
-    hasActiveMealPlan: false,
-    completedWorkoutToday: false,
-  }), [profile]);
+    workoutCount,
+    mealCount,
+    hasActiveMealPlan,
+    completedWorkoutToday,
+  }), [profile, workoutCount, mealCount, hasActiveMealPlan, completedWorkoutToday]);
   
   // Set Page Accent
   React.useEffect(() => {
@@ -58,22 +86,56 @@ export default function AICommandModule() {
   }, []);
 
   const handleSend = async (msg: string) => {
-    setMessages(prev => [...prev, { type: "user", content: msg }]);
-    
-    // Generate contextual response based on user message using the real AiService
-    const response = await aiService.getCoachingResponse(coachState, msg, messages);
-    
-    const aiResponse = response && response.response
-      ? formatCoachMessage(response.response) 
-      : "I'm having trouble connecting to my database right now. Give me a second.";
-    
-    setMessages(prev => [...prev, { 
-      type: "ai", 
-      content: aiResponse,
-      confidence: response?.response?.confidence || coachState.confidence,
-      widget: response?.response?.widgets?.[0]?.component || undefined,
-      insight: response?.response?.widgets?.[0]?.data || undefined,
-    }]);
+    const trimmed = msg.trim();
+    if (!trimmed || isSending) return;
+
+    const userMessage = { type: "user", content: trimmed };
+    const nextHistory = appendChatMessage(messagesRef.current, userMessage);
+    if (nextHistory.length === messagesRef.current.length) {
+      return;
+    }
+
+    setIsSending(true);
+    const nextMessages = [...messagesRef.current, userMessage];
+    setMessages(nextMessages);
+
+    try {
+      const response = await aiService.getCoachingResponse(coachState, trimmed, nextHistory);
+
+      const aiResponse = response && response.response
+        ? formatCoachMessage(response.response)
+        : "I'm having trouble connecting to my database right now. Give me a second.";
+
+      const aiMsg = {
+        type: "ai",
+        content: aiResponse,
+        confidence: response?.response?.confidence || coachState.confidence,
+        widget: response?.response?.widgets?.[0]?.component || undefined,
+        insight: response?.response?.widgets?.[0]?.data || undefined,
+      };
+
+      setMessages(prev => {
+        const next = [...prev, aiMsg];
+        // persist conversation if allowed
+        try {
+          const storeHistory = localStorage.getItem('ascend_ai_store_history');
+          if (storeHistory !== 'false') {
+            const raw = localStorage.getItem('ascend_ai_conversations') || '[]';
+            const convos = JSON.parse(raw);
+            const id = crypto.randomUUID();
+            const title = (next.find((m: any) => m.type === 'user')?.content || '').slice(0, 50) || 'Conversation';
+            const snippet = (aiMsg.content || '').slice(0, 200);
+            const entry = { id, title, snippet, createdAt: new Date().toISOString(), messages: next };
+            convos.unshift(entry);
+            // keep limit
+            localStorage.setItem('ascend_ai_conversations', JSON.stringify(convos.slice(0, 50)));
+          }
+        } catch (e) {}
+        return next;
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -157,10 +219,10 @@ export default function AICommandModule() {
               <Badge variant="outline" className="border-success text-success text-[9px] px-1.5 py-0">Online</Badge>
             </div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-text-secondary">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-text-secondary" onClick={() => setIsHistoryOpen(true)}>
                 <History size={16} />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-text-secondary">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-text-secondary" onClick={() => setIsSettingsOpen(true)}>
                 <Settings size={16} />
               </Button>
             </div>
@@ -213,7 +275,7 @@ export default function AICommandModule() {
 
           {/* Omnibar Input Area */}
           <div className="p-4 bg-gradient-to-t from-bg-surface to-transparent shrink-0">
-            <Omnibar onSend={handleSend} placeholder={coachState.prompt} />
+            <Omnibar onSend={handleSend} placeholder={coachState.prompt} disabled={isSending} />
             <div className="flex justify-center gap-4 mt-3 flex-wrap">
               <Caption className="text-[10px] text-text-secondary hover:text-accent-ai cursor-pointer transition-colors">
                 "Suggest a high-protein Indian breakfast"
@@ -230,6 +292,32 @@ export default function AICommandModule() {
         </div>
 
       </div>
+      {/* History & Settings overlays */}
+      {isHistoryOpen && (
+        <AIHistoryModal
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          onLoad={(id: string) => {
+            try {
+              const raw = localStorage.getItem('ascend_ai_conversations');
+              if (!raw) return;
+              const convos = JSON.parse(raw);
+              const found = convos.find((c: any) => c.id === id);
+              if (!found) return;
+              const payload = found.messages || found.payload || null;
+              if (payload && Array.isArray(payload)) {
+                setMessages(payload);
+                messagesRef.current = payload;
+              }
+            } catch (e) {}
+            setIsHistoryOpen(false);
+          }}
+        />
+      )}
+
+      {isSettingsOpen && (
+        <AISettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      )}
     </PageContainer>
   );
 }

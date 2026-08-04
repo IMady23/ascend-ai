@@ -7,6 +7,29 @@ import { useNutritionStore } from "@/stores/nutrition.store";
 import { useActivityStore } from "@/stores/activity.store";
 import { eventBus } from "@/lib/events/EventBus";
 
+let recoverySyncInitialized = false;
+
+function subscribeRecoveryDependencies() {
+  if (recoverySyncInitialized) return;
+
+  const nutritionStore = useNutritionStore.getState();
+  const activityStore = useActivityStore.getState();
+
+  useNutritionStore.subscribe((state) => {
+    if (state.dailyCalories !== nutritionStore.dailyCalories || state.dailyProtein !== nutritionStore.dailyProtein || state.dailyWaterMl !== nutritionStore.dailyWaterMl) {
+      useRecoveryStore.getState().calculateRecoveryScore();
+    }
+  });
+
+  useActivityStore.subscribe((state) => {
+    if (state.activities !== activityStore.activities || state.dailySteps !== activityStore.dailySteps) {
+      useRecoveryStore.getState().calculateRecoveryScore();
+    }
+  });
+
+  recoverySyncInitialized = true;
+}
+
 export interface ExplanationPoint {
   factor: string;
   impact: "positive" | "negative" | "neutral";
@@ -63,6 +86,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
       },
 
       logRecoverySession: async (sessionData) => {
+        subscribeRecoveryDependencies();
         const userId = useUserStore.getState().userId;
         const id = crypto.randomUUID();
         const now = new Date();
@@ -91,6 +115,7 @@ export const useRecoveryStore = create<EnhancedRecoveryState>()(
       },
 
       fetchRecovery: async () => {
+        subscribeRecoveryDependencies();
         const userId = useUserStore.getState().userId;
         if (!userId) {
           // If no user, just calculate local state

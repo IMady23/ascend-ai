@@ -5,7 +5,12 @@ import { useNutritionStore } from "@/stores/nutrition.store";
 import { useWorkspaceStore } from "@/stores/workspace.store";
 import { useProgressionStore } from "@/stores/progression.store";
 import { useAnalyticsStore } from "@/stores/analytics.store";
-import { useSettingsStore } from "@/stores/settings.store";
+import { useMetricsStore } from "@/stores/metrics.store";
+import { useMissionStore } from "@/stores/mission.store";
+import { useNotificationStore } from "@/stores/notification.store";
+import { useRecoveryStore } from "@/stores/recovery.store";
+import { useReminderStore } from "@/stores/reminder.store";
+import { useDashboardPersonalization } from "@/stores/dashboard-personalization.store";
 
 /**
  * Clears all user-scoped local state on logout.
@@ -68,29 +73,66 @@ export function resetStoresOnLogout() {
     recentFoods: [],
   });
 
-  useActivityStore.setState({
-    activities: [],
-    currentActivity: null,
-    workoutState: "not_started",
-    startTime: null,
-    elapsedTime: 0,
-    notes: "",
-    activeExercises: [],
-    dailySteps: 0,
+  useMetricsStore.setState({
+    weightHistory: [],
+    compositionHistory: [],
   });
+
+  useMissionStore.setState({
+    missions: [],
+    activeMissionId: null,
+  });
+
+  useNotificationStore.setState({
+    notifications: [],
+  });
+
+  useRecoveryStore.setState({
+    currentProfile: null,
+    history: [],
+    sessions: [],
+    muscleRecovery: { chest: 100, back: 100, legs: 100, shoulders: 100, arms: 100 },
+    explanation: [],
+  });
+
+  useReminderStore.getState().clearState();
+
+  if ((useProgressionStore.getState() as any).setProfile) {
+    useProgressionStore.setState({ profile: null, activeMissions: [] });
+  }
 
   // Clear persisted localStorage so Zustand's persist middleware cannot
   // rehydrate stale data from the previous session on the next login.
   // Without this, after setState([]) clears in-memory state, persist
   // immediately rehydrates it back from localStorage on the next tick.
+  const PERSIST_KEYS = [
+    "ascend-nutrition-storage",
+    "ascend-activity-storage",
+    "ascend-metrics-storage",
+    "ascend-mission-storage",
+    "ascend-notification-preferences",
+    "ascend-recovery-storage",
+    "ascend-reminder-storage",
+    "ascend-progression-storage",
+    "ascend-dashboard-personalization",
+    "ascend-workspace-storage",
+  ];
+
   try {
     useNutritionStore.persist.clearStorage();
     useActivityStore.persist.clearStorage();
+    useMetricsStore.persist.clearStorage();
+    useMissionStore.persist.clearStorage();
+    useNotificationStore.persist.clearStorage();
+    useRecoveryStore.persist.clearStorage();
+    useReminderStore.persist.clearStorage();
+    useProgressionStore.persist.clearStorage();
+    useDashboardPersonalization.persist.clearStorage();
+    useWorkspaceStore.persist.clearStorage();
   } catch {
-    // Fallback for browsers that block localStorage
+    // Fallback for browsers that block localStorage access
     try {
-      localStorage.removeItem("ascend-nutrition-storage");
-      localStorage.removeItem("ascend-activity-storage");
+      PERSIST_KEYS.forEach(key => localStorage.removeItem(key));
     } catch { /* ignore */ }
   }
 }

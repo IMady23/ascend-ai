@@ -7,10 +7,11 @@ import { useUserStore } from "@/stores/user.store";
 import { SyncManager } from "@/services/sync/sync-manager";
 import { resetStoresOnLogout } from "@/lib/auth/reset-stores";
 import { ReminderEngine } from "@/services/notifications/reminder.engine";
+import { auth } from "@/lib/firebase";
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 import type { UserProfile } from "@/types/user";
-import { AUTH_ROUTES, ONBOARDING_ROUTE, resolvePostAuthRoute } from "@/lib/auth/post-auth-routing";
+import { AUTH_ROUTES, resolvePostAuthRoute } from "@/lib/auth/post-auth-routing";
 
 type StartupState = 'INITIALIZING' | 'AUTH_LOADING' | 'PROFILE_LOADING' | 'READY' | 'ROUTED';
 
@@ -21,12 +22,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [startupState, setStartupState] = useState<StartupState>('INITIALIZING');
   const pathnameRef = useRef(pathname);
   pathnameRef.current = pathname;
+  // Tracks whether we've received at least one confirmed auth state from Firebase.
+  // Firebase fires null on page load before resolving the persisted session from
+  // IndexedDB. Without this guard, that transient null triggers resetStoresOnLogout(),
+  // which wipes localStorage (nutrition/activity stores), causing calories and water
+  // to reset to 0 on every refresh even though the user is authenticated.
+  const authResolvedRef = useRef(false);
 
   // Firebase auth subscription — runs once
   useEffect(() => {
     setStartupState('AUTH_LOADING');
+
+    // Wait for Firebase to resolve the persisted auth session before subscribing
+    // to state changes. authStateReady() resolves once the initial auth state is
+    // known, preventing us from acting on the transient null that Firebase emits
+    // during its IndexedDB read on page load.
+    auth.authStateReady().then(() => {
+      authResolvedRef.current = true;
+    });
+
     const unsubscribe = AuthRepository.onAuthStateChanged(async (user) => {
       if (user) {
+        authResolvedRef.current = true;
         setStartupState('PROFILE_LOADING');
         setUserId(user.uid);
 
@@ -54,6 +71,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStartupState('ROUTED');
 
       } else {
+        // Only run logout cleanup once Firebase has confirmed the auth state.
+        // On page refresh, Firebase emits null before reading the persisted session
+        // from IndexedDB. Acting on that null would wipe stores and localStorage,
+        // causing all nutrition/activity data to reset to 0 on every refresh.
+        if (!authResolvedRef.current) {
+          console.log("[AuthProvider] Skipping logout cleanup — auth not yet resolved (transient null)");
+          return;
+        }
+
         resetStoresOnLogout();
         setAuthStatus(false, true, false);
         SyncManager.stopSync();

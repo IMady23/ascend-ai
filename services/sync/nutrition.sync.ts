@@ -36,17 +36,30 @@ export const NutritionSync = {
       userId,
       currentDate,
       (logs) => {
-        useNutritionStore.getState().setMeals(logs);
+        // Guard: if Firestore fires its first empty snapshot (before cache warms up)
+        // but the store already has locally-persisted meals for TODAY, skip the update.
+        // This prevents dailyCalories from resetting to 0 on page refresh.
+        // We check specifically for today's meals to avoid skipping a genuinely
+        // empty today when the store only has meals from previous days.
+        const state = useNutritionStore.getState();
+        const todaysMeals = state.meals.filter((m) => m.date === currentDate);
+        if (logs.length === 0 && todaysMeals.length > 0) return;
+        state.setMeals(logs);
       },
       (error) => console.error("Failed to sync nutrition logs:", error)
     );
 
-    // Same reasoning applies to hydration — setHydrationLogs is safe merge
+    // Same guard applies to hydration
     unsubscribeHydration = NutritionRepository.subscribeToHydrationLogs(
       userId,
       currentDate,
       (logs) => {
-        useNutritionStore.getState().setHydrationLogs(logs);
+        // Guard: if Firestore fires its first empty snapshot but the store already has
+        // locally-persisted hydration logs for TODAY, skip the update.
+        const state = useNutritionStore.getState();
+        const todaysLogs = state.hydrationLogs.filter((l) => l.date === currentDate);
+        if (logs.length === 0 && todaysLogs.length > 0) return;
+        state.setHydrationLogs(logs);
       },
       (error) => console.error("Failed to sync hydration logs:", error)
     );

@@ -17,8 +17,6 @@ export class ReminderEngine {
   static start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    
-    console.log("[ReminderEngine] Engine started.");
 
     // Handle visibility changes (e.g. laptop wakes up, tab becomes active)
     if (typeof window !== "undefined") {
@@ -37,12 +35,10 @@ export class ReminderEngine {
       document.removeEventListener("visibilitychange", this.handleVisibilityChange);
       window.removeEventListener("focus", this.handleVisibilityChange);
     }
-    console.log("[ReminderEngine] Engine stopped.");
   }
 
   private static handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
-      console.log("[ReminderEngine] Wake-up detected. Re-evaluating reminders.");
       this.evaluateNext();
     }
   };
@@ -87,8 +83,6 @@ export class ReminderEngine {
 
     // Schedule the timeout
     this.currentNextReminderId = nextReminder.reminder.id;
-    console.log(`[ReminderEngine] Scheduled next reminder (${nextReminder.reminder.title}) for ${nextReminder.triggerTime.toLocaleTimeString()}`);
-    
     this.timeoutId = setTimeout(() => {
       this.triggerReminder(nextReminder!.reminder);
     }, delay);
@@ -137,8 +131,6 @@ export class ReminderEngine {
   }
 
   private static async triggerReminder(reminder: Reminder) {
-    console.log(`[ReminderEngine] Triggering reminder: ${reminder.id}`);
-    
     const now = new Date();
     
     // Check delivery guard (Idempotency)
@@ -146,7 +138,6 @@ export class ReminderEngine {
     if (reminder.lastTriggeredAt) {
       const lastTrigger = new Date(reminder.lastTriggeredAt);
       if (now.getTime() - lastTrigger.getTime() < 60000) {
-        console.warn(`[ReminderEngine] Idempotency guard blocked duplicate trigger for ${reminder.id}`);
         this.evaluateNext();
         return;
       }
@@ -219,9 +210,8 @@ export class ReminderEngine {
         const userEmail = auth.currentUser?.email;
         
         if (!userEmail) {
-          console.warn(`[ReminderEngine] ❌ Email failed.\nReason: No authenticated user email found.`);
+          console.error(`[ReminderEngine] Email delivery failed: no authenticated user email found.`);
         } else {
-          console.log(`[ReminderEngine] 📧 Sending reminder email...\nRecipient: ${userEmail}\nReminder Type: ${reminder.type}`);
           fetch("/api/email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -236,18 +226,16 @@ export class ReminderEngine {
               }
             })
           }).then(res => {
-            if (res.ok) {
-              console.log("[ReminderEngine] ✅ Email sent");
-            } else {
-              console.error(`[ReminderEngine] ❌ Email failed.\nReason: API returned status ${res.status}`);
+            if (!res.ok) {
+              console.error(`[ReminderEngine] Email delivery failed: API returned status ${res.status}`);
             }
           }).catch(err => {
-            console.error(`[ReminderEngine] ❌ Email failed.\nReason: ${err.message}`);
+            console.error(`[ReminderEngine] Email delivery failed: ${err.message}`);
           });
           deliveredChannels.push("email");
         }
       } catch (e: any) {
-        console.error(`[ReminderEngine] ❌ Email failed.\nReason: ${e.message}`);
+        console.error(`[ReminderEngine] Email delivery failed: ${e.message}`);
       }
     }
 

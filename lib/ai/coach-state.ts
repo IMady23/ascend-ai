@@ -30,6 +30,16 @@ export function determineConfidenceLevel(input: {
   return "Low";
 }
 
+function resolveDisplayName(profile: any): string {
+  return (
+    profile?.identity?.nickname ||
+    profile?.identity?.fullName?.split(" ")[0] ||
+    profile?.nickname ||
+    profile?.name?.split(" ")[0] ||
+    "there"
+  );
+}
+
 export function buildCoachState(input: {
   profile?: any; // Accepting UserProfile loosely to avoid strict dependency loop if not needed
   workoutCount: number;
@@ -37,7 +47,7 @@ export function buildCoachState(input: {
   hasActiveMealPlan: boolean;
   completedWorkoutToday: boolean;
 }): CoachState {
-  const userName = input.profile?.identity?.nickname || input.profile?.identity?.fullName?.split(" ")[0] || "there";
+  const userName = resolveDisplayName(input.profile);
   const confidence = determineConfidenceLevel({
     workoutCount: input.workoutCount,
     mealCount: input.mealCount,
@@ -103,7 +113,7 @@ export function buildFallbackCoachResponse(
   contextSnapshot: any,
   userMessage: string
 ): { summary: string; followUpQuestion: string; confidence: number } {
-  const userName = contextSnapshot.profile?.identity?.nickname || contextSnapshot.profile?.identity?.fullName?.split(" ")[0] || "there";
+  const userName = resolveDisplayName(contextSnapshot.profile);
   const hasWorkouts = (contextSnapshot.training?.totalWorkouts || 0) > 0;
   const hasMeals = (contextSnapshot.nutrition?.caloriesConsumed || 0) > 0;
 

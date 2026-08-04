@@ -39,7 +39,7 @@ import { MealConfirmationWidget } from "@/features/ai/components/MealConfirmatio
 
 export default function NutritionModule() {
   const { profile, isLoading: isUserLoading } = useUserStore();
-  const { meals = [], dailyCalories, dailyProtein, dailyWaterMl, dailySugar, setDailyWater, currentDate } = useNutritionStore();
+  const { meals = [], dailyCalories, dailyProtein, dailyWaterMl, dailySugar, currentDate, addWater } = useNutritionStore();
   
   const readiness = useDataReadiness();
   const isLoading = isUserLoading || readiness.nutrition.status === "loading";
@@ -228,11 +228,11 @@ export default function NutritionModule() {
           <HydrationBeakerWidget 
             currentOunces={hydration}
             goalOunces={targets.water}
-            onClick={() => {
+            onClick={async () => {
               const newHydration = Math.min(hydration + 250, targets.water);
               setHydration(newHydration);
-              setDailyWater(newHydration);
-              
+              await addWater(250);
+
               if (newHydration >= targets.water && hydration < targets.water) {
                 triggerCelebration({
                   title: 'Hydration Goal Met!',

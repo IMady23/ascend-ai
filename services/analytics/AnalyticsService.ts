@@ -109,19 +109,39 @@ export class AnalyticsService {
   }
 
   static injectNutritionLog(log: NutritionLog) {
-    this.cache.nutritionLogs.push(log);
+    const existingIndex = this.cache.nutritionLogs.findIndex(item => item.id === log.id || item.date === log.date && item.mealType === log.mealType && item.timestamp?.seconds === log.timestamp?.seconds);
+    if (existingIndex >= 0) {
+      this.cache.nutritionLogs[existingIndex] = { ...this.cache.nutritionLogs[existingIndex], ...log };
+    } else {
+      this.cache.nutritionLogs.push(log);
+    }
   }
 
   static injectActivity(activity: Activity) {
-    this.cache.activities.push(activity);
+    const existingIndex = this.cache.activities.findIndex(item => item.id === activity.id || item.date?.toDate?.().toISOString?.() === activity.date?.toDate?.().toISOString?.());
+    if (existingIndex >= 0) {
+      this.cache.activities[existingIndex] = { ...this.cache.activities[existingIndex], ...activity };
+    } else {
+      this.cache.activities.push(activity);
+    }
   }
 
   static injectDailyLog(log: DailyLog) {
-    this.cache.dailyLogs.push(log);
+    const existingIndex = this.cache.dailyLogs.findIndex(item => item.date === log.date);
+    if (existingIndex >= 0) {
+      this.cache.dailyLogs[existingIndex] = { ...this.cache.dailyLogs[existingIndex], ...log };
+    } else {
+      this.cache.dailyLogs.push(log);
+    }
   }
 
   static injectHydrationLog(log: HydrationLog) {
-    this.cache.hydrationLogs.push(log);
+    const existingIndex = this.cache.hydrationLogs.findIndex(item => item.id === log.id || item.date === log.date && item.timestamp?.seconds === log.timestamp?.seconds);
+    if (existingIndex >= 0) {
+      this.cache.hydrationLogs[existingIndex] = { ...this.cache.hydrationLogs[existingIndex], ...log };
+    } else {
+      this.cache.hydrationLogs.push(log);
+    }
   }
 
   static updateDailyLogSteps(date: string, steps: number) {

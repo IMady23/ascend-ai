@@ -146,7 +146,28 @@ export const useNutritionStore = create<NutritionState>()(
           dailyWaterMl: todaysWater.reduce((acc, l) => acc + (l.amountMl || 0), 0)
         };
       }),
-      setDailyWater: (waterMl) => set({ dailyWaterMl: waterMl }), // Legacy support
+      setDailyWater: (waterMl) => set((state) => {
+        const currentDateLogs = state.hydrationLogs.filter((log) => log.date === state.currentDate);
+        const otherLogs = state.hydrationLogs.filter((log) => log.date !== state.currentDate);
+
+        if (waterMl <= 0) {
+          return { hydrationLogs: otherLogs, dailyWaterMl: 0 };
+        }
+
+        const existingLog = currentDateLogs[0];
+        const replacementLog: HydrationLog = {
+          id: existingLog?.id || crypto.randomUUID(),
+          userId: existingLog?.userId || useUserStore.getState().userId || "",
+          amountMl: waterMl,
+          date: state.currentDate,
+          timestamp: existingLog?.timestamp || { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as any,
+        };
+
+        return {
+          hydrationLogs: [replacementLog, ...otherLogs],
+          dailyWaterMl: waterMl,
+        };
+      }), // Legacy support
 
       addMeal: async (mealData) => {
         const userId = useUserStore.getState().userId;
@@ -280,7 +301,9 @@ export const useNutritionStore = create<NutritionState>()(
           const newLogs = [newLog, ...state.hydrationLogs];
           return {
             hydrationLogs: newLogs,
-            dailyWaterMl: newLogs.reduce((acc, l) => acc + (l.amountMl || 0), 0)
+            dailyWaterMl: newLogs
+              .filter((l) => l.date === state.currentDate)
+              .reduce((acc, l) => acc + (l.amountMl || 0), 0),
           };
         });
 
