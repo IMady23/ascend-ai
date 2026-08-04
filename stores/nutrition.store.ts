@@ -23,7 +23,9 @@ interface NutritionState {
 
   // Setters for Sync
   setMeals: (meals: NutritionLog[]) => void;
+  replaceMeals: (meals: NutritionLog[]) => void; // Full replace from Firestore (used by sync)
   setHydrationLogs: (logs: HydrationLog[]) => void;
+  replaceHydrationLogs: (logs: HydrationLog[]) => void; // Full replace from Firestore (used by sync)
   setMealPlans: (plans: MealPlan[]) => void;
   setCustomFoods: (foods: FoodItem[]) => void;
   setCurrentDate: (date: string) => void;
@@ -62,31 +64,31 @@ export const useNutritionStore = create<NutritionState>()(
         set((state) => {
           // Merge meals by ID to prevent wiping local optimistic updates or other dates
           const mealMap = new Map<string, NutritionLog>();
-          
-          // Add all existing meals first
           state.meals.forEach(m => mealMap.set(m.id, m));
-          
-          // Overwrite/add with incoming newMeals
           newMeals.forEach(m => mealMap.set(m.id, m));
-          
           const mergedMeals = Array.from(mealMap.values());
-          // Keep sorted by createdAt descending
-          mergedMeals.sort((a, b) => {
-            const aTime = a.createdAt?.seconds || 0;
-            const bTime = b.createdAt?.seconds || 0;
-            return bTime - aTime;
-          });
-          
+          mergedMeals.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
           const todaysMeals = mergedMeals.filter(m => m.date === state.currentDate);
-          const calories = todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
-          const protein = todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
-          const sugar = todaysMeals.reduce((acc, m) => acc + (m.sugar || 0), 0);
-          
-          return { 
-            meals: mergedMeals, 
-            dailyCalories: calories, 
-            dailyProtein: protein,
-            dailySugar: sugar
+          return {
+            meals: mergedMeals,
+            dailyCalories: todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
+            dailyProtein: todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailySugar: todaysMeals.reduce((acc, m) => acc + (m.sugar || 0), 0),
+          };
+        });
+      },
+
+      // Full replace — used by NutritionSync so Firestore is authoritative source.
+      // Does NOT merge with stale localStorage data.
+      replaceMeals: (newMeals) => {
+        set((state) => {
+          const sorted = [...newMeals].sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+          const todaysMeals = sorted.filter(m => m.date === state.currentDate);
+          return {
+            meals: sorted,
+            dailyCalories: todaysMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
+            dailyProtein: todaysMeals.reduce((acc, m) => acc + (m.protein || 0), 0),
+            dailySugar: todaysMeals.reduce((acc, m) => acc + (m.sugar || 0), 0),
           };
         });
       },
@@ -95,18 +97,19 @@ export const useNutritionStore = create<NutritionState>()(
           const logMap = new Map<string, HydrationLog>();
           state.hydrationLogs.forEach(l => logMap.set(l.id, l));
           logs.forEach(l => logMap.set(l.id, l));
-          
           const mergedLogs = Array.from(logMap.values());
-          mergedLogs.sort((a, b) => {
-            const aTime = a.timestamp?.seconds || 0;
-            const bTime = b.timestamp?.seconds || 0;
-            return bTime - aTime;
-          });
-          
+          mergedLogs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
           const todaysLogs = mergedLogs.filter(l => l.date === state.currentDate);
-          const water = todaysLogs.reduce((acc, l) => acc + (l.amountMl || 0), 0);
-          
-          return { hydrationLogs: mergedLogs, dailyWaterMl: water };
+          return { hydrationLogs: mergedLogs, dailyWaterMl: todaysLogs.reduce((acc, l) => acc + (l.amountMl || 0), 0) };
+        });
+      },
+
+      // Full replace — used by NutritionSync on login. Firestore is authoritative.
+      replaceHydrationLogs: (logs) => {
+        set((state) => {
+          const sorted = [...logs].sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+          const todaysLogs = sorted.filter(l => l.date === state.currentDate);
+          return { hydrationLogs: sorted, dailyWaterMl: todaysLogs.reduce((acc, l) => acc + (l.amountMl || 0), 0) };
         });
       },
       setMealPlans: (plans) => {

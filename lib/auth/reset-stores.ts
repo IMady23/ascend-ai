@@ -67,4 +67,31 @@ export function resetStoresOnLogout() {
     favoriteFoods: [],
     recentFoods: [],
   });
+
+  useActivityStore.setState({
+    activities: [],
+    currentActivity: null,
+    workoutState: "not_started",
+    startTime: null,
+    elapsedTime: 0,
+    notes: "",
+    activeExercises: [],
+    dailySteps: 0,
+  });
+
+  // Clear persisted localStorage so Zustand's persist middleware cannot
+  // rehydrate stale data from the previous session on the next login.
+  // Without this, after setState([]) clears in-memory state, persist
+  // immediately rehydrates it back from localStorage on the next tick.
+  try {
+    useNutritionStore.persist.clearStorage();
+    useActivityStore.persist.clearStorage();
+  } catch {
+    // Fallback for browsers that block localStorage
+    try {
+      localStorage.removeItem("ascend-nutrition-storage");
+      localStorage.removeItem("ascend-activity-storage");
+    } catch { /* ignore */ }
+  }
 }
+

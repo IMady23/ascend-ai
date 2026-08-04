@@ -12,21 +12,22 @@ export const NutritionSync = {
     // 1. Meals
     const currentDate = useNutritionStore.getState().currentDate;
 
+    // 1. Meals — use replaceMeals so Firestore is authoritative on login
     unsubscribeMeals = NutritionRepository.subscribeToNutritionLogs(
       userId,
       currentDate,
       (logs) => {
-        useNutritionStore.getState().setMeals(logs);
+        useNutritionStore.getState().replaceMeals(logs);
       },
       (error) => console.error("Failed to sync nutrition logs:", error)
     );
 
-    // 2. Hydration
+    // 2. Hydration — use replaceHydrationLogs so Firestore is authoritative on login
     unsubscribeHydration = NutritionRepository.subscribeToHydrationLogs(
       userId,
       currentDate,
       (logs) => {
-        useNutritionStore.getState().setHydrationLogs(logs);
+        useNutritionStore.getState().replaceHydrationLogs(logs);
       },
       (error) => console.error("Failed to sync hydration logs:", error)
     );
