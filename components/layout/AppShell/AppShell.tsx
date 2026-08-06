@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0 h-full max-w-[1600px] mx-auto relative md:pb-0 pb-16">
         <TopBar />
         <main 
-          className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pb-6"
+          className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pb-6 overscroll-none"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {children}

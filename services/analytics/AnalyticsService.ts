@@ -26,27 +26,25 @@ export class AnalyticsService {
   };
 
   /**
-   * Fetches all relevant historical data ONCE and caches it locally.
+   * Fetches historical data and caches it locally.
+   * @param lookbackDays — default 30 for dashboard; use 365 on analytics pages.
    */
-  static async initializeCache(userId: string, forceRefresh = false) {
+  static async initializeCache(userId: string, forceRefresh = false, lookbackDays = 30) {
     if (!forceRefresh && this.cache.lastFetched) {
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      if (this.cache.lastFetched > oneHourAgo) {
-        return; // Cache is fresh enough
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      if (this.cache.lastFetched > fiveMinutesAgo) {
+        return;
       }
     }
 
-    console.log("[AnalyticsService] Fetching raw data for analytics cache...");
-    
-    // We fetch the last 365 days of data to support all filters up to 1 Year.
-    const oneYearAgoDate = new Date();
-    oneYearAgoDate.setFullYear(oneYearAgoDate.getFullYear() - 1);
-    const oneYearAgoString = oneYearAgoDate.toISOString().split("T")[0]; // YYYY-MM-DD
-    const oneYearAgoTimestamp = Timestamp.fromDate(oneYearAgoDate);
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - lookbackDays);
+    const startDateString = startDate.toISOString().split("T")[0];
+    const startTimestamp = Timestamp.fromDate(startDate);
 
-    // 1. Fetch Daily Logs (contains weight, steps, sleep, mood, energy)
+    // 1. Daily Logs
     const logsRef = collection(db, "users", userId, "daily_logs");
-    const logsQ = query(logsRef, where("date", ">=", oneYearAgoString), orderBy("date", "desc"));
+    const logsQ = query(logsRef, where("date", ">=", startDateString), orderBy("date", "desc"));
     const logsSnap = await getDocs(logsQ);
     const dailyLogs = logsSnap.docs.map(d => {
       const data = d.data();
@@ -60,7 +58,7 @@ export class AnalyticsService {
 
     // 2. Fetch Activities (contains workouts, duration, volume)
     const activitiesRef = collection(db, "users", userId, "activities");
-    const activitiesQ = query(activitiesRef, where("date", ">=", oneYearAgoTimestamp), orderBy("date", "desc"));
+    const activitiesQ = query(activitiesRef, where("date", ">=", startTimestamp), orderBy("date", "desc"));
     const activitiesSnap = await getDocs(activitiesQ);
     const activities = activitiesSnap.docs.map(d => {
       const data = d.data();
@@ -69,7 +67,7 @@ export class AnalyticsService {
 
     // 3. Fetch Nutrition Logs (contains meals, macros)
     const nutritionRef = collection(db, "users", userId, "nutrition_logs");
-    const nutritionQ = query(nutritionRef, where("date", ">=", oneYearAgoString), orderBy("date", "desc"));
+    const nutritionQ = query(nutritionRef, where("date", ">=", startDateString), orderBy("date", "desc"));
     const nutritionSnap = await getDocs(nutritionQ);
     const nutritionLogs = nutritionSnap.docs.map(d => {
       const data = d.data();
@@ -84,7 +82,7 @@ export class AnalyticsService {
 
     // 4. Fetch Hydration Logs
     const hydrationRef = collection(db, "users", userId, "hydration_logs");
-    const hydrationQ = query(hydrationRef, where("date", ">=", oneYearAgoString), orderBy("date", "desc"));
+    const hydrationQ = query(hydrationRef, where("date", ">=", startDateString), orderBy("date", "desc"));
     const hydrationSnap = await getDocs(hydrationQ);
     const hydrationLogs = hydrationSnap.docs.map(d => d.data() as HydrationLog);
 

@@ -87,7 +87,10 @@ export default function MissionControl() {
 
   useEffect(() => {
     if (userId) {
-      fetchStats(userId);
+      // Defer analytics fetch — it's heavy (4 Firestore queries for 365 days)
+      // and not needed for the initial paint. Run it after the dashboard has rendered.
+      const id = setTimeout(() => fetchStats(userId), 200);
+      return () => clearTimeout(id);
     }
   }, [userId, fetchStats]);
 

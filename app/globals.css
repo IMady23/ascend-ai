@@ -169,3 +169,18 @@ body {
   }
 }
 
+@keyframes ambient-blob-drift {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.03; }
+  50% { transform: scale(1.1) translate(2%, 2%); opacity: 0.05; }
+}
+
+.ambient-blob-animate {
+  animation: ambient-blob-drift 30s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-blob-animate {
+    animation: none;
+  }
+}
+

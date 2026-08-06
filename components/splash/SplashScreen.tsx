@@ -79,10 +79,12 @@ export function SplashScreen({ onFinish, onRevealApp }: SplashScreenProps) {
         muted
         playsInline
         preload="auto"
+        width="1920"
+        height="1080"
         onEnded={handleVideoEnded}
         onError={handleVideoError}
         className={cn(
-          "w-full h-full object-contain md:object-cover transition-opacity duration-300",
+          "w-full h-full object-cover transition-opacity duration-300",
           phase === "fading" ? "opacity-0" : "opacity-100"
         )}
       >

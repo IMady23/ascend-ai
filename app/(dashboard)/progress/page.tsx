@@ -44,7 +44,7 @@ export default function ProgressPage() {
 
   React.useEffect(() => {
     if (userId) {
-      fetchStats(userId);
+      fetchStats(userId, { lookbackDays: 365 });
     }
   }, [userId, fetchStats]);
 

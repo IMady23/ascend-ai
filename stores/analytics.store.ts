@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { AnalyticsService, TimeRange } from '@/services/analytics/AnalyticsService';
 import { useUserStore } from './user.store';
+import { scheduleIdleWork } from '@/lib/performance/schedule-idle';
+
+export type AnalyticsFetchOptions = {
+  forceRefresh?: boolean;
+  lookbackDays?: number;
+};
 
 export type AnalyticsSlice = 'nutrition' | 'workout' | 'hydration' | 'weight' | 'sleep' | 'general' | 'all';
 
@@ -34,7 +40,7 @@ export interface AnalyticsState {
 
   // Actions
   setTimeRange: (range: TimeRange) => void;
-  fetchStats: (userId: string, forceRefresh?: boolean) => Promise<void>;
+  fetchStats: (userId: string, options?: AnalyticsFetchOptions) => Promise<void>;
   recalculate: (slices?: AnalyticsSlice[]) => void;
   setInteractionState: (updates: Partial<Pick<AnalyticsState, 'selectedDate' | 'hoveredDate' | 'isTimelineLocked' | 'activeMetric' | 'selectedChart' | 'inspectionMode' | 'comparisonMode'>>) => void;
   clearInteractionState: () => void;
@@ -174,47 +180,62 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
     set(updates);
   },
 
-  fetchStats: async (userId, forceRefresh = false) => {
+  fetchStats: async (userId, options = {}) => {
+    const { forceRefresh = false, lookbackDays = 30 } = options;
     set({ isLoading: true, error: null });
     try {
-      await AnalyticsService.initializeCache(userId, forceRefresh);
-      
+      await AnalyticsService.initializeCache(userId, forceRefresh, lookbackDays);
+
       const cache = AnalyticsService.getCache();
-      const hasData = cache.activities.length > 0 || cache.dailyLogs.length > 0 || cache.nutritionLogs.length > 0;
-      
+      const hasData =
+        cache.activities.length > 0 ||
+        cache.dailyLogs.length > 0 ||
+        cache.nutritionLogs.length > 0;
+
       if (!hasData) {
         set({ hasData: false, isLoading: false });
+        return;
       }
 
       set({ hasData: true, isLoading: false });
-      get().recalculate(['all']); // initial full slice
 
-      // Setup BroadcastChannel for cross-tab sync
-      if (typeof window !== 'undefined') {
-        try {
-          const channel = new BroadcastChannel('ascend_analytics_sync');
-          channel.onmessage = (event) => {
-             if (event.data.type === 'SYNC_RECALCULATE') {
-               get().recalculate(event.data.slices);
-             } else if (event.data.type === 'SYNC_INTERACTION') {
-               set({ ...event.data.state });
-             }
-          };
-          window.addEventListener('storage', (e) => {
-            if (e.key === 'ascend_sync_trigger') {
-               get().recalculate(['all']);
-            }
-          });
-        } catch (e) {
-          console.warn('BroadcastChannel not supported');
-        }
-      }
+      // Recalculate off the main thread path so the dashboard stays responsive
+      scheduleIdleWork(() => get().recalculate(['all']));
+
+      ensureAnalyticsListeners();
     } catch (error: any) {
       console.error('Failed to fetch analytics stats:', error);
       set({ error: error.message || 'Failed to fetch stats', isLoading: false });
     }
   },
 }));
+
+let analyticsListenersRegistered = false;
+
+function ensureAnalyticsListeners() {
+  if (analyticsListenersRegistered || typeof window === 'undefined') return;
+  analyticsListenersRegistered = true;
+
+  try {
+    const channel = new BroadcastChannel('ascend_analytics_sync');
+    channel.onmessage = (event) => {
+      const store = useAnalyticsStore.getState();
+      if (event.data.type === 'SYNC_RECALCULATE') {
+        scheduleIdleWork(() => store.recalculate(event.data.slices));
+      } else if (event.data.type === 'SYNC_INTERACTION') {
+        store.setInteractionState(event.data.state);
+      }
+    };
+  } catch {
+    // BroadcastChannel not supported
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ascend_sync_trigger') {
+      scheduleIdleWork(() => useAnalyticsStore.getState().recalculate(['all']));
+    }
+  });
+}
 
 // Setup EventBus listener outside the store to bridge domains
 import { eventBus } from '@/lib/events/EventBus';
@@ -278,7 +299,7 @@ if (typeof window !== 'undefined') {
         break;
     }
 
-    store.recalculate(slicesToUpdate);
+    scheduleIdleWork(() => store.recalculate(slicesToUpdate));
 
     try {
       const channel = new BroadcastChannel('ascend_analytics_sync');

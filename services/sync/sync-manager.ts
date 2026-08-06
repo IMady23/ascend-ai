@@ -5,10 +5,11 @@ import { ActivitySync } from "./activity.sync";
 import { NutritionSync } from "./nutrition.sync";
 import { JournalSync } from "./journal.sync";
 import { NotificationSync } from "./notification.sync";
-import { AiSync } from "./ai.sync";
 import { ProgressSync } from "./progress.sync";
 import { ConversationSync } from "./conversation.sync";
 import { DailyLogSync } from "./daily-log.sync";
+
+let deferredSyncTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const SyncManager = {
   isSyncing: false,
@@ -16,32 +17,39 @@ export const SyncManager = {
 
   /**
    * Initializes real-time synchronization across all domains for the authenticated user.
+   * Critical syncs (profile, nutrition, activity, daily log) start immediately.
+   * Secondary syncs are deferred so the dashboard paints first.
    */
   startSync(userId: string) {
-    // Always dispose first to guarantee clean re-subscription.
-    // Do NOT early-return on same userId — after a logout the subscriptions
-    // were torn down and must be re-established even for the same user.
     this.stopSync();
 
+    // Critical — needed for Mission Control metrics
     UserSync.start(userId);
-    MissionSync.subscribe(userId);
-    ChapterSync.subscribe(userId);
-    ActivitySync.subscribe(userId);
     NutritionSync.subscribe(userId);
     DailyLogSync.subscribe(userId);
-    JournalSync.subscribe(userId);
-    NotificationSync.subscribe(userId);
-    ProgressSync.subscribe(userId);
-    ConversationSync.subscribe(userId);
+    ActivitySync.subscribe(userId);
+
+    // Secondary — defer to keep first paint fast
+    deferredSyncTimer = setTimeout(() => {
+      if (this.currentUserId !== userId) return;
+      MissionSync.subscribe(userId);
+      ChapterSync.subscribe(userId);
+      JournalSync.subscribe(userId);
+      NotificationSync.subscribe(userId);
+      ProgressSync.subscribe(userId);
+      ConversationSync.subscribe(userId);
+    }, 1500);
 
     this.currentUserId = userId;
     this.isSyncing = true;
+    console.log(`[SyncManager] Real-time sync started for user: ${userId}`);
   },
 
-  /**
-   * Cleans up all active subscriptions. Should be called on logout.
-   */
   stopSync() {
+    if (deferredSyncTimer) {
+      clearTimeout(deferredSyncTimer);
+      deferredSyncTimer = null;
+    }
     if (!this.isSyncing) return;
 
     UserSync.stopForLogout();
@@ -57,5 +65,6 @@ export const SyncManager = {
 
     this.currentUserId = null;
     this.isSyncing = false;
+    console.log(`[SyncManager] Real-time sync stopped.`);
   }
 };

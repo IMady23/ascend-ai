@@ -27,12 +27,12 @@ export const PageMotion: any = {
   staggerContainer: {
     initial: {},
     animate: {
-      transition: { staggerChildren: 0.08 }, // 80ms stagger as requested
+      transition: { staggerChildren: 0.04 },
     },
   },
   staggerItem: {
-    initial: { opacity: 0, y: 40, rotateX: 15 },
-    animate: { opacity: 1, y: 0, rotateX: 0, transition: { duration: Timing.slow, ease: [0.25, 0.1, 0.25, 1] } },
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
   },
 };
 
