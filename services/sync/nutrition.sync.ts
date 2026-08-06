@@ -28,21 +28,20 @@ export const NutritionSync = {
      *   - On fresh login (state.meals = [] after resetStoresOnLogout + clearStorage):
      *       merge([], correctData) = correctData        <-- correct ✅
      *
-     * The stale-localStorage-rehydration problem (the original logout/login bug)
-     * is already solved by persist.clearStorage() in reset-stores.ts. We no
-     * longer need replaceMeals for that.
+     * resetStoresOnLogout is ONLY called from explicit logout handlers
+     * (MobileDrawer, ProfileMenu) — never from onAuthStateChanged. This prevents
+     * the transient null Firebase fires on app startup from wiping localStorage.
      */
     unsubscribeMeals = NutritionRepository.subscribeToNutritionLogs(
       userId,
       currentDate,
       (logs) => {
-        // Guard: if Firestore fires its first empty snapshot (before cache warms up)
-        // but the store already has locally-persisted meals for TODAY, skip the update.
-        // This prevents dailyCalories from resetting to 0 on page refresh.
-        // We check specifically for today's meals to avoid skipping a genuinely
-        // empty today when the store only has meals from previous days.
         const state = useNutritionStore.getState();
         const todaysMeals = state.meals.filter((m) => m.date === currentDate);
+        // Guard: skip empty Firestore snapshot if localStorage already has today's meals.
+        // Firestore fires an empty result before the network response when there is no
+        // local IndexedDB cache. Without this guard, that empty snapshot would wipe
+        // dailyCalories to 0 on every app restart.
         if (logs.length === 0 && todaysMeals.length > 0) return;
         state.setMeals(logs);
       },

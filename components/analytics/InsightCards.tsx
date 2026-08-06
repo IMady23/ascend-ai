@@ -17,7 +17,7 @@ export function InsightCards({ userId }: InsightCardsProps) {
     // In a real implementation, this would fetch from a new API route that calls InsightEngine
     const fetchInsights = async () => {
       try {
-        const response = await fetch('/api/insights');
+        const response = await fetch(`/api/insights?userId=${encodeURIComponent(userId)}`);
         if (response.ok) {
           const data = await response.json();
           setInsights(data.insights);

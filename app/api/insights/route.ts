@@ -1,13 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { InsightEngine } from "@/lib/intelligence/InsightEngine";
 
-// Mock authentication for the API
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // In a real app, extract userId from session
-    const userId = "test_user_1"; 
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json({ insights: [] });
+    }
+
     const insights = await InsightEngine.generateDashboardInsights(userId);
-    
     return NextResponse.json({ insights });
   } catch (error) {
     console.error("Failed to generate insights:", error);
