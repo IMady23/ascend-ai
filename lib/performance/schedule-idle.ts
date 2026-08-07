@@ -10,6 +10,6 @@ export function scheduleIdleWork(callback: () => void, timeoutMs = 3000): () => 
     return () => window.cancelIdleCallback(id);
   }
 
-  const id = window.setTimeout(callback, 250);
-  return () => window.clearTimeout(id);
+  const id = (window as Window).setTimeout(callback, 250);
+  return () => (window as Window).clearTimeout(id);
 }

@@ -26,28 +26,28 @@
 }
 
 :root[data-theme="dark"] {
-  /* DARK MODE (Luxury Black) */
+  /* DARK MODE (Luxury Black & Gold) */
   color-scheme: dark;
   
   --color-bg-base: #000000;
   --color-bg-surface: #0A0A0A;
-  --color-bg-surface-elevated: #121212;
-  --color-border: #262626; /* neutral-800 */
+  --color-bg-surface-elevated: #1A1A1A;
+  --color-border: #2A2A2A;
   
-  --color-text-primary: #FAFAFA; /* neutral-50 */
-  --color-text-secondary: #A3A3A3; /* neutral-400 */
-  --color-text-disabled: #525252; /* neutral-600 */
+  --color-text-primary: #D4AF37; /* Luxury Gold */
+  --color-text-secondary: #C9A961; /* Muted Gold */
+  --color-text-disabled: #6B5A3D; /* Dark Gold */
 
-  /* Glassmorphism System */
-  --color-bg-glass-standard: rgba(10, 10, 10, 0.6);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-glass-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  /* Glassmorphism System with Gold Tint */
+  --color-bg-glass-standard: rgba(26, 26, 26, 0.8);
+  --color-glass-border: rgba(212, 175, 55, 0.15);
+  --color-glass-highlight: inset 0 1px 0 0 rgba(212, 175, 55, 0.1);
   
-  /* Shadows */
+  /* Shadows with Gold Glow */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.8);
-  --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.9);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.6), 0 0 20px -8px rgba(212, 175, 55, 0.1);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.8), 0 0 40px -12px rgba(212, 175, 55, 0.15);
+  --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.9), 0 0 60px -20px rgba(212, 175, 55, 0.2);
 }
 
 @theme inline {
@@ -95,23 +95,25 @@
   --color-accent-ai: var(--color-accent-workout);
 
   /* Component Semantic Colors */
-  --color-success: #10B981; /* emerald-500 */
+  --color-success: #D4AF37; /* Luxury Gold */
   --color-warning: #F59E0B; /* amber-500 */
   --color-danger: #EF4444; /* red-500 */
-  --color-info: #3B82F6; /* blue-500 */
+  --color-info: #C9A961; /* Muted Gold */
 
-  /* Premium Module Accent Colors */
-  --color-accent-workout: #8B5CF6; /* violet-500 */
-  --color-accent-nutrition: #10B981; /* emerald-500 */
-  --color-accent-hydration: #38BDF8; /* sky-400 */
-  --color-accent-recovery: #F43F5E; /* rose-500 */
+  /* Premium Module Accent Colors - Black & Gold Theme */
+  --color-accent-workout: #D4AF37; /* Luxury Gold */
+  --color-accent-nutrition: #C9A961; /* Muted Gold */
+  --color-accent-hydration: #B8964F; /* Darker Gold */
+  --color-accent-recovery: #F5E6C8; /* Champagne Gold */
   --color-accent-gold: #D4AF37; /* Luxury Gold */
+  --color-accent-mission: #D4AF37; /* Luxury Gold */
+  --color-accent-dashboard: #D4AF37; /* Luxury Gold */
   
   /* Legacy/Aliases (Phase out gently) */
-  --color-accent-blue: var(--color-accent-hydration);
-  --color-accent-purple: var(--color-accent-workout);
-  --color-accent-green: var(--color-accent-nutrition);
-  --color-accent-orange: var(--color-warning);
+  --color-accent-blue: #D4AF37;
+  --color-accent-purple: #C9A961;
+  --color-accent-green: #B8964F;
+  --color-accent-orange: #F59E0B;
 
   /* Animations & Easing */
   --animate-fast: 150ms;
@@ -142,6 +144,14 @@ body {
   touch-action: pan-x pan-y;
 }
 
+/* Luxury Gold Background for Dark Mode */
+[data-theme="dark"] body {
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 175, 55, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 50% 120%, rgba(212, 175, 55, 0.05), transparent),
+    #000000;
+}
+
 /* Premium Component Utilities */
 .glass-panel {
   background: var(--color-bg-glass-standard) !important;
@@ -152,6 +162,15 @@ body {
   border-radius: var(--radius-2xl) !important;
 }
 
+[data-theme="dark"] .glass-panel {
+  background: rgba(26, 26, 26, 0.8) !important;
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  box-shadow: 
+    var(--shadow-md), 
+    var(--color-glass-highlight),
+    0 0 30px -10px rgba(212, 175, 55, 0.15) !important;
+}
+
 .glass-dropdown {
   background: var(--color-bg-glass-standard) !important;
   backdrop-filter: blur(24px) !important;
@@ -159,6 +178,27 @@ body {
   border: 1px solid var(--color-glass-border) !important;
   box-shadow: var(--shadow-modal), var(--color-glass-highlight) !important;
   border-radius: var(--radius-lg) !important;
+}
+
+[data-theme="dark"] .glass-dropdown {
+  background: rgba(26, 26, 26, 0.9) !important;
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  box-shadow: 
+    var(--shadow-modal), 
+    var(--color-glass-highlight),
+    0 0 40px -15px rgba(212, 175, 55, 0.2) !important;
+}
+
+.glass-premium {
+  background: rgba(26, 26, 26, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.6),
+    0 0 50px -15px rgba(212, 175, 55, 0.25),
+    inset 0 1px 0 0 rgba(212, 175, 55, 0.15) !important;
+  border-radius: var(--radius-2xl) !important;
 }
 
 @utility no-scrollbar {

@@ -48,40 +48,163 @@ One transaction. All-or-nothing. No partial profiles. No sync issues.
 
 ---
 
-## 3. Full Step Sequence (v2 — Expanded)
+## 3. Full Step Sequence (v2 — Dynamic Branching)
 
-Steps are deliberately short. One focused question per screen.
-Progress bar shows estimated minutes remaining, not just step count.
+The onboarding flow is **adaptive**. Not everyone sees all steps. The sequence is determined by answers to earlier questions. This is what makes it feel like a coach rather than a form.
+
+### Core vs Conditional Steps
+
+**Core steps** — every user sees these (required for TDEE calculation and AI baseline):
 
 ```
 Step  0 — Welcome Ceremony
 Step  1 — Name
-Step  2 — Height           ← each physical metric gets its own interaction
+Step  2 — Height
 Step  3 — Weight
 Step  4 — Date of Birth
-Step  5 — Why (Motivation / Emotional Reason)
+Step  5 — Why (Emotional Motivation)
 Step  6 — Primary Goal
-Step  7 — Target Weight    ← shown only if goal is lose_fat or gain_muscle
-Step  8 — Milestone Preview
 Step  9 — Activity Level
 Step 10 — Fitness Experience
-Step 11 — Workout Preference (Gym / Home / Running / Sports / Mix)
-Step 12 — Target Preview   ← AI-computed, display only. User can adjust.
+Step 12 — Target Preview (AI-computed)
 Step 13 — Diet Type
-Step 14 — Food Culture     ← preferred cuisine
-Step 15 — Allergies        ← optional
-Step 16 — Wearable
-Step 17 — Daily Rhythm (Wake time)
-Step 18 — Daily Rhythm (Sleep time)
+Step 17 — Wake Time
+Step 18 — Sleep Time
 Step 19 — Coaching Style
-Step 20 — App Preferences  ← theme, units, time format
+Step 20 — App Preferences
 Step 21 — Completion Ceremony
 ```
 
-Estimated duration: 3–4 minutes displayed to user.
-Each step shows the achievement milestone at 25%, 50%, 75%, 100%.
+**Conditional steps** — shown only when relevant:
+
+```
+Step  7 — Target Weight        → shown if goal = lose_fat OR gain_muscle
+Step  8 — Milestone Preview    → shown if targetWeight was entered
+Step 11 — Workout Preference   → always shown (branches the follow-up)
+Step 11a— Gym Days/Week        → shown if workoutPreference includes 'gym'
+Step 11b— Running Distance     → shown if workoutPreference includes 'running'
+Step 14 — Food Culture         → always shown
+Step 14a— Meat Preferences     → shown if dietType = non_vegetarian OR eggetarian
+Step 14b— Vegetable Preferences→ shown if dietType = vegetarian OR vegan
+Step 15 — Allergies            → always shown (optional, but always offered)
+Step 16 — Wearable             → always shown
+```
+
+### Branching Rules
+
+```
+goal === 'lose_fat' || goal === 'gain_muscle'
+  → show Step 7 (Target Weight)
+  → if targetWeight entered: show Step 8 (Milestone Preview)
+
+goal === 'maintain' || goal === 'recomp'
+  → skip Step 7
+  → show performance goal question instead:
+    "What does success look like for you in 3 months?"
+    (freeform or card-select: "Run 5km", "Do 10 pull-ups", "Feel stronger", etc.)
+
+workoutPreference includes 'gym'
+  → show Step 11a: "How many gym sessions per week?"
+    → writes to preferences.goals.workoutDaysPerWeek
+
+workoutPreference includes 'running'
+  → show Step 11b: "What's your average running distance?"
+    → writes to preferences.goals.runningDistanceKm (new field)
+
+workoutPreference === 'home' only
+  → show Step 11c: "Do you have any equipment at home?"
+    → writes to preferences.homeEquipment[] (new field, optional)
+
+dietType === 'non_vegetarian' || dietType === 'eggetarian'
+  → show Step 14a: "Any meat preferences?" (chicken / beef / fish / lamb / all)
+    → writes to preferences.meatPreferences[] (new field)
+
+dietType === 'vegetarian' || dietType === 'vegan'
+  → skip Step 14a
+  → show Step 14b: "Favourite plant proteins?" (lentils / tofu / paneer / chickpeas / etc.)
+    → writes to preferences.plantProteins[] (new field)
+```
+
+### Estimated Step Counts by Path
+
+| User type | Approx steps seen |
+|-----------|------------------|
+| Lose fat + gym + non-veg | 19 steps |
+| Maintain + home + vegan | 17 steps |
+| Gain muscle + running + vegetarian | 18 steps |
+| Recomp + sports + non-veg | 17 steps |
+
+The progress bar and "minutes remaining" estimate update dynamically as branching decisions are made. When a branch is skipped, the remaining time shrinks visibly — the user feels like they're moving faster.
 
 ---
+
+## 3a. Step Resolver (Architecture)
+
+The step sequence is not a hardcoded array. It is computed by a **step resolver function**:
+
+```typescript
+// lib/onboarding/stepResolver.ts
+
+export function resolveStepSequence(draft: OnboardingDraft): OnboardingStep[] {
+  const steps: OnboardingStep[] = [
+    STEPS.WELCOME,
+    STEPS.NAME,
+    STEPS.HEIGHT,
+    STEPS.WEIGHT,
+    STEPS.DOB,
+    STEPS.MOTIVATION,
+    STEPS.PRIMARY_GOAL,
+  ];
+
+  // Goal-dependent branch
+  if (draft.primaryGoal === 'lose_fat' || draft.primaryGoal === 'gain_muscle') {
+    steps.push(STEPS.TARGET_WEIGHT);
+    if (draft.identity.targetWeight) {
+      steps.push(STEPS.MILESTONE_PREVIEW);
+    }
+  } else {
+    steps.push(STEPS.PERFORMANCE_GOAL);
+  }
+
+  steps.push(STEPS.ACTIVITY_LEVEL);
+  steps.push(STEPS.FITNESS_EXPERIENCE);
+  steps.push(STEPS.WORKOUT_PREFERENCE);
+
+  // Workout-dependent branches
+  const wp = draft.preferences.workoutPreference ?? [];
+  if (wp.includes('gym')) steps.push(STEPS.GYM_DAYS);
+  if (wp.includes('running')) steps.push(STEPS.RUNNING_DISTANCE);
+  if (wp.length === 1 && wp[0] === 'home') steps.push(STEPS.HOME_EQUIPMENT);
+
+  steps.push(STEPS.TARGET_PREVIEW);
+  steps.push(STEPS.DIET_TYPE);
+
+  // Diet-dependent branches
+  const dt = draft.preferences.dietType;
+  if (dt === 'non_vegetarian' || dt === 'eggetarian') steps.push(STEPS.MEAT_PREFERENCES);
+  if (dt === 'vegetarian' || dt === 'vegan') steps.push(STEPS.PLANT_PROTEINS);
+
+  steps.push(STEPS.FOOD_CULTURE);
+  steps.push(STEPS.ALLERGIES);
+  steps.push(STEPS.WEARABLE);
+  steps.push(STEPS.WAKE_TIME);
+  steps.push(STEPS.SLEEP_TIME);
+  steps.push(STEPS.COACHING_STYLE);
+  steps.push(STEPS.APP_PREFERENCES);
+  steps.push(STEPS.COMPLETION);
+
+  return steps;
+}
+```
+
+The resolver is called:
+- On mount (to build the initial sequence from any existing draft)
+- After each step that affects branching (goal, workout preference, diet type)
+
+The resolver is a **pure function** — no side effects, easy to test. It returns a typed array of step identifiers. The UI iterates this array, not a hardcoded list.
+
+---
+
 
 ## 4. Step Details
 
@@ -326,26 +449,31 @@ This is not a commitment — it's a preview to build excitement.
 
 ### Step 21 — Completion Ceremony
 **Type:** Cinematic, full-screen, sequential animation  
-**Purpose:** Make this moment memorable. The user just did something meaningful.
+**Purpose:** Make this moment memorable. 5–8 seconds. The user watches their personal AI being built.
 
-**Sequence:**
+**Sequence (each line holds for ~700ms, progress bar fills):**
 
 ```
-Analyzing your profile...        (800ms)
-Building Nutrition Plan...       (800ms)
-Generating Workout Program...    (800ms)
-Training your AI Coach...        (800ms)
-Calibrating Recovery System...   (800ms)
-━━━━━━━━━━━━━━━━━━━━
+Analyzing your profile...          ██░░░░░░░░░░  15%
+Calculating metabolism...          ████░░░░░░░░  30%
+Generating calorie targets...      ██████░░░░░░  45%
+Creating workout recommendations...████████░░░░  60%
+Personalizing AI Coach...          ██████████░░  80%
+Preparing nutrition profile...     ███████████░  90%
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Mission Ready.
+Welcome to Ascend AI.
 Welcome, {nickname}.
 ```
 
-Then Mission Control opens with a personalized first AI message already loaded.
+Then Mission Control opens. The first AI message is already loaded and personalized — not a placeholder.
 
-**Actions at this step:** Run the completion pipeline (validate → calculateTargets → save → sync).
+**What the first AI message says (example for "lose fat + friendly coaching + Indian food + gym):**
 
----
+> "Hey {nickname} 👋 I've built your plan. You're targeting {targetCalories} kcal/day with {protein}g protein to hit your fat-loss goal. Your first mission starts today. Ready to go?"
+
+**Actions at this step:** Run the completion pipeline. The animation plays while the pipeline executes in the background. If the pipeline finishes before the animation, wait. If the animation finishes before the pipeline, hold on the final frame until the save completes.
+
 
 
 ## 5. Achievement Milestones During Onboarding
@@ -382,7 +510,54 @@ After each group of steps, the AI teases what just became available. This makes 
 
 ---
 
-## 7. Progress Indicator Design
+## 6a. "AI is Learning" Indicator
+
+Every few steps, a full-width status bar shows the AI building the user's profile in real time. This is shown between steps, not on top of them — it's a transition moment, not a distraction.
+
+**Three profile layers build progressively:**
+
+```
+After Steps 1–4 (physical baseline complete):
+┌─────────────────────────────────────────┐
+│ 🧠  Building your baseline...           │
+│                                          │
+│  Nutrition Profile    ████████░░  80%   │
+│  Fitness Profile      ████░░░░░░  40%   │
+│  Recovery Profile     ██░░░░░░░░  20%   │
+└─────────────────────────────────────────┘
+
+After Steps 9–11 (fitness profile complete):
+┌─────────────────────────────────────────┐
+│ ✓  Fitness Profile Built               │
+│                                          │
+│  ✓ Nutrition Profile  ████████████ 100% │
+│  ✓ Fitness Profile    ████████████ 100% │
+│  ⏳ Recovery Profile  ██████░░░░░░  60% │
+└─────────────────────────────────────────┘
+
+After Steps 17–18 (recovery profile complete):
+┌─────────────────────────────────────────┐
+│ ✓  All Profiles Built                  │
+│                                          │
+│  ✓ Nutrition Profile  ████████████ 100% │
+│  ✓ Fitness Profile    ████████████ 100% │
+│  ✓ Recovery Profile   ████████████ 100% │
+└─────────────────────────────────────────┘
+```
+
+**Three profile layers and their source steps:**
+
+| Layer | Built from |
+|-------|-----------|
+| Nutrition Profile | height, weight, dob, goal, activity, diet type, cuisines, allergies |
+| Fitness Profile | fitness experience, workout preference, gym/running sub-questions |
+| Recovery Profile | wake time, sleep time, coaching style, motivation reason |
+
+**Implementation:** Each layer's progress is computed by `calculateProfileLayerProgress(draft, layer)` — a pure function that counts non-null fields in the relevant slice of the draft.
+
+This reinforces that the AI is **actively building something**, not just storing answers.
+
+---
 
 Show both step count and estimated time remaining.
 

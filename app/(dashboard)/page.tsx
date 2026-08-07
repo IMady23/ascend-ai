@@ -155,22 +155,11 @@ export default function MissionControl() {
     };
   }, []);
 
-  if (!profile || !profile.onboardingCompleted) return null;
-
-  const { identity, targets } = profile;
-  const userName = identity?.nickname || identity?.fullName.split(" ")[0] || "Commander";
-  
-  const targetCalories = profile.preferences?.goals?.calories || profile.targets?.dailyCalories || 2000;
-  const targetWater = ((profile.preferences?.goals?.waterMl || profile.targets?.water || 3000)) / 1000; // in L
-  const targetSteps = profile.preferences?.goals?.steps || 10000;
-  const targetProtein = profile.preferences?.goals?.proteinGrams || profile.targets?.protein || 150;
-
-  // Dynamic Score Calculation (using displayMetrics so it syncs with hover)
-  const waterProgress = targetWater > 0 ? Math.min(1, displayMetrics.waterMl / (targetWater * 1000)) : 0;
-  const stepsProgress = targetSteps > 0 ? Math.min(1, displayMetrics.steps / targetSteps) : 0;
-  const proteinProgress = targetProtein > 0 ? Math.min(1, displayMetrics.protein / targetProtein) : 0;
-  const calorieProgress = (targetCalories ?? 0) > 0 ? Math.min(1, displayMetrics.calories / (targetCalories ?? 1)) : 0;
-  const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
+  // Goal haptics must be called before any early returns (React hooks rule)
+  const targetCalories = profile?.preferences?.goals?.calories || profile?.targets?.dailyCalories || 2000;
+  const targetProtein = profile?.preferences?.goals?.proteinGrams || profile?.targets?.protein || 150;
+  const targetSteps = profile?.preferences?.goals?.steps || 10000;
+  const targetWater = ((profile?.preferences?.goals?.waterMl || profile?.targets?.water || 3000)) / 1000;
 
   useGoalHaptics([
     { value: displayMetrics.calories, target: targetCalories, label: "calories" },
@@ -178,6 +167,25 @@ export default function MissionControl() {
     { value: displayMetrics.steps, target: targetSteps, label: "steps" },
     { value: displayMetrics.waterMl, target: targetWater * 1000, label: "water" },
   ]);
+
+  if (!profile || !profile.onboardingCompleted) return null;
+
+  console.log("[Dashboard] Profile loaded:", {
+    identity: profile.identity,
+    goals: profile.goals,
+    targets: profile.targets,
+    preferencesGoals: profile.preferences?.goals
+  });
+
+  const { identity, targets } = profile;
+  const userName = identity?.nickname || identity?.fullName.split(" ")[0] || "Commander";
+
+  // Dynamic Score Calculation (using displayMetrics so it syncs with hover)
+  const waterProgress = targetWater > 0 ? Math.min(1, displayMetrics.waterMl / (targetWater * 1000)) : 0;
+  const stepsProgress = targetSteps > 0 ? Math.min(1, displayMetrics.steps / targetSteps) : 0;
+  const proteinProgress = targetProtein > 0 ? Math.min(1, displayMetrics.protein / targetProtein) : 0;
+  const calorieProgress = (targetCalories ?? 0) > 0 ? Math.min(1, displayMetrics.calories / (targetCalories ?? 1)) : 0;
+  const dailyScore = Math.round(((waterProgress + stepsProgress + proteinProgress + calorieProgress) / 4) * 100);
 
   // "How am I doing today?" summary
   const caloriesRemaining = Math.max(0, targetCalories - displayMetrics.calories);

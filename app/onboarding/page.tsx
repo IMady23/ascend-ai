@@ -1,410 +1,470 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useUserStore } from "@/stores/user.store";
+import { useOnboardingStore, canProceedFromStep } from "@/stores/onboarding.store";
 import { useSettingsStore } from "@/stores/settings.store";
 import { UserSync } from "@/services/sync/user.sync";
-import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, CheckCircle2, Loader2, Play } from "lucide-react";
-import type { UserProfile, UserIdentity, UserPreferences, PrimaryGoal, ActivityLevel, DietType } from "@/types/user";
+import { calculateAllTargets } from "@/lib/calculations/targets";
+import { migrateUserProfileToV2 } from "@/types/user";
+import { useCoach } from "@/lib/coach";
+import type { UserProfileV2 } from "@/types/user";
 
-export default function Onboarding() {
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREEN IMPORTS — Phase 2B (Screens 0–3 are live)
+// ─────────────────────────────────────────────────────────────────────────────
+import { Step0Welcome } from "./screens/Step0Welcome";
+import { Step1Name } from "./screens/Step1Name";
+import { Step2AboutYou } from "./screens/Step2AboutYou";
+import { Step3YourBody } from "./screens/Step3YourBody";
+import { Step4Analyzing } from "./screens/Step4Analyzing";
+import { Step5Goal } from "./screens/Step5Goal";
+import { Step6Motivation } from "./screens/Step6Motivation";
+import { Step7Activity } from "./screens/Step7Activity";
+import { Step8Training } from "./screens/Step8Training";
+import { Step9Nutrition } from "./screens/Step9Nutrition";
+import { Step10Schedule } from "./screens/Step10Schedule";
+import { Step11Preferences } from "./screens/Step11Preferences";
+import { Step11_5BaselineActivity } from "./screens/Step11_5BaselineActivity";
+import { Step12Review } from "./screens/Step12Review";
+import { Step13Welcome } from "./screens/Step13Welcome";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PLACEHOLDER — used only for steps 4–11 until Phase 2C/2D
+// ─────────────────────────────────────────────────────────────────────────────
+
+function StepPlaceholder({ step, label }: { step: number; label: string }) {
+  const { goNext, goBack, data, isSubmitting } = useOnboardingStore();
+  const canProceed = canProceedFromStep(step, data);
+  return (
+    <div className="flex flex-col min-h-[100svh]">
+      <div className="flex flex-col items-center justify-center flex-1 gap-4 p-8 text-center">
+        <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] flex items-center justify-center">
+          <span className="text-lg font-black font-mono text-[var(--color-text-secondary)]">{step}</span>
+        </div>
+        <p className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-widest">{label}</p>
+        <p className="text-xs text-[var(--color-text-disabled)] max-w-xs">Screen coming in Phase 2C/2D.</p>
+      </div>
+      <div className="px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-3 max-w-lg mx-auto w-full flex gap-3">
+        {step > 0 && (
+          <button type="button" onClick={goBack}
+            className="h-14 px-5 rounded-2xl border border-[var(--color-border)] text-[var(--color-text-secondary)] text-sm font-medium hover:bg-[var(--color-bg-surface-elevated)] transition-colors">
+            Back
+          </button>
+        )}
+        <button type="button" onClick={goNext} disabled={!canProceed || isSubmitting}
+          className="flex-1 h-14 rounded-2xl bg-[var(--color-accent-blue)] text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 transition-all active:scale-[0.98]">
+          {isSubmitting ? "Saving..." : step === 12 ? "Looks Good, Let's Go" : "Continue"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STEP ROUTER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function StepRouter() {
+  const {
+    currentStep,
+    data,
+    goNext,
+    goBack,
+    updateName,
+    updateAboutYou,
+    updateBody,
+    updateGoal,
+    updateMotivation,
+    updateActivity,
+    updateTraining,
+    updateNutrition,
+    updateSchedule,
+    updateAppConfig,
+    updateBaselineActivity,
+  } = useOnboardingStore();
+
+  const handleUpdateName = useCallback(
+    (fullName: string, nickname: string) => updateName(fullName, nickname),
+    [updateName]
+  );
+  const handleUpdateAboutYou = useCallback(
+    (dob: string, gender: Parameters<typeof updateAboutYou>[1]) =>
+      updateAboutYou(dob, gender),
+    [updateAboutYou]
+  );
+  const handleUpdateBody = useCallback(
+    (height: number, weight: number) => updateBody(height, weight),
+    [updateBody]
+  );
+  const handleUpdateGoal = useCallback(
+    (goal: Parameters<typeof updateGoal>[0], targetWeight: Parameters<typeof updateGoal>[1]) =>
+      updateGoal(goal, targetWeight),
+    [updateGoal]
+  );
+  const handleUpdateMotivation = useCallback(
+    (whyStarted: string) => updateMotivation(whyStarted),
+    [updateMotivation]
+  );
+  const handleUpdateActivity = useCallback(
+    (activityLevel: Parameters<typeof updateActivity>[0], fitnessExperience: Parameters<typeof updateActivity>[1]) =>
+      updateActivity(activityLevel, fitnessExperience),
+    [updateActivity]
+  );
+  const handleUpdateTraining = useCallback(
+    (days: number, duration: number) => updateTraining(days, duration),
+    [updateTraining]
+  );
+  const handleUpdateNutrition = useCallback(
+    (dietType: Parameters<typeof updateNutrition>[0], allergies: Parameters<typeof updateNutrition>[1]) =>
+      updateNutrition(dietType, allergies),
+    [updateNutrition]
+  );
+  const handleUpdateSchedule = useCallback(
+    (wakeTime: string, sleepTime: string, sleepHours: number) =>
+      updateSchedule(wakeTime, sleepTime, sleepHours),
+    [updateSchedule]
+  );
+  const handleUpdateAppConfig = useCallback(
+    (theme: Parameters<typeof updateAppConfig>[0], units: Parameters<typeof updateAppConfig>[1], timeFormat: Parameters<typeof updateAppConfig>[2]) =>
+      updateAppConfig(theme, units, timeFormat),
+    [updateAppConfig]
+  );
+  const handleUpdateBaselineActivity = useCallback(
+    (steps: number, waterMl: number, calorieIntake: number, calorieBurn: number) =>
+      updateBaselineActivity(steps, waterMl, calorieIntake, calorieBurn),
+    [updateBaselineActivity]
+  );  switch (currentStep) {
+    case 0:
+      return <Step0Welcome onStart={goNext} />;
+    case 1:
+      return (
+        <Step1Name
+          fullName={data.fullName}
+          nickname={data.nickname}
+          onUpdate={handleUpdateName}
+          onNext={goNext}
+          onBack={goBack}
+        />
+      );
+    case 2:
+      return (
+        <Step2AboutYou
+          fullName={data.fullName}
+          dob={data.dob}
+          gender={data.gender}
+          onUpdate={handleUpdateAboutYou}
+          onNext={goNext}
+          onBack={goBack}
+        />
+      );
+    case 3:
+      return (
+        <Step3YourBody
+          fullName={data.fullName}
+          height={data.height}
+          weight={data.weight}
+          units={data.units}
+          onUpdate={handleUpdateBody}
+          onNext={goNext}
+          onBack={goBack}
+        />
+      );
+    case 4:  return <Step4Analyzing
+              fullName={data.fullName}
+              dob={data.dob}
+              height={data.height}
+              weight={data.weight}
+              gender={data.gender}
+              activityLevel={data.activityLevel}
+              onComplete={goNext}
+            />;
+    case 5:  return (
+              <Step5Goal
+                fullName={data.fullName}
+                primaryGoal={data.primaryGoal}
+                targetWeightKg={data.targetWeightKg}
+                currentWeightKg={data.weight}
+                units={data.units}
+                onUpdate={handleUpdateGoal}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 6:  return (
+              <Step6Motivation
+                whyStarted={data.whyStarted}
+                fullName={data.fullName}
+                goalLabel={data.primaryGoal.replace(/_/g, " ")}
+                onUpdate={handleUpdateMotivation}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 7:  return (
+              <Step7Activity
+                activityLevel={data.activityLevel}
+                fitnessExperience={data.fitnessExperience}
+                onUpdate={handleUpdateActivity}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 8:  return (
+              <Step8Training
+                workoutDaysPerWeek={data.workoutDaysPerWeek}
+                workoutDurationMin={data.workoutDurationMin}
+                onUpdate={handleUpdateTraining}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 9:  return (
+              <Step9Nutrition
+                dietType={data.dietType}
+                allergies={data.allergies}
+                onUpdate={handleUpdateNutrition}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 10: return (
+              <Step10Schedule
+                wakeTime={data.wakeTime}
+                sleepTime={data.sleepTime}
+                sleepHours={data.sleepHours}
+                timeFormat={data.timeFormat}
+                onUpdate={handleUpdateSchedule}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 11: return (
+              <Step11Preferences
+                theme={data.theme}
+                units={data.units}
+                timeFormat={data.timeFormat}
+                onUpdate={handleUpdateAppConfig}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 12: return (
+              <Step11_5BaselineActivity
+                fullName={data.fullName}
+                baselineSteps={data.baselineSteps}
+                baselineWaterMl={data.baselineWaterMl}
+                baselineCalorieIntake={data.baselineCalorieIntake}
+                baselineCalorieBurn={data.baselineCalorieBurn}
+                onUpdate={handleUpdateBaselineActivity}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            );
+    case 13: return <Step12Review data={data} onComplete={goNext} />;
+    case 14: return <Step13Welcome fullName={data.fullName} whyStarted={data.whyStarted} />;
+    default: return <Step0Welcome onStart={goNext} />;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPLETION HANDLER
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function completeOnboarding(
+  userId: string,
+  data: ReturnType<typeof useOnboardingStore.getState>["data"],
+  existingProfile: ReturnType<typeof useUserStore.getState>["profile"],
+  settingsStore: ReturnType<typeof useSettingsStore.getState>,
+  setSubmitting: (v: boolean) => void,
+  clearDraft: () => void,
+  setProfile: (p: any) => void,
+  router: ReturnType<typeof useRouter>
+) {
+  setSubmitting(true);
+
+  try {
+    // 1. Save app preferences to SettingsStore (localStorage only — no Firestore)
+    await settingsStore.updateAppearance({ theme: data.theme });
+    await settingsStore.updateLocalization({
+      units: data.units,
+      timeFormat: data.timeFormat,
+    });
+
+    // 2. Calculate targets from collected data
+    const targets = calculateAllTargets(
+      {
+        dob: data.dob,
+        height: data.height,
+        weight: data.weight,
+      },
+      data.primaryGoal,
+      {
+        activity: data.activityLevel,
+        goals: { waterMl: 3000 },
+      }
+    );
+
+    // 3. Build the V2 profile
+    // Start from existing profile (migrated to V2) to preserve any existing data
+    const baseProfile = existingProfile
+      ? migrateUserProfileToV2(existingProfile)
+      : null;
+
+    const now = new Date().toISOString();
+
+    // Build profile with conditional fields (omit undefined values)
+    const newProfile: UserProfileV2 = {
+      version: 2,
+      onboardingCompleted: true,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+      identity: {
+        fullName: data.fullName.trim(),
+        nickname: data.nickname.trim(),
+        dob: data.dob,
+        height: data.height,
+        weight: data.weight,
+        gender: data.gender || undefined,
+      },
+
+      goals: {
+        primaryGoal: data.primaryGoal,
+        ...(data.targetWeightKg != null && { targetWeightKg: data.targetWeightKg }),
+      },
+
+      preferences: {
+        activity: data.activityLevel,
+        fitnessExperience: data.fitnessExperience,
+        wakeTime: data.wakeTime,
+        sleepTime: data.sleepTime,
+        dietType: data.dietType,
+        allergies: data.allergies,
+        goals: {
+          steps: data.baselineSteps,
+          waterMl: data.baselineWaterMl,
+          calories: targets.dailyCalories,
+          proteinGrams: targets.protein,
+          carbsGrams: targets.carbs,
+          fatGrams: targets.fat,
+          sleepHours: data.sleepHours,
+          workoutDurationMin: data.workoutDurationMin,
+          workoutDaysPerWeek: data.workoutDaysPerWeek,
+          weightKg: data.targetWeightKg ?? undefined,
+        },
+      },
+
+      targets,
+
+      createdAt: baseProfile?.createdAt ?? now,
+      updatedAt: now,
+    };
+
+    // Only add optional fields if they exist (Firestore doesn't accept undefined)
+    if (data.whyStarted && data.whyStarted.trim()) {
+      newProfile.motivation = { whyStarted: data.whyStarted.trim() };
+    }
+    if (baseProfile?.communication) {
+      newProfile.communication = baseProfile.communication;
+    }
+    if (baseProfile?.health) {
+      newProfile.health = baseProfile.health;
+    }
+    if (baseProfile?.lifestyle) {
+      newProfile.lifestyle = baseProfile.lifestyle;
+    }
+
+    // 4. Write to store and sync to Firestore
+    setProfile(newProfile);
+    await UserSync.syncLocalChanges(userId);
+
+    // 5. Clear onboarding draft
+    clearDraft();
+
+  } catch (error) {
+    console.error("[Onboarding] Completion failed:", error);
+    setSubmitting(false);
+    throw error; // Let caller handle
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function OnboardingPage() {
   const router = useRouter();
+
   const { profile, userId, setProfile } = useUserStore();
   const settingsStore = useSettingsStore();
 
-  const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const {
+    currentStep,
+    data,
+    isSubmitting,
+    isInitialized,
+    loadDraft,
+    clearDraft,
+    goToStep,
+    setSubmitting,
+  } = useOnboardingStore();
 
-  // Form State
-  const [identity, setIdentity] = useState<UserIdentity>({
-    fullName: "",
-    nickname: "",
-    dob: "2000-01-01",
-    height: 175,
-    weight: 75
-  });
-
-  const [primaryGoal, setPrimaryGoal] = useState<PrimaryGoal>('lose_fat');
-  
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    activity: 'moderate',
-    fitnessExperience: 'intermediate',
-    wakeTime: '06:30',
-    sleepTime: '22:30',
-    dietType: 'non_vegetarian',
-    allergies: [],
-    goals: {
-      steps: 10000,
-      waterMl: 3000,
-      calories: 0,
-      proteinGrams: 0,
-      carbsGrams: 0,
-      fatGrams: 0,
-      sleepHours: 8,
-      workoutDurationMin: 60,
-      workoutDaysPerWeek: 4
-    }
-  });
-
-  // Settings State for Step 4
-  const [appConfig, setAppConfig] = useState({
-    theme: "system",
-    units: "metric",
-    timeFormat: "24h"
-  });
-
-  // Redirect users who already completed onboarding
+  // ── Guard: redirect if already onboarded ──────────────────────────────────
+  // Reuses existing routing logic — no duplication.
   useEffect(() => {
-    if (profile?.onboardingCompleted || localStorage.getItem("ascend-onboarding-completed") === "true") {
+    if (profile?.onboardingCompleted === true) {
       router.replace("/");
     }
   }, [profile, router]);
 
-  // Load from Draft or Profile
+  // ── Initialize: load draft or detect locale defaults ─────────────────────
   useEffect(() => {
-    if (loaded) return;
-
-    const draft = localStorage.getItem("ascend-onboarding-draft");
-    if (draft) {
-      try {
-        const parsed = JSON.parse(draft);
-        if (parsed.identity) setIdentity(parsed.identity);
-        if (parsed.primaryGoal) setPrimaryGoal(parsed.primaryGoal);
-        if (parsed.preferences) setPreferences(parsed.preferences);
-        if (parsed.appConfig) setAppConfig(parsed.appConfig);
-        if (parsed.step && parsed.step > 1 && parsed.step < 5) setStep(parsed.step);
-      } catch (e) {
-        console.error("Failed to parse onboarding draft", e);
-      }
-    } else if (profile) {
-      // Pre-fill from existing profile if no draft
-      if (profile.identity) {
-        setIdentity({
-          ...identity,
-          fullName: profile.identity.fullName || "",
-          nickname: profile.identity.nickname || "",
-          dob: profile.identity.dob || "2000-01-01",
-          height: profile.identity.height || 175,
-          weight: profile.identity.weight || 75
-        });
-      }
-      if (profile.goals?.primaryGoal) setPrimaryGoal(profile.goals.primaryGoal);
-      if (profile.preferences) {
-         // handle migration if fitnessExperience is missing
-         const pref = profile.preferences as any;
-         setPreferences({
-           ...preferences,
-           ...profile.preferences,
-           fitnessExperience: pref.fitnessExperience || 'intermediate'
-         });
-      }
+    if (!isInitialized && userId) {
+      // Load draft for this specific user (or start fresh if no draft)
+      loadDraft(userId);
     }
-    
-    // Default app settings from store
-    setAppConfig({
-      theme: settingsStore.appearance.theme,
-      units: settingsStore.localization.units,
-      timeFormat: settingsStore.localization.timeFormat
-    });
+  }, [isInitialized, userId, loadDraft]);
 
-    setLoaded(true);
-   
-  }, [profile, loaded]);
-
-  // Save to Draft
+  // ── Handle step 14 transition (completion) ──────────────────────────────
+  // When user reaches Step13Welcome (now step 14), save profile and let the welcome screen handle redirect
   useEffect(() => {
-    if (!loaded) return;
-    localStorage.setItem("ascend-onboarding-draft", JSON.stringify({
-      step,
-      identity,
-      primaryGoal,
-      preferences,
-      appConfig
-    }));
-  }, [step, identity, primaryGoal, preferences, appConfig, loaded]);
-
-  const handleNext = () => setStep(s => s + 1);
-  const handleBack = () => setStep(s => s - 1);
-
-  const calculateTargets = (id: UserIdentity, goal: PrimaryGoal, pref: UserPreferences) => {
-    // 1. Calculate Age
-    const age = Math.abs(new Date(Date.now() - new Date(id.dob).getTime()).getUTCFullYear() - 1970);
-    
-    // 2. BMI
-    const bmi = id.weight / Math.pow(id.height / 100, 2);
-
-    // 3. BMR (Mifflin-St Jeor)
-    const bmr = (10 * id.weight) + (6.25 * id.height) - (5 * age) + 5;
-
-    // 4. TDEE
-    const activityMultipliers: Record<ActivityLevel, number> = {
-      sedentary: 1.2,
-      light: 1.375,
-      moderate: 1.55,
-      active: 1.725,
-      athlete: 1.9
-    };
-    const tdee = bmr * activityMultipliers[pref.activity];
-
-    // 5. Daily Calories based on goal
-    let dailyCalories = tdee;
-    if (goal === 'lose_fat') dailyCalories -= 500;
-    if (goal === 'gain_muscle') dailyCalories += 300;
-    if (goal === 'recomp') dailyCalories -= 100;
-
-    // 6. Macros
-    const protein = id.weight * 2;
-    const fat = id.weight * 1;
-    const proteinCals = protein * 4;
-    const fatCals = fat * 9;
-    const carbCals = dailyCalories - proteinCals - fatCals;
-    const carbs = Math.max(0, carbCals / 4);
-
-    return {
-      tdee: Math.round(tdee),
-      bmr: Math.round(bmr),
-      bmi: Math.round(bmi * 10) / 10,
-      dailyCalories: Math.round(dailyCalories),
-      protein: Math.round(protein),
-      carbs: Math.round(carbs),
-      fat: Math.round(fat),
-      water: pref.goals?.waterMl || 3000
-    };
-  };
-
-  const handleComplete = async () => {
-    if (!userId || isSubmitting) return;
-    setIsSubmitting(true);
-    setStep(5); // Show Welcome Interstitial
-
-    try {
-      // Save App Settings
-      await settingsStore.updateAppearance({ theme: appConfig.theme });
-      await settingsStore.updateLocalization({ units: appConfig.units as any, timeFormat: appConfig.timeFormat as any });
-
-      const targets = calculateTargets(identity, primaryGoal, preferences);
-      
-      const newProfile: UserProfile = {
-        version: 1,
-        onboardingCompleted: true,
-        identity,
-        goals: { primaryGoal },
-        preferences: {
-          ...preferences,
-          goals: {
-            ...(preferences.goals as any),
-            calories: targets.dailyCalories,
-            proteinGrams: targets.protein,
-            carbsGrams: targets.carbs,
-            fatGrams: targets.fat
-          }
-        },
-        targets,
-        createdAt: profile?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      setProfile(newProfile);
-      await UserSync.syncLocalChanges(userId);
-
-      // Clean up draft
-      localStorage.removeItem("ascend-onboarding-draft");
-
-      localStorage.setItem("ascend-onboarding-completed", "true");
-
-      window.setTimeout(() => {
-        router.replace("/");
-      }, 3000);
-
-    } catch (error) {
-      console.error("Failed to complete onboarding:", error);
-      setIsSubmitting(false);
-      setStep(4);
+    if (currentStep === 14 && !isSubmitting && userId) {
+      completeOnboarding(
+        userId,
+        data,
+        profile,
+        settingsStore,
+        setSubmitting,
+        clearDraft,
+        setProfile,
+        router
+      ).catch(() => {
+        // Roll back to review step on failure
+        goToStep(13);
+      });
     }
-  };
+  }, [currentStep]); // intentionally depends only on step change
 
-  if (!loaded) return <div className="min-h-screen bg-base flex items-center justify-center"><Loader2 className="animate-spin text-purple-500" /></div>;
+  // ── Loading state (before draft is loaded) ───────────────────────────────
+  if (!isInitialized) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100svh]">
+        <Loader2
+          size={24}
+          className="animate-spin text-[var(--color-text-disabled)]"
+          aria-label="Loading"
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-base flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        
-        {step > 1 && step < 5 && (
-          <div className="mb-8">
-            <h1 className="text-2xl font-black text-primary text-center tracking-tight mb-2">Build Your Protocol</h1>
-            <div className="flex gap-2 justify-center">
-              {[2, 3, 4].map(i => (
-                <div key={i} className={`h-1.5 w-12 rounded-full ${i <= step ? 'bg-purple-500' : 'bg-surface-elevated'}`} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="bg-surface border border-border-subtle rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-          
-          {/* STEP 1: WELCOME */}
-          {step === 1 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="text-center py-6">
-              <div className="w-16 h-16 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Play className="w-8 h-8 text-purple-500 ml-1" />
-              </div>
-              <h1 className="text-3xl font-black text-primary mb-4">Welcome to Ascend AI</h1>
-              <p className="text-secondary mb-8">
-                Your personal AI-driven fitness and nutrition ecosystem. We'll set up your profile, define your mission, and calibrate your daily targets so your AI Coach can guide you to success.
-              </p>
-              <button onClick={handleNext} className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-primary/90">
-                Begin Calibration <ChevronRight size={16} />
-              </button>
-            </motion.div>
-          )}
-
-          {/* STEP 2: IDENTITY */}
-          {step === 2 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-lg font-bold text-primary mb-6">Personal Details</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-1">Full Name</label>
-                  <input type="text" value={identity.fullName} onChange={e => setIdentity({...identity, fullName: e.target.value})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors" />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-1">Date of Birth</label>
-                  <input type="date" value={identity.dob} onChange={e => setIdentity({...identity, dob: e.target.value})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-1">Height (cm)</label>
-                    <input type="number" value={identity.height} onChange={e => setIdentity({...identity, height: Number(e.target.value)})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-1">Weight (kg)</label>
-                    <input type="number" value={identity.weight} onChange={e => setIdentity({...identity, weight: Number(e.target.value)})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                 <button onClick={handleBack} className="p-3 border border-border-subtle rounded-lg hover:bg-surface-elevated text-primary"><ChevronLeft size={16} /></button>
-                 <button onClick={handleNext} disabled={!identity.fullName || !identity.height || !identity.weight} className="flex-1 bg-primary text-primary-foreground font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-primary/90 disabled:opacity-50">
-                  Continue <ChevronRight size={16} />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 3: GOAL & EXPERIENCE */}
-          {step === 3 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-lg font-bold text-primary mb-4">Mission & Experience</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Primary Goal</label>
-                  <select value={primaryGoal} onChange={e => setPrimaryGoal(e.target.value as PrimaryGoal)} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                    <option value="lose_fat">Lose Fat</option>
-                    <option value="gain_muscle">Gain Muscle</option>
-                    <option value="maintain">Maintain & Improve Fitness</option>
-                    <option value="recomp">Body Recomposition</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Current Fitness Experience</label>
-                  <select value={preferences.fitnessExperience} onChange={e => setPreferences({...preferences, fitnessExperience: e.target.value as any})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                    <option value="beginner">Beginner (New to working out)</option>
-                    <option value="intermediate">Intermediate (Consistent for 6+ months)</option>
-                    <option value="advanced">Advanced (Years of experience)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Activity Level</label>
-                  <select value={preferences.activity} onChange={e => setPreferences({...preferences, activity: e.target.value as ActivityLevel})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                    <option value="sedentary">Sedentary (Office job, little exercise)</option>
-                    <option value="light">Lightly Active (1-3 days/week)</option>
-                    <option value="moderate">Moderately Active (3-5 days/week)</option>
-                    <option value="active">Very Active (6-7 days/week)</option>
-                    <option value="athlete">Athlete (Physical job / 2x training)</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button onClick={handleBack} className="p-3 border border-border-subtle rounded-lg hover:bg-surface-elevated text-primary"><ChevronLeft size={16} /></button>
-                <button onClick={handleNext} className="flex-1 bg-primary text-primary-foreground font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-primary/90">Continue <ChevronRight size={16} /></button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 4: PREFERENCES & WRAP UP */}
-          {step === 4 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-lg font-bold text-primary mb-6">Preferences</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Dietary Preference</label>
-                  <select value={preferences.dietType} onChange={e => setPreferences({...preferences, dietType: e.target.value as DietType})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                    <option value="non_vegetarian">No Restrictions</option>
-                    <option value="vegetarian">Vegetarian</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="eggetarian">Eggetarian</option>
-                  </select>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border-subtle">
-                  <div>
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Units</label>
-                    <select value={appConfig.units} onChange={e => setAppConfig({...appConfig, units: e.target.value})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                      <option value="metric">Metric (kg, cm)</option>
-                      <option value="imperial">Imperial (lbs, in)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">Theme</label>
-                    <select value={appConfig.theme} onChange={e => setAppConfig({...appConfig, theme: e.target.value})} className="w-full bg-base border border-border-subtle rounded-lg p-3 text-primary focus:border-purple-500 transition-colors">
-                      <option value="system">System Default</option>
-                      <option value="dark">Dark Mode</option>
-                      <option value="light">Light Mode</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button onClick={handleBack} className="p-3 border border-border-subtle rounded-lg hover:bg-surface-elevated text-primary"><ChevronLeft size={16} /></button>
-                <button onClick={handleComplete} disabled={isSubmitting} className="flex-1 bg-purple-600 text-primary font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-purple-700 disabled:opacity-50">
-                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Complete Setup"}
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 5: WELCOME INTERSTITIAL */}
-          {step === 5 && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-8">
-              <div className="w-16 h-16 rounded-2xl bg-base border border-border-subtle flex items-center justify-center mb-6 relative">
-                 <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse" />
-                 <CheckCircle2 size={32} className="text-purple-400 relative z-10" />
-              </div>
-              <h2 className="text-2xl font-black text-primary mb-2">Welcome to Ascend AI</h2>
-              <p className="text-sm text-secondary mb-8">Your personal coach is ready.</p>
-
-              <div className="w-full space-y-3 text-left">
-                <div className="flex items-center gap-3 text-sm text-primary bg-base p-3 rounded-lg border border-border-subtle">
-                  <CheckCircle2 size={16} className="text-emerald-500" /> AI Coach initialized
-                </div>
-                <div className="flex items-center gap-3 text-sm text-primary bg-base p-3 rounded-lg border border-border-subtle">
-                  <CheckCircle2 size={16} className="text-emerald-500" /> Macros & targets configured
-                </div>
-                <div className="flex items-center gap-3 text-sm text-primary bg-base p-3 rounded-lg border border-border-subtle">
-                  <CheckCircle2 size={16} className="text-emerald-500" /> App preferences saved
-                </div>
-              </div>
-              <div className="mt-8 text-xs text-secondary font-bold uppercase tracking-widest animate-pulse">
-                Entering Mission Control...
-              </div>
-            </motion.div>
-          )}
-
-        </div>
-      </div>
+    <div className="flex flex-col flex-1">
+      <main className="flex-1 flex flex-col">
+        <StepRouter />
+      </main>
     </div>
   );
 }
