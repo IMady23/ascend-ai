@@ -52,7 +52,7 @@ export function Step13Welcome({ fullName, whyStarted }: Step13WelcomeProps) {
   React.useEffect(() => {
     event({ type: "context_changed", context: "onboarding", step: 13, label: "welcome" });
     celebrate(); // Orb enters celebrating state
-    say(null); // Clear any previous message
+    say(""); // Clear any previous message
 
     // Reduced motion: show content immediately
     if (prefersReducedMotion) {
