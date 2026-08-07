@@ -266,7 +266,7 @@ export function Step12Review({ data, onComplete }: Step12ReviewProps) {
     // Phase 4: Plan reveal (4300ms+)
     timers.push(setTimeout(() => {
       setPhase("plan");
-      say(null); // Clear message, let numbers speak
+      say(""); // Clear message, let numbers speak
     }, 4300));
 
     // Stagger plan items (300ms between each)
