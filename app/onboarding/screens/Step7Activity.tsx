@@ -82,7 +82,7 @@ export function Step7Activity({
     // Fire event for experience rules
     if (!hasAcknowledgedActivity.current) {
       hasAcknowledgedActivity.current = true;
-      event({ type: "activity_selected", activityLevel: level });
+      event({ type: "activity_selected", activityLevel: level, fitnessExperience: selectedExperience });
     }
     
     // Ask about experience after activity is chosen
